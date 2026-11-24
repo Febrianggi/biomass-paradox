@@ -16,7 +16,7 @@ Peringkat berbasis satu indikator bisa menyesatkan. Pada SDG 7.2.1 (pangsa energ
 
 ## Data
 
-Sumber: UN SDG Indicators Database (API UNSD) dan World Bank Open Data. Kode seri, kustodian, satuan, dan transformasi tiap variabel ada di [`data/kamus_data_sdg.csv`](data/kamus_data_sdg.csv).
+Sumber: UN SDG Indicators Database (API UNSD) dan World Bank Open Data. Kode seri, kustodian, satuan, dan transformasi tiap variabel ada di [`data/sdg_data_dictionary.csv`](data/sdg_data_dictionary.csv).
 
 | Fitur | Indikator | Transformasi |
 |---|---|---|
@@ -28,27 +28,27 @@ Sumber: UN SDG Indicators Database (API UNSD) dan World Bank Open Data. Kode ser
 | `co2_per_capita` | Emisi CO2 per kapita (ton) | log(1 + x), lalu z-score |
 
 - Panel [`data/sdg_energy_climate_panel_2015_2023.csv`](data/sdg_energy_climate_panel_2015_2023.csv) memuat 215 ekonomi untuk tahun 2015, 2022, dan 2023. Analisis memakai 2015 dan 2023.
-- Model hanya memakai ekonomi yang lengkap pada keenam fitur: 189 dari 215 ekonomi, mencakup 8,02 miliar jiwa ([`output/ringkasan_konsol.txt`](output/ringkasan_konsol.txt)). Data hilang terbanyak ada pada `clean_cooking` (23 ekonomi, 10,7%) ([`tabel_01`](output/tables/tabel_01_audit_kualitas_data_2023.csv)).
+- Model hanya memakai ekonomi yang lengkap pada keenam fitur: 189 dari 215 ekonomi, mencakup 8,02 miliar jiwa ([`output/console_summary.txt`](output/console_summary.txt)). Data hilang terbanyak ada pada `clean_cooking` (23 ekonomi, 10,7%) ([`table_01`](output/tables/table_01_data_quality_audit_2023.csv)).
 - Emisi CO2 per kapita diambil dari World Bank (EDGAR, AR5). Bila kosong, nilainya diisi dari seri UNSD (IEA). Sumber per baris tercatat di kolom `co2_source`.
 - PDB per kapita PPP dan persentase penduduk perkotaan tidak masuk model. Keduanya hanya dipakai sebagai validator eksternal.
 
 ## Metode
 
-Semua langkah ada di [`analisis_sdg_transisi_energi.R`](analisis_sdg_transisi_energi.R), dengan `set.seed(2026)`.
+Semua langkah ada di [`sdg_energy_transition_analysis.R`](sdg_energy_transition_analysis.R), dengan `set.seed(2026)`.
 
-1. **Prapengolahan.** Tiga fitur yang sangat menceng ditransformasi dengan log(1 + x). Skewness absolut maksimum turun dari 5,87 menjadi 1,74 ([`tabel_02`](output/tables/tabel_02_statistik_deskriptif_transformasi.csv)). Keenam fitur lalu distandardisasi memakai rata-rata dan simpangan baku tahun 2023.
-2. **Diagnostik.** Pencilan diperiksa dengan jarak Mahalanobis (D² > 22,46, kuantil chi-kuadrat 0,999). Enam ekonomi melewati batas ini dan tetap dipertahankan ([`tabel_03`](output/tables/tabel_03_pencilan_mahalanobis.csv)). Nilai KMO keseluruhan 0,767, statistik Hopkins 0,9995, dan PC1 menjelaskan 59,4% varians ([`output/ringkasan_konsol.txt`](output/ringkasan_konsol.txt)).
+1. **Prapengolahan.** Tiga fitur yang sangat menceng ditransformasi dengan log(1 + x). Skewness absolut maksimum turun dari 5,87 menjadi 1,74 ([`table_02`](output/tables/table_02_descriptive_stats_transformation.csv)). Keenam fitur lalu distandardisasi memakai rata-rata dan simpangan baku tahun 2023.
+2. **Diagnostik.** Pencilan diperiksa dengan jarak Mahalanobis (D² > 22,46, kuantil chi-kuadrat 0,999). Enam ekonomi melewati batas ini dan tetap dipertahankan ([`table_03`](output/tables/table_03_mahalanobis_outliers.csv)). Nilai KMO keseluruhan 0,767, statistik Hopkins 0,9995, dan PC1 menjelaskan 59,4% varians ([`output/console_summary.txt`](output/console_summary.txt)).
 3. **Empat metode untuk k = 2 sampai 6.** Metode yang dibandingkan: K-Means (`nstart = 100`), PAM/K-Medoids, hierarki Ward D2 (jarak Euklides), dan Gaussian Mixture Model (`mclust`, model kovarians dipilih dengan BIC). Keempatnya mewakili pendekatan yang berbeda: berbasis rata-rata, berbasis objek representatif yang lebih tahan pencilan, hierarki aglomeratif, dan model probabilistik.
-4. **Evaluasi.** Indeks internal yang dipakai: Silhouette, Davies-Bouldin, Calinski-Harabasz, dan Dunn. Stabilitas diukur dengan Jaccard bootstrap (`fpc::clusterboot`, B = 500). Untuk GMM, bootstrap ditulis manual, dan jumlah replikasi yang berhasil dihitung dari hasil bootstrap itu sendiri ([`tabel_04`](output/tables/tabel_04_evaluasi_komparatif_model.csv)). Kesepakatan antarmetode diukur dengan Adjusted Rand Index ([`tabel_05`](output/tables/tabel_05_kesepakatan_ari_antar_metode.csv)).
-5. **Uji sensitivitas.** (a) Data hilang diimputasi dengan `missMDA::imputePCA` pada 207 ekonomi yang punya minimal 4 dari 6 indikator, lalu hasilnya dibandingkan pada 189 ekonomi yang sama. (b) Spesifikasi kovarians GMM: model bebas pilihan BIC (VEV) dibandingkan dengan model sferis EII ([`tabel_11`](output/tables/tabel_11_uji_hipotesis_batas_atas_gmm.csv)).
+4. **Evaluasi.** Indeks internal yang dipakai: Silhouette, Davies-Bouldin, Calinski-Harabasz, dan Dunn. Stabilitas diukur dengan Jaccard bootstrap (`fpc::clusterboot`, B = 500). Untuk GMM, bootstrap ditulis manual, dan jumlah replikasi yang berhasil dihitung dari hasil bootstrap itu sendiri ([`table_04`](output/tables/table_04_model_comparison.csv)). Kesepakatan antarmetode diukur dengan Adjusted Rand Index ([`table_05`](output/tables/table_05_ari_agreement_between_methods.csv)).
+5. **Uji sensitivitas.** (a) Data hilang diimputasi dengan `missMDA::imputePCA` pada 207 ekonomi yang punya minimal 4 dari 6 indikator, lalu hasilnya dibandingkan pada 189 ekonomi yang sama. (b) Spesifikasi kovarians GMM: model bebas pilihan BIC (VEV) dibandingkan dengan model sferis EII ([`table_11`](output/tables/table_11_gmm_covariance_sensitivity.csv)).
 6. **Validasi eksternal.** Uji Kruskal-Wallis untuk PDB per kapita PPP dan urbanisasi antarrezim.
 7. **Perbandingan 2015 dengan 2023.** Data 2015 diskalakan memakai parameter 2023, lalu tiap ekonomi ditempatkan ke centroid K-Means 2023 terdekat. Dengan cara ini model tidak dilatih ulang pada data 2015.
 
 ## Hasil utama
 
-**Pemilihan k.** Untuk K-Means, k = 2 memberi Silhouette tertinggi (0,4451) dan Jaccard rata-rata 0,9758. Di antara k ≥ 3, stabilitas tertinggi ada pada k = 4, dengan Jaccard rata-rata 0,9533, minimum 0,9114, dan Silhouette 0,3485 ([`tabel_04`](output/tables/tabel_04_evaluasi_komparatif_model.csv)). Analisis utama memakai k = 4 karena keempat rezimnya membedakan pola kebijakan yang tergabung pada k = 2. Hasil k = 2 tetap dilaporkan sebagai alternatif. Pada k = 2, rezim B2 menggabungkan seluruh R3 dan R4 serta 8 ekonomi R2 ([`tabel_10`](output/tables/tabel_10_alternatif_dua_rezim_k2.csv)).
+**Pemilihan k.** Untuk K-Means, k = 2 memberi Silhouette tertinggi (0,4451) dan Jaccard rata-rata 0,9758. Di antara k ≥ 3, stabilitas tertinggi ada pada k = 4, dengan Jaccard rata-rata 0,9533, minimum 0,9114, dan Silhouette 0,3485 ([`table_04`](output/tables/table_04_model_comparison.csv)). Analisis utama memakai k = 4 karena keempat rezimnya membedakan pola kebijakan yang tergabung pada k = 2. Hasil k = 2 tetap dilaporkan sebagai alternatif. Pada k = 2, rezim B2 menggabungkan seluruh R3 dan R4 serta 8 ekonomi R2 ([`table_10`](output/tables/table_10_two_regime_alternative_k2.csv)).
 
-**Empat rezim 2023 (K-Means, k = 4)** ([`tabel_06`](output/tables/tabel_06_profil_rezim_global_2023.csv)):
+**Empat rezim 2023 (K-Means, k = 4)** ([`table_06`](output/tables/table_06_global_regime_profiles_2023.csv)):
 
 | Rezim | Negara | Median akses listrik (%) | Median memasak bersih (%) | Median pangsa EBT final (%) | Median CO2 (t/kap) | Jaccard |
 |---|---|---|---|---|---|---|
@@ -59,15 +59,15 @@ Semua langkah ada di [`analisis_sdg_transisi_energi.R`](analisis_sdg_transisi_en
 
 R1 memperlihatkan paradoks biomassa: median pangsa energi terbarukannya paling tinggi (78,98%), padahal median akses listriknya hanya 40,5% dan median akses memasak bersihnya 5%.
 
-**Ketergantungan pada metode.** Pada k = 4, kesepakatan K-Means dengan Ward D2 cukup tinggi (ARI 0,795), tetapi dengan GMM rendah (ARI 0,3671) ([`tabel_05`](output/tables/tabel_05_kesepakatan_ari_antar_metode.csv)). Pada GMM VEV, dua komponen memiliki varians `elec_access` terstandar yang sangat kecil (0,00308 dan 0,00300). Ini konsisten dengan banyaknya ekonomi yang terkumpul di batas atas 100% akses listrik (59,3% ekonomi pada 2023, [`tabel_01`](output/tables/tabel_01_audit_kualitas_data_2023.csv)). Dengan kovarians sferis EII, Silhouette naik dari 0,1975 menjadi 0,3599 dan ARI terhadap K-Means naik dari 0,3671 menjadi 0,8421 ([`tabel_11`](output/tables/tabel_11_uji_hipotesis_batas_atas_gmm.csv)). Jadi hasil GMM sensitif terhadap spesifikasi kovarians pada keenam fitur.
+**Ketergantungan pada metode.** Pada k = 4, kesepakatan K-Means dengan Ward D2 cukup tinggi (ARI 0,795), tetapi dengan GMM rendah (ARI 0,3671) ([`table_05`](output/tables/table_05_ari_agreement_between_methods.csv)). Pada GMM VEV, dua komponen memiliki varians `elec_access` terstandar yang sangat kecil (0,00308 dan 0,00300). Ini konsisten dengan banyaknya ekonomi yang terkumpul di batas atas 100% akses listrik (59,3% ekonomi pada 2023, [`table_01`](output/tables/table_01_data_quality_audit_2023.csv)). Dengan kovarians sferis EII, Silhouette naik dari 0,1975 menjadi 0,3599 dan ARI terhadap K-Means naik dari 0,3671 menjadi 0,8421 ([`table_11`](output/tables/table_11_gmm_covariance_sensitivity.csv)). Jadi hasil GMM sensitif terhadap spesifikasi kovarians pada keenam fitur.
 
-**Sensitivitas dan validasi** ([`output/ringkasan_konsol.txt`](output/ringkasan_konsol.txt)):
+**Sensitivitas dan validasi** ([`output/console_summary.txt`](output/console_summary.txt)):
 - Model hasil imputasi (n = 207) memberi pengelompokan yang identik pada 189 ekonomi yang sama (ARI 1,0000).
 - Rezim berbeda nyata dalam PDB per kapita PPP (Kruskal-Wallis H = 116,03, p = 5,527e-25) dan urbanisasi (H = 67,79, p = 1,271e-14), padahal kedua variabel ini tidak dipakai dalam model.
 
-**2015 dibanding 2023** ([`tabel_08`](output/tables/tabel_08_matriks_migrasi_2015_2023.csv)): 165 dari 189 ekonomi berada di rezim yang sama. 7 ekonomi pindah dari R1 ke R2, 8 dari R2 ke R3, 7 dari R4 ke R3, dan 2 dari R3 ke R4. Ini perbandingan deskriptif posisi terhadap struktur rezim 2023, bukan estimasi dampak suatu kebijakan.
+**2015 dibanding 2023** ([`table_08`](output/tables/table_08_migration_matrix_2015_2023.csv)): 165 dari 189 ekonomi berada di rezim yang sama. 7 ekonomi pindah dari R1 ke R2, 8 dari R2 ke R3, 7 dari R4 ke R3, dan 2 dari R3 ke R4. Ini perbandingan deskriptif posisi terhadap struktur rezim 2023, bukan estimasi dampak suatu kebijakan.
 
-**Indonesia dan ASEAN** ([`tabel_09`](output/tables/tabel_09_benchmark_indonesia_asean.csv)): Indonesia berada di R3, dengan akses listrik 99,4% pada 2023 dan kapasitas listrik terbarukan 47,39 W per kapita. Sebagai pembanding, Viet Nam memiliki 476,30 W per kapita.
+**Indonesia dan ASEAN** ([`table_09`](output/tables/table_09_indonesia_asean_benchmark.csv)): Indonesia berada di R3, dengan akses listrik 99,4% pada 2023 dan kapasitas listrik terbarukan 47,39 W per kapita. Sebagai pembanding, Viet Nam memiliki 476,30 W per kapita.
 
 ## Keterbatasan
 
@@ -82,15 +82,15 @@ R1 memperlihatkan paradoks biomassa: median pangsa energi terbarukannya paling t
 
 ```
 .
-├── analisis_sdg_transisi_energi.R   analisis lengkap dari panel tersimpan
-├── unduh_data_resmi_sdg.R           opsional: unduh ulang data dari API UNSD dan World Bank
+├── sdg_energy_transition_analysis.R   analisis lengkap dari panel tersimpan
+├── download_sdg_data.R           opsional: unduh ulang data dari API UNSD dan World Bank
 ├── data/
 │   ├── sdg_energy_climate_panel_2015_2023.csv
-│   └── kamus_data_sdg.csv
+│   └── sdg_data_dictionary.csv
 ├── output/
-│   ├── tables/    tabel_01 s.d. tabel_11 (CSV)
+│   ├── tables/    table_01 s.d. table_11 (CSV)
 │   ├── figures/   fig01 s.d. fig06 (PNG, 300 DPI)
-│   └── ringkasan_konsol.txt
+│   └── console_summary.txt
 ├── dashboard/
 │   ├── index.html
 │   └── data/      dashboard_data.json, dashboard_data.js
@@ -114,7 +114,7 @@ install.packages(c(
 ```
 
 ```bash
-Rscript analisis_sdg_transisi_energi.R
+Rscript sdg_energy_transition_analysis.R
 ```
 
 Skrip ini membaca `data/sdg_energy_climate_panel_2015_2023.csv` lalu menulis ulang `output/tables/`, `output/figures/`, dan `dashboard/data/`. Tidak perlu koneksi internet.
@@ -124,7 +124,7 @@ Skrip ini membaca `data/sdg_energy_climate_panel_2015_2023.csv` lalu menulis ula
 Skrip ini membutuhkan koneksi internet dan paket `httr2`, `jsonlite`, `dplyr`, `tidyr`, `readr`, dan `countrycode`.
 
 ```bash
-Rscript unduh_data_resmi_sdg.R
+Rscript download_sdg_data.R
 ```
 
 Skrip ini menimpa kedua berkas di `data/`. Variabel lingkungan `SDG_RDS_CACHE` dapat diisi dengan sebuah folder untuk menyimpan respons API sebagai cache. Setelah mengunduh ulang, jalankan langkah 1 lagi.
