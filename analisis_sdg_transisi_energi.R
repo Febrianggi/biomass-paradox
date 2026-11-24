@@ -1,4 +1,5 @@
 # ==============================================================================
+# UAS DATA MINING SEMESTER 5 (TA 2025/2026) - PROGRAM STUDI S1 STATISTIKA UNPAD
 # Judul Analisis : Membongkar Paradoks Biomassa dan Trilema Transisi Energi-Iklim
 #                  Global (SDG 7 & SDG 13): Perbandingan Empat Metode Clustering
 #                  dan Dinamika Rezim Pasca-Kesepakatan Paris (2015-2023)
@@ -58,7 +59,7 @@ cat("ANALISIS DATA MINING: TRANSISI ENERGI BERSIH & AKSI IKLIM (SDG 7 & 13)\n")
 cat("======================================================================\n\n")
 
 # ==============================================================================
-# TAHAP 1: PERUMUSAN MASALAH & PEMERIKSAAN KUALITAS DATA
+# TAHAP 1: PERUMUSAN MASALAH & PEMERIKSAAN KUALITAS DATA (C.1 & C.2)
 # ==============================================================================
 panel <- read_csv(
   file.path(data_dir, "sdg_energy_climate_panel_2015_2023.csv"),
@@ -99,7 +100,7 @@ audit_missing <- tibble(
   maks_2023          = round(sapply(core_vars, function(v) max(d2023_all[[v]], na.rm = TRUE)), 3),
   persen_nilai_100   = round(100 * sapply(core_vars, function(v) mean(d2023_all[[v]] == 100, na.rm = TRUE)), 1)
 )
-write_csv(audit_missing, file.path(tab_dir, "table_01_data_quality_audit_2023.csv"))
+write_csv(audit_missing, file.path(tab_dir, "tabel_01_audit_kualitas_data_2023.csv"))
 
 d23 <- d2023_all |> filter(complete.cases(across(all_of(core_vars))))
 cat("[Tahap 1] Audit Kualitas Data (2023):\n")
@@ -109,7 +110,7 @@ cat("  - Ekonomi berdaulat lengkap (6 fitur):", nrow(d23),
     sprintf("(mencakup %.2f miliar jiwa)\n\n", sum(d23$population, na.rm = TRUE) / 1e9))
 
 # ==============================================================================
-# TAHAP 2: PERSIAPAN DATA, PENCEGAHAN KEBOCORAN DATA, & EKSPLORASI
+# TAHAP 2: PERSIAPAN DATA, PENCEGAHAN KEBOCORAN DATA, & EKSPLORASI (C.3)
 # ==============================================================================
 calc_skew <- function(x) {
   x <- x[!is.na(x)]
@@ -141,7 +142,7 @@ desc_stats <- tibble(
   skew_sebelum     = round(sapply(X23_raw, calc_skew), 3),
   skew_sesudah_log = round(sapply(X23_trans, calc_skew), 3)
 )
-write_csv(desc_stats, file.path(tab_dir, "table_02_descriptive_stats_transformation.csv"))
+write_csv(desc_stats, file.path(tab_dir, "tabel_02_statistik_deskriptif_transformasi.csv"))
 
 X23_scaled <- scale(X23_trans)
 mu_2023    <- attr(X23_scaled, "scaled:center")
@@ -156,7 +157,7 @@ outliers_maha <- d23 |>
   filter(is_outlier) |>
   arrange(desc(mahalanobis_d2)) |>
   select(iso3, country_en, mahalanobis_d2, all_of(core_vars))
-write_csv(outliers_maha, file.path(tab_dir, "table_03_mahalanobis_outliers.csv"))
+write_csv(outliers_maha, file.path(tab_dir, "tabel_03_pencilan_mahalanobis.csv"))
 
 cor_mat  <- cor(X23_scaled)
 kmo_res  <- psych::KMO(X23_scaled)
@@ -190,7 +191,7 @@ set.seed(2026)
 km_sens     <- kmeans(X_part_sc, centers = 4, nstart = 100, iter.max = 200)
 
 # ==============================================================================
-# TAHAP 3: PEMODELAN & EVALUASI 4 METODE DATA MINING - B = 500 BOOTSTRAP
+# TAHAP 3: PEMODELAN & EVALUASI 4 METODE DATA MINING (C.4) - B = 500 BOOTSTRAP
 # ==============================================================================
 calc_davies_bouldin <- function(X, cl) {
   labs <- sort(unique(cl))
@@ -343,7 +344,7 @@ for (k in 2:6) {
 }
 
 eval_table <- bind_rows(eval_rows) |> arrange(k, desc(silhouette))
-write_csv(eval_table, file.path(tab_dir, "table_04_model_comparison.csv"))
+write_csv(eval_table, file.path(tab_dir, "tabel_04_evaluasi_komparatif_model.csv"))
 
 # Verifikasi ketat bahwa partisi referensi clusterboot K-Means k=4 identik 100% dengan km_fit
 ari_km4_cb <- mclust::adjustedRandIndex(models_by_k[["4"]]$KMeans$cl, models_by_k[["4"]]$KMeans$cb_part)
@@ -384,7 +385,7 @@ gmm_ceiling_diag <- bind_rows(
     ari_vs_kmeans4   = round(mclust::adjustedRandIndex(models_by_k[["4"]]$KMeans$cl, gmm4_eii$classification), 4)
   )
 )
-write_csv(gmm_ceiling_diag, file.path(tab_dir, "table_11_gmm_covariance_sensitivity.csv"))
+write_csv(gmm_ceiling_diag, file.path(tab_dir, "tabel_11_uji_hipotesis_batas_atas_gmm.csv"))
 cat("[Tahap 3] Diagnostik Konsentrasi Batas Atas & Sensitivitas Kovarians GMM (k=4):\n")
 print(gmm_ceiling_diag |> select(spesifikasi_gmm, n_negara, var_elec_access, var_clean_cook, silhouette_k4, ari_vs_kmeans4))
 cat("\n")
@@ -431,7 +432,7 @@ ari_mat <- outer(names(cl4_list), names(cl4_list),
                  Vectorize(function(a, b) round(mclust::adjustedRandIndex(cl4_list[[a]], cl4_list[[b]]), 4)))
 dimnames(ari_mat) <- list(names(cl4_list), names(cl4_list))
 ari_df <- as_tibble(ari_mat, rownames = "metode")
-write_csv(ari_df, file.path(tab_dir, "table_05_ari_agreement_between_methods.csv"))
+write_csv(ari_df, file.path(tab_dir, "tabel_05_kesepakatan_ari_antar_metode.csv"))
 
 # Sensitivitas imputasi missMDA: model di-fit pada n=207 ekonomi, ARI dihitung pada 189 kasus bersama
 sens_ord <- order_regime_labels(km_sens$cluster[match(d23$iso3, d23_partial$iso3)], d23)
@@ -469,7 +470,7 @@ k2_profiles <- d23 |>
     ),
     .groups = "drop"
   )
-write_csv(k2_profiles, file.path(tab_dir, "table_10_two_regime_alternative_k2.csv"))
+write_csv(k2_profiles, file.path(tab_dir, "tabel_10_alternatif_dua_rezim_k2.csv"))
 
 regime_meta <- tibble(
   regime_id  = 1:4,
@@ -540,7 +541,7 @@ regime_profiles <- d23_res |>
   ) |>
   mutate(medoid_pam_iso3 = pam_medoid_iso)
 
-write_csv(regime_profiles, file.path(tab_dir, "table_06_global_regime_profiles_2023.csv"))
+write_csv(regime_profiles, file.path(tab_dir, "tabel_06_profil_rezim_global_2023.csv"))
 
 kw_gdp <- kruskal.test(gdp_pc_ppp ~ factor(regime_km), data = d23_res)
 kw_urb <- kruskal.test(urban_pct  ~ factor(regime_km), data = d23_res)
@@ -601,12 +602,12 @@ migration_df <- d15 |>
     delta_co2_pc     = round(co2_pc_2023 - co2_pc_2015, 2)
   )
 
-write_csv(migration_df, file.path(tab_dir, "table_07_full_results_189_countries_2015_2023.csv"))
+write_csv(migration_df, file.path(tab_dir, "tabel_07_hasil_lengkap_189_negara_2015_2023.csv"))
 
 mig_matrix <- migration_df |>
   count(kode_2015, kode_2023) |>
   pivot_wider(names_from = kode_2023, values_from = n, values_fill = 0L)
-write_csv(mig_matrix, file.path(tab_dir, "table_08_migration_matrix_2015_2023.csv"))
+write_csv(mig_matrix, file.path(tab_dir, "tabel_08_matriks_migrasi_2015_2023.csv"))
 
 asean_bench <- migration_df |>
   filter(is_asean) |>
@@ -615,7 +616,7 @@ asean_bench <- migration_df |>
          renew_share_2023, renew_cap_2023, delta_renew_cap,
          energy_int_2023, co2_pc_2023, cap_hydro_wpc, cap_solar_wpc,
          cap_geothermal_wpc, cap_wind_wpc, cap_bioenergy_wpc)
-write_csv(asean_bench, file.path(tab_dir, "table_09_indonesia_asean_benchmark.csv"))
+write_csv(asean_bench, file.path(tab_dir, "tabel_09_benchmark_indonesia_asean.csv"))
 
 cat("[Tahap 4] Profil Alternatif Biner Dua Rezim (k = 2):\n")
 print(k2_profiles |> select(kode_k2, jaccard_km_k2, n_negara, populasi_miliar, elec_mean, cooking_mean, co2_pc_median, komposisi_rezim_k4))
@@ -623,7 +624,7 @@ cat("\n[Tahap 4] Matriks Migrasi Rezim Pasca-Kesepakatan Paris (2015 -> 2023):\n
 print(mig_matrix)
 
 # ==============================================================================
-# TAHAP 5: VISUALISASI STATIS (PNG 300 DPI)
+# TAHAP 5: VISUALISASI STATIS PUBLIKASI UNTUK LAPORAN & X-BANNER
 # ==============================================================================
 pal_regime <- c(
   "R1" = "#B45309",
@@ -666,7 +667,7 @@ p1 <- ggplot(eval_long, aes(x = k, y = nilai, color = metode, shape = metode)) +
     caption = "Sumber: Diolah dari UN SDG Indicators Database & World Bank Open Data (n = 189 negara, 2023; B = 500; seed = 2026)"
   ) +
   theme_sdg
-ggsave(file.path(fig_dir, "fig01_four_method_comparison.png"), p1, width = 10, height = 6.5, dpi = 300)
+ggsave(file.path(fig_dir, "fig01_evaluasi_komparatif_4_metode.png"), p1, width = 10, height = 6.5, dpi = 300)
 
 highlight_iso <- c("IDN", "VNM", "MYS", "SGP", "BRN", "NOR", "ISL", "COD", "ETH", "QAT", "CHN", "USA")
 d_lbl <- migration_df |> filter(iso3 %in% highlight_iso)
@@ -688,7 +689,7 @@ p2 <- ggplot(migration_df, aes(x = renew_share_2023, y = renew_cap_2023 + 1, col
   ) +
   theme_sdg +
   guides(color = guide_legend(nrow = 2))
-ggsave(file.path(fig_dir, "fig02_biomass_paradox_sdg7.png"), p2, width = 10.5, height = 6.5, dpi = 300)
+ggsave(file.path(fig_dir, "fig02_paradoks_biomassa_sdg7.png"), p2, width = 10.5, height = 6.5, dpi = 300)
 
 load_df <- as_tibble(pca_fit$rotation[, 1:2], rownames = "fitur") |>
   mutate(
@@ -719,7 +720,7 @@ p3 <- ggplot(migration_df, aes(x = pc1_2023, y = pc2_2023, color = kode_2023)) +
   ) +
   theme_sdg +
   guides(color = guide_legend(nrow = 2))
-ggsave(file.path(fig_dir, "fig03_pca_biplot_global_regimes.png"), p3, width = 10.5, height = 6.8, dpi = 300)
+ggsave(file.path(fig_dir, "fig03_pca_biplot_rezim_global.png"), p3, width = 10.5, height = 6.8, dpi = 300)
 
 cent_long <- as_tibble(centers_km4, rownames = "kode_rezim") |>
   pivot_longer(-kode_rezim, names_to = "fitur", values_to = "z_score") |>
@@ -745,7 +746,7 @@ p4 <- ggplot(cent_long, aes(x = fitur_lbl, y = z_score, fill = kode_rezim)) +
   ) +
   theme_sdg +
   guides(fill = guide_legend(nrow = 2))
-ggsave(file.path(fig_dir, "fig04_centroid_zscore_profiles.png"), p4, width = 10.5, height = 6, dpi = 300)
+ggsave(file.path(fig_dir, "fig04_profil_zscore_centroid.png"), p4, width = 10.5, height = 6, dpi = 300)
 
 asean_tech <- migration_df |>
   filter(is_asean) |>
@@ -777,7 +778,7 @@ p5 <- ggplot(asean_tech, aes(x = reorder(paste0(country_en, " (", kode_2023, ")"
     caption = "Sumber: UN SDG Indicators Database - Seri EG_EGY_RNEW (IRENA, 2023)"
   ) +
   theme_sdg
-ggsave(file.path(fig_dir, "fig05_renewable_mix_indonesia_asean.png"), p5, width = 10.5, height = 6, dpi = 300)
+ggsave(file.path(fig_dir, "fig05_bauran_ebt_indonesia_asean.png"), p5, width = 10.5, height = 6, dpi = 300)
 
 mig_long <- migration_df |>
   count(kode_2015, kode_2023) |>
@@ -797,7 +798,7 @@ p6 <- ggplot(mig_long, aes(x = kode_2023, y = factor(kode_2015, levels = paste0(
     caption = "Proyeksi 2015 menggunakan parameter penskalaan & centroid 2023 agar bebas kebocoran temporal (n = 189 negara)"
   ) +
   theme_sdg
-ggsave(file.path(fig_dir, "fig06_migration_matrix_2015_2023.png"), p6, width = 8.5, height = 6, dpi = 300)
+ggsave(file.path(fig_dir, "fig06_matriks_migrasi_paris_2015_2023.png"), p6, width = 8.5, height = 6, dpi = 300)
 
 # ==============================================================================
 # TAHAP 6: EKSPOR JSON & PETA SVG ROBINSON UNTUK DASHBOARD INTERAKTIF
