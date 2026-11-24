@@ -808,7 +808,7 @@ footer.site-foot {
     <div class="topbar">
       <div class="brand">
         <span class="brand-mark" aria-hidden="true"></span>
-        <span id="t-brand">UAS Data Mining · SDG 7 &amp; SDG 13 Global Atlas</span>
+        <span id="t-brand">Atlas Global SDG 7 &amp; SDG 13</span>
       </div>
       <div class="top-actions">
         <div class="seg" role="group" aria-label="Language">
@@ -1148,7 +1148,7 @@ footer.site-foot {
 <footer class="site-foot">
   <div class="wrap">
     <p id="t-footer">
-      Sumber Data Resmi: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh nilai pada dashboard ini diekspor otomatis dari skrip R (<code>analisis_sdg_transisi_energi.R</code>, seed = 2026).
+      Sumber Data Resmi: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh nilai pada dashboard ini diekspor otomatis dari skrip R (<code>sdg_energy_transition_analysis.R</code>, seed = 2026).
     </p>
   </div>
 </footer>
@@ -1160,7 +1160,7 @@ footer.site-foot {
 
   const I18N = {
     id: {
-      brand: "UAS Data Mining · Atlas Global SDG 7 & SDG 13",
+      brand: "Atlas Global SDG 7 & SDG 13",
       themeBtn: "Tema",
       dlCsv: "Unduh CSV (189 Negara)",
       title: "Membongkar Paradoks Biomassa & Trilema Transisi Energi-Iklim Global",
@@ -1210,10 +1210,10 @@ footer.site-foot {
         pca: ["Biplot Komponen Utama (PC1 & PC2 Menjelaskan 77,1% Varians)", "PC1 merepresentasikan kemajuan elektrifikasi dan memasak bersih; PC2 memisahkan kapasitas listrik EBT modern dari intensitas energi fosil."],
         carbon: ["Intensitas Energi Primer (SDG 7.3.1) vs Emisi CO2 per Kapita (SDG 13)", "Rezim R4 terkunci pada pemborosan energi primer per unit PDB sekaligus emisi karbon per kapita yang sangat tinggi."]
       },
-      footer: 'Sumber Data Resmi: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh angka diekspor langsung dari skrip R (<code>analisis_sdg_transisi_energi.R</code>, seed = 2026).'
+      footer: 'Sumber Data Resmi: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh angka diekspor langsung dari skrip R (<code>sdg_energy_transition_analysis.R</code>, seed = 2026).'
     },
     en: {
-      brand: "Data Mining Final Project · SDG 7 & SDG 13 Global Atlas",
+      brand: "SDG 7 & SDG 13 Global Atlas",
       themeBtn: "Theme",
       dlCsv: "Download CSV (189 Countries)",
       title: "Unpacking the Biomass Paradox & the Global Clean Energy-Climate Trilemma",
@@ -1263,7 +1263,7 @@ footer.site-foot {
         pca: ["Principal Component Biplot (PC1 & PC2 Explain 77.1% of Variance)", "PC1 captures electrification and clean cooking access; PC2 separates modern renewable power capacity from fossil energy intensity."],
         carbon: ["Primary Energy Intensity (SDG 7.3.1) vs Per-Capita CO2 Emissions (SDG 13)", "Regime R4 is locked into high primary energy waste per unit of GDP alongside extreme per-capita carbon emissions."]
       },
-      footer: 'Official Data Sources: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). All figures exported directly from R (<code>analisis_sdg_transisi_energi.R</code>, seed = 2026).'
+      footer: 'Official Data Sources: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). All figures exported directly from R (<code>sdg_energy_transition_analysis.R</code>, seed = 2026).'
     }
   };
 
@@ -2256,7 +2256,7 @@ footer.site-foot {
     const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "sdg7_sdg13_189_negara_hasil_klaster.csv";
+    a.download = "sdg7_sdg13_189_countries_cluster_results.csv";
     a.click();
     URL.revokeObjectURL(a.href);
   });

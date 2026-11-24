@@ -1,13 +1,12 @@
 # ==============================================================================
 # SKRIP AKUISISI DATA RESMI: UN SDG INDICATORS DATABASE & WORLD BANK OPEN DATA
-# Mata Kuliah : Data Mining (UAS Semester 5 - S1 Statistika UNPAD)
 # Tema        : Trilema Transisi Energi Bersih & Dekarbonisasi Global (SDG 7 & 13)
 # Sumber Utama:
 #   1. UN Statistics Division SDG API (https://unstats.un.org/sdgs/dataportal)
 #   2. World Bank Open Data API v2    (https://data.worldbank.org)
 # Catatan     : Skrip ini mengunduh ulang data mentah langsung dari API resmi PBB
 #               dan Bank Dunia, lalu menyimpannya ke folder `data/`. Salinan CSV
-#               terverifikasi sudah disertakan agar `analisis_sdg_transisi_energi.R`
+#               terverifikasi sudah disertakan agar `sdg_energy_transition_analysis.R`
 #               dapat langsung dijalankan secara luring tanpa kendala kuota API.
 # ==============================================================================
 
@@ -248,7 +247,7 @@ build_sdg_dataset <- function(cache_rds_dir = NULL) {
     "urban_pct",           "SP.URB.TOTL.IN.ZS",    "SDG 11",    "Konteks",      "UN Population Div / WB",     "% populasi perkotaan",         "Validasi Eksternal (Bebas Bocor)","Tidak masuk fit model",
     "population",          "SP.POP.TOTL",          "Konteks",   "Konteks",      "UN Population Div / WB",     "Jiwa",                         "Bobot Populasi & Per Kapita",    "Tidak masuk fit model"
   )
-  write_csv(kamus, file.path(data_dir, "kamus_data_sdg.csv"))
+  write_csv(kamus, file.path(data_dir, "sdg_data_dictionary.csv"))
   message(sprintf("Selesai! Tersimpan %d baris (%d ekonomi x 3 tahun) di %s",
                   nrow(panel), length(unique(panel$iso3)), data_dir))
 }
