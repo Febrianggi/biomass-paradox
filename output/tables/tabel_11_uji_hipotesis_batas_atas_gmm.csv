@@ -1,0 +1,6 @@
+spesifikasi_gmm,n_negara,var_elec_access,var_clean_cook,var_renew_share,var_log_rcap,silhouette_k4,ari_vs_kmeans4
+GMM Bebas BIC (VEV) - Komponen 1,70,2.30122,0.72491,1.48048,1.45068,0.1975,0.3671
+GMM Bebas BIC (VEV) - Komponen 2,57,0.00308,0.01352,0.22684000000000001,0.1084,0.1975,0.3671
+GMM Bebas BIC (VEV) - Komponen 3,21,0.09513,0.2814,0.02343,0.61357,0.1975,0.3671
+GMM Bebas BIC (VEV) - Komponen 4,41,0.003,0.02207,0.10403,0.18244,0.1975,0.3671
+GMM Sferis Terkendala (EII - kovarians isotropik 6 fitur),189,0.34681,0.34681,0.34681,0.34681,0.3599,0.8421

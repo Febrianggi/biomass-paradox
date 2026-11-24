@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>
+try {
+  const savedScheme = localStorage.getItem("color-scheme");
+  if (savedScheme === "light" || savedScheme === "dark") {
+    document.querySelector('meta[name="color-scheme"]').content = savedScheme;
+  }
+} catch (_) {}
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='%230F766E'/%3E%3Cpath d='M9 21l5-6 4 3 5-8' fill='none' stroke='%23ECF9FA' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='23' cy='10' r='2.3' fill='%23FCD34D'/%3E%3C/svg%3E">
+<title>Atlas Transisi Energi Bersih &amp; Iklim Global (SDG 7 &amp; 13)</title>
+<style>
+:root {
+  /* Light & dark raw tokens (Teal Scientific + Statistical Ledger) */
+  --bg-l: #F4F5F2;          --bg-d: #101517;
+  --surface-l: #FFFFFF;     --surface-d: #172023;
+  --surface2-l: #EAECE7;    --surface2-d: #1F2B2F;
+  --line-l: #CFD8DC;        --line-d: #2B3B41;
+  --line-strong-l: #90A4AE; --line-strong-d: #486068;
+  --text-l: #111C21;        --text-d: #ECF9FA;
+  --muted-l: #45565E;       --muted-d: #A8BEC4;
+  --accent-l: #0B6E69;      --accent-d: #56C6CF;
+  --accent-ink-l: #FFFFFF;  --accent-ink-d: #082023;
+  --accent-soft-l: rgba(11, 110, 105, 0.10);
+  --accent-soft-d: rgba(86, 198, 207, 0.14);
+
+  /* Regime semantic tokens (WCAG AA compliant on both surfaces) */
+  --r1-l: #B45309; --r1-d: #F59E0B;
+  --r2-l: #1D4ED8; --r2-d: #60A5FA;
+  --r3-l: #0F766E; --r3-d: #2DD4BF;
+  --r4-l: #BE123C; --r4-d: #FB7185;
+  --map-na-l: #DCE2E5; --map-na-d: #253338;
+  --map-stroke-l: #FFFFFF; --map-stroke-d: #101517;
+
+  /* Default fallback (light) */
+  --bg: var(--bg-l);
+  --surface: var(--surface-l);
+  --surface-2: var(--surface2-l);
+  --line: var(--line-l);
+  --line-strong: var(--line-strong-l);
+  --text: var(--text-l);
+  --muted: var(--muted-l);
+  --accent: var(--accent-l);
+  --accent-ink: var(--accent-ink-l);
+  --accent-soft: var(--accent-soft-l);
+  --r1: var(--r1-l);
+  --r2: var(--r2-l);
+  --r3: var(--r3-l);
+  --r4: var(--r4-l);
+  --map-na: var(--map-na-l);
+  --map-stroke: var(--map-stroke-l);
+
+  --font: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+  --radius: 6px;
+
+  color-scheme: light dark;
+  accent-color: var(--accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--bg-d);
+    --surface: var(--surface-d);
+    --surface-2: var(--surface2-d);
+    --line: var(--line-d);
+    --line-strong: var(--line-strong-d);
+    --text: var(--text-d);
+    --muted: var(--muted-d);
+    --accent: var(--accent-d);
+    --accent-ink: var(--accent-ink-d);
+    --accent-soft: var(--accent-soft-d);
+    --r1: var(--r1-d);
+    --r2: var(--r2-d);
+    --r3: var(--r3-d);
+    --r4: var(--r4-d);
+    --map-na: var(--map-na-d);
+    --map-stroke: var(--map-stroke-d);
+  }
+}
+
+:root:has(> head > meta[name="color-scheme"][content="dark"]) {
+  color-scheme: dark;
+  --bg: var(--bg-d); --surface: var(--surface-d); --surface-2: var(--surface2-d);
+  --line: var(--line-d); --line-strong: var(--line-strong-d);
+  --text: var(--text-d); --muted: var(--muted-d);
+  --accent: var(--accent-d); --accent-ink: var(--accent-ink-d); --accent-soft: var(--accent-soft-d);
+  --r1: var(--r1-d); --r2: var(--r2-d); --r3: var(--r3-d); --r4: var(--r4-d);
+  --map-na: var(--map-na-d); --map-stroke: var(--map-stroke-d);
+}
+
+:root:has(> head > meta[name="color-scheme"][content="light"]) {
+  color-scheme: light;
+  --bg: var(--bg-l); --surface: var(--surface-l); --surface-2: var(--surface2-l);
+  --line: var(--line-l); --line-strong: var(--line-strong-l);
+  --text: var(--text-l); --muted: var(--muted-l);
+  --accent: var(--accent-l); --accent-ink: var(--accent-ink-l); --accent-soft: var(--accent-soft-l);
+  --r1: var(--r1-l); --r2: var(--r2-l); --r3: var(--r3-l); --r4: var(--r4-l);
+  --map-na: var(--map-na-l); --map-stroke: var(--map-stroke-l);
+}
+
+@supports (color: light-dark(white, black)) {
+  :root {
+    --bg: light-dark(var(--bg-l), var(--bg-d));
+    --surface: light-dark(var(--surface-l), var(--surface-d));
+    --surface-2: light-dark(var(--surface2-l), var(--surface2-d));
+    --line: light-dark(var(--line-l), var(--line-d));
+    --line-strong: light-dark(var(--line-strong-l), var(--line-strong-d));
+    --text: light-dark(var(--text-l), var(--text-d));
+    --muted: light-dark(var(--muted-l), var(--muted-d));
+    --accent: light-dark(var(--accent-l), var(--accent-d));
+    --accent-ink: light-dark(var(--accent-ink-l), var(--accent-ink-d));
+    --accent-soft: light-dark(var(--accent-soft-l), var(--accent-soft-d));
+    --r1: light-dark(var(--r1-l), var(--r1-d));
+    --r2: light-dark(var(--r2-l), var(--r2-d));
+    --r3: light-dark(var(--r3-l), var(--r3-d));
+    --r4: light-dark(var(--r4-l), var(--r4-d));
+    --map-na: light-dark(var(--map-na-l), var(--map-na-d));
+    --map-stroke: light-dark(var(--map-stroke-l), var(--map-stroke-d));
+    scrollbar-color: light-dark(#6C7D84, #5E757D) light-dark(#EAECE7, #172023);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; background: var(--bg); scroll-padding-top: 64px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 15px/1.55 var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+h1, h2, h3, h4, p { margin: 0; }
+h1 { font: 700 clamp(24px, 3.2vw, 36px)/1.14 var(--serif); letter-spacing: -0.015em; max-width: 34ch; }
+h2 { font: 650 clamp(18px, 2vw, 23px)/1.22 var(--serif); letter-spacing: -0.01em; }
+h3 { font: 600 15.5px/1.3 var(--font); }
+a { color: var(--accent); text-underline-offset: 3px; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.muted { color: var(--muted); }
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 var(--s5); }
+@media (max-width: 640px) { .wrap { padding: 0 var(--s4); } }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Masthead */
+header.masthead {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 44px;
+}
+.brand-mark {
+  width: 16px;
+  height: 18px;
+  border: 1.5px solid var(--text);
+  border-left: 4px solid var(--accent);
+  background: repeating-linear-gradient(var(--surface) 0 4px, var(--line) 4px 5px);
+  flex-shrink: 0;
+}
+.top-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+/* Buttons & inputs (min 44px touch target per antislop) */
+.btn, select, input[type="search"] {
+  font: inherit;
+  font-size: 13.5px;
+  min-height: 44px;
+  max-width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 var(--s3);
+  font-weight: 550;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { background: var(--surface-2); border-color: var(--text); }
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 650;
+}
+.btn.primary:hover { filter: brightness(0.94); }
+select {
+  padding: 0 32px 0 var(--s3);
+  cursor: pointer;
+}
+input[type="search"] {
+  padding: 0 var(--s3);
+  min-width: 190px;
+}
+.seg {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 2px;
+  gap: 2px;
+}
+.seg button {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  min-height: 40px;
+  min-width: 44px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.seg button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  font-weight: 700;
+}
+
+/* Hero Context & Summary Ledger */
+.hero {
+  padding: var(--s5) 0 var(--s4);
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: var(--s5);
+  align-items: end;
+}
+@media (max-width: 920px) {
+  .hero-grid { grid-template-columns: 1fr; }
+}
+.hero-lead {
+  margin-top: var(--s2);
+  color: var(--muted);
+  max-width: 72ch;
+  font-size: 14.5px;
+}
+.context-box {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--s3) var(--s4);
+  font-size: 13px;
+  color: var(--muted);
+}
+.context-box strong { color: var(--text); }
+
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
+@media (max-width: 960px) { .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .kpi-strip { grid-template-columns: 1fr; } }
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--text);
+  border-radius: var(--radius);
+  padding: var(--s3) var(--s4);
+}
+.kpi-card .kpi-val {
+  font: 700 22px/1.2 var(--font);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.kpi-card .kpi-lbl {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.kpi-card .kpi-sub {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* Sticky Navigation Tabs (modern-web-guidance tabs pattern) */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.tablist {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: inline proximity;
+  scrollbar-width: none;
+  gap: var(--s2);
+}
+.tablist::-webkit-scrollbar { display: none; }
+[role="tab"] {
+  flex: none;
+  scroll-snap-align: start;
+  position: relative;
+  min-height: 48px;
+  padding: 0 var(--s4);
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: 600 14px/1 var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+}
+[role="tab"]:hover { color: var(--text); }
+[role="tab"][aria-selected="true"] {
+  color: var(--accent);
+}
+[role="tab"][aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  border-block-end: 3px solid var(--accent);
+}
+
+/* Tab panels: style child wrapper, not panel itself (hidden="until-found" rule) */
+.panels-stack {
+  display: block;
+}
+[role="tabpanel"] {
+  min-width: 0;
+}
+[role="tabpanel"][hidden] {
+  pointer-events: none;
+}
+.panel-inner {
+  padding: var(--s5) 0 var(--s7);
+}
+
+/* State banners */
+.state-box {
+  margin: var(--s5) 0;
+  padding: var(--s5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.state-box.error { border-color: var(--r4); }
+
+/* Cards & Grids */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--s4);
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.field { min-width: 0; max-width: 100%; }
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  padding-bottom: var(--s3);
+  margin-bottom: var(--s3);
+  border-bottom: 1px solid var(--line);
+}
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.field label, .field .field-lbl {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Atlas Layout */
+.atlas-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(310px, 1fr);
+  gap: var(--s4);
+  align-items: start;
+}
+@media (max-width: 1020px) {
+  .atlas-grid { grid-template-columns: 1fr; }
+}
+.map-stage {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--s2);
+  position: relative;
+}
+.map-stage svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 460px;
+}
+.country-path {
+  stroke: var(--map-stroke);
+  stroke-width: 0.55px;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition: fill 200ms ease, opacity 160ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .country-path { transition: none; }
+}
+.country-path:hover {
+  stroke: var(--text);
+  stroke-width: 1.6px;
+}
+.country-path.is-selected {
+  stroke: var(--text);
+  stroke-width: 2.2px;
+}
+.country-path:focus {
+  outline: none;
+}
+.country-path:focus-visible {
+  stroke: var(--text);
+  stroke-width: 3px;
+  stroke-dasharray: 4 2;
+}
+.country-path.is-dimmed {
+  opacity: 0.22;
+}
+
+.legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  margin-top: var(--s3);
+  font-size: 13px;
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.swatch {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.18);
+  flex-shrink: 0;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid currentColor;
+}
+.badge.r1 { color: var(--r1); }
+.badge.r2 { color: var(--r2); }
+.badge.r3 { color: var(--r3); }
+.badge.r4 { color: var(--r4); }
+
+/* Country Inspector */
+.inspector-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin: var(--s2) 0 var(--s3);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.method-pills {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: var(--s3);
+}
+.method-pill {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 6px 8px;
+  text-align: center;
+  font-size: 12px;
+}
+.method-pill strong { display: block; font-size: 13px; margin-top: 2px; }
+
+.metric-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mbar-row { font-size: 12.5px; }
+.mbar-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.mbar-track {
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.mbar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+.mbar-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--text);
+}
+
+/* 4 Regime Archetype Cards */
+.regime-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
+@media (max-width: 1050px) { .regime-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 580px)  { .regime-cards { grid-template-columns: 1fr; } }
+.regime-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top-width: 4px;
+  border-radius: var(--radius);
+  padding: var(--s3) var(--s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.regime-card[data-r="1"] { border-top-color: var(--r1); }
+.regime-card[data-r="2"] { border-top-color: var(--r2); }
+.regime-card[data-r="3"] { border-top-color: var(--r3); }
+.regime-card[data-r="4"] { border-top-color: var(--r4); }
+.regime-dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 8px;
+  font-size: 12.5px;
+  padding-top: var(--s2);
+  border-top: 1px solid var(--line);
+}
+.regime-dl dt { color: var(--muted); }
+.regime-dl dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+
+/* Two-column analytical layouts */
+.two-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: start;
+}
+@media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+
+.svg-chart-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+.svg-chart-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Interactive Migration Matrix */
+.mig-grid {
+  display: grid;
+  grid-template-columns: auto repeat(4, minmax(58px, 1fr));
+  gap: 6px;
+  align-items: stretch;
+  margin-top: var(--s2);
+}
+.mig-hdr {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+}
+.mig-cell {
+  min-height: 56px;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+.mig-cell strong { font-size: 17px; font-variant-numeric: tabular-nums; }
+.mig-cell span { font-size: 11px; color: var(--muted); }
+.mig-cell[aria-pressed="true"] {
+  border: 2px solid var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Sortable & Responsive Data Table (modern-web-guidance sortable-table + responsive-table) */
+.table-wrapper {
+  overflow: auto;
+  max-inline-size: 100%;
+  max-block-size: min(580px, 76vh);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+table.data-table {
+  width: 100%;
+  min-inline-size: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+table.data-table caption {
+  text-align: left;
+  padding: var(--s3) var(--s4);
+  font-weight: 700;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+table.data-table thead {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 3;
+  background: var(--surface-2);
+}
+table.data-table th, table.data-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+table.data-table td.num, table.data-table th[data-type="number"] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+table.data-table th:has(> button) {
+  padding: 0;
+}
+table.data-table thead th > button {
+  font: inherit;
+  font-weight: 650;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: pointer;
+}
+table.data-table th[data-type="number"] > button {
+  justify-content: flex-end;
+}
+table.data-table thead th > button:hover {
+  background: var(--accent-soft);
+}
+.sort-icon {
+  font-size: 11px;
+  opacity: 0.45;
+}
+th[aria-sort="ascending"] .sort-icon::after  { content: "▲"; opacity: 1; color: var(--accent); }
+th[aria-sort="descending"] .sort-icon::after { content: "▼"; opacity: 1; color: var(--accent); }
+th:not([aria-sort]) .sort-icon::after        { content: "↕"; }
+
+table.data-table tbody th {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  background: var(--surface);
+  font-weight: 600;
+  border-right: 1px solid var(--line);
+}
+table.data-table tbody tr {
+  cursor: pointer;
+}
+table.data-table tbody tr:hover td,
+table.data-table tbody tr:hover th {
+  background: var(--surface-2);
+}
+table.data-table tbody tr.is-active td,
+table.data-table tbody tr.is-active th {
+  background: var(--accent-soft);
+}
+
+/* Simple small tables */
+table.compact-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+table.compact-table th, table.compact-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+table.compact-table th.num, table.compact-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+table.compact-table thead th {
+  font-weight: 650;
+  color: var(--muted);
+  border-bottom: 1.5px solid var(--text);
+}
+
+/* Floating Tooltip */
+.tooltip {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--text);
+  border-radius: var(--radius);
+  padding: 8px 11px;
+  font-size: 12.5px;
+  max-width: 280px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+.tooltip[hidden] { display: none; }
+
+footer.site-foot {
+  border-top: 1px solid var(--line);
+  padding: var(--s5) 0;
+  color: var(--muted);
+  font-size: 13px;
+  background: var(--surface);
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span id="t-brand">UAS Data Mining · SDG 7 &amp; SDG 13 Global Atlas</span>
+      </div>
+      <div class="top-actions">
+        <div class="seg" role="group" aria-label="Language">
+          <button type="button" id="lang-id" aria-pressed="true">ID</button>
+          <button type="button" id="lang-en" aria-pressed="false">EN</button>
+        </div>
+        <button type="button" class="btn" id="theme-toggle" aria-label="Ubah tema warna">
+          <span aria-hidden="true" id="theme-icon">◐</span>
+          <span id="t-theme-btn">Tema</span>
+        </button>
+        <button type="button" class="btn primary" id="download-csv-btn">
+          <span id="t-dl-csv">Unduh CSV (189 Negara)</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-grid">
+        <div>
+          <h1 id="t-title">Membongkar Paradoks Biomassa &amp; Trilema Transisi Energi-Iklim Global</h1>
+          <p class="hero-lead" id="t-subtitle">
+            Pemetaan multivariat 189 negara berdaulat dari portal resmi UN SDG &amp; World Bank (2015 s/d 2023): membandingkan K-Means, PAM (K-Medoids), Hierarchical Ward's D2, dan Gaussian Mixture Model, disertai evaluasi celah transisi Indonesia di kawasan ASEAN.
+          </p>
+        </div>
+        <div class="context-box" id="t-context">
+          <strong>Konteks Pengguna Kebijakan:</strong> Dirancang bagi perencana Bappenas, Kementerian ESDM, Sekretariat JETP, dan analis SDG untuk membedakan pangsa EBT semu berbasis kayu bakar tradisional (SDG 7.2.1) dari kapasitas listrik bersih modern (SDG 7.b.1) dan efisiensi karbon (SDG 7.3.1 &amp; SDG 13).
+        </div>
+      </div>
+
+      <div class="kpi-strip" id="kpi-strip">
+        <div class="kpi-card">
+          <div class="kpi-val num" id="kpi-1-val">189 Negara</div>
+          <div class="kpi-lbl" id="kpi-1-lbl">Cakupan Global (8,02 Miliar Jiwa)</div>
+          <div class="kpi-sub" id="kpi-1-sub">6 indikator resmi UN SDG 7 &amp; 13 tanpa kebocoran data</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val num" id="kpi-2-val">K-Means (k = 4)</div>
+          <div class="kpi-lbl" id="kpi-2-lbl">Puncak Multi-Rezim Jaccard 0,953</div>
+          <div class="kpi-sub" id="kpi-2-sub">Optimum biner kasar di k=2 (0,976) · ARI 0,795 dgn Ward's D2</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val num" id="kpi-3-val">22 Negara</div>
+          <div class="kpi-lbl" id="kpi-3-lbl">Migrasi Positif Pasca-Paris (2015 ke 2023)</div>
+          <div class="kpi-sub" id="kpi-3-sub">7 lepas dari R1, 8 lulus ke R3, 7 dekarbonisasi dari R4</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val num" id="kpi-4-val">47,4 W/kapita</div>
+          <div class="kpi-lbl" id="kpi-4-lbl">Kapasitas Listrik EBT Indonesia (R3)</div>
+          <div class="kpi-sub" id="kpi-4-sub">Akses listrik 99,4%, namun tertinggal 10x dari Vietnam (476 W)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="nav-bar">
+  <div class="wrap">
+    <div class="tablist" role="tablist" focusgroup="tablist nomemory" id="main-tablist" aria-label="Bagian analisis dashboard">
+      <button type="button" role="tab" id="tab-atlas" aria-selected="true" focusgroupstart>Peta Rezim &amp; Negara</button>
+      <button type="button" role="tab" id="tab-eda" aria-selected="false" tabindex="-1">Eksplorasi &amp; Paradoks Biomassa</button>
+      <button type="button" role="tab" id="tab-models" aria-selected="false" tabindex="-1">Evaluasi 4 Metode Data Mining</button>
+      <button type="button" role="tab" id="tab-asean" aria-selected="false" tabindex="-1">Dinamika 2015-2023 &amp; ASEAN</button>
+      <button type="button" role="tab" id="tab-data" aria-selected="false" tabindex="-1">Tabel 189 Negara &amp; Metodologi</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="app-state" class="state-box" role="status">
+    <p id="state-msg">Memuat data terverifikasi dari hasil analisis R...</p>
+  </div>
+
+  <div class="panels-stack" id="panels-root" hidden>
+    <!-- PANEL 1: ATLAS & COUNTRY INSPECTOR -->
+    <div role="tabpanel" id="panel-atlas" aria-labelledby="tab-atlas">
+      <div class="panel-inner">
+        <div class="controls-row">
+          <div class="field">
+            <label for="map-layer-select" id="lbl-map-layer">Lapisan Peta &amp; Algoritma</label>
+            <select id="map-layer-select">
+              <option value="km2023">2023 · K-Means (Model Utama, k=4)</option>
+              <option value="km2_2023">2023 · Alternatif Biner Kasar (K-Means, k=2)</option>
+              <option value="km2015">2015 · Baseline Kesepakatan Paris (Proyeksi k=4)</option>
+              <option value="ward2023">2023 · Hierarchical Ward's D2 (k=4)</option>
+              <option value="pam2023">2023 · PAM / K-Medoids (k=4)</option>
+              <option value="gmm2023">2023 · Gaussian Mixture Model / GMM (k=4)</option>
+            </select>
+          </div>
+          <div class="field">
+            <span class="field-lbl" id="lbl-map-zoom">Cakupan Peta</span>
+            <div class="seg" role="group" aria-label="Zoom peta">
+              <button type="button" id="zoom-world" aria-pressed="true">Dunia</button>
+              <button type="button" id="zoom-asean" aria-pressed="false">Fokus ASEAN</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="atlas-regime-filter" id="lbl-regime-filter">Sorot Rezim</label>
+            <select id="atlas-regime-filter">
+              <option value="ALL">Semua Rezim (R1 s/d R4)</option>
+              <option value="1">R1 · Defisit Akses &amp; Biomassa</option>
+              <option value="2">R2 · Transisi Akses Berkembang</option>
+              <option value="3">R3 · Elektrifikasi Efisien &amp; EBT</option>
+              <option value="4">R4 · Intensif Fosil &amp; Karbon Tinggi</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="country-picker" id="lbl-country-picker">Pilih Negara Inspeksi</label>
+            <select id="country-picker"></select>
+          </div>
+        </div>
+
+        <div class="atlas-grid">
+          <section class="card" aria-labelledby="h-map-card">
+            <div class="card-head">
+              <div>
+                <h2 id="h-map-card">Peta Sebaran Rezim Transisi Energi-Iklim</h2>
+                <p class="muted" style="font-size:13px" id="p-map-hint">Klik negara mana pun pada peta untuk melihat perbandingan 6 indikator SDG dan konsensus 4 model.</p>
+              </div>
+              <span class="muted num" style="font-size:12.5px" id="map-count-lbl">189 negara aktif</span>
+            </div>
+            <div class="map-stage">
+              <svg id="world-svg" role="img" aria-label="Peta dunia rezim transisi energi bersih SDG 7 dan SDG 13"></svg>
+            </div>
+            <div class="legend-row" id="map-legend"></div>
+          </section>
+
+          <aside class="card" id="country-inspector" aria-live="polite">
+            <div class="card-head">
+              <div>
+                <h2 id="insp-name">Indonesia</h2>
+                <p class="muted" style="font-size:13px" id="insp-sub">IDN · East Asia &amp; Pacific · Upper middle income</p>
+              </div>
+              <span class="badge r3" id="insp-badge">R3</span>
+            </div>
+            <div class="inspector-meta" id="insp-migration-line"></div>
+            <div class="method-pills" id="insp-methods"></div>
+            <div class="metric-bars" id="insp-bars"></div>
+          </aside>
+        </div>
+
+        <div class="regime-cards" id="regime-cards"></div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: EDA, BIOMASS PARADOX & PCA -->
+    <div role="tabpanel" id="panel-eda" aria-labelledby="tab-eda" hidden="until-found">
+      <div class="panel-inner">
+        <div class="controls-row">
+          <div class="field">
+            <span class="field-lbl" id="lbl-eda-preset">Tampilan Eksplorasi Utama</span>
+            <div class="seg" role="group" aria-label="Preset grafik eksplorasi">
+              <button type="button" data-preset="paradox" class="eda-preset" aria-pressed="true">Paradoks Biomassa (SDG 7.2.1 vs 7.b.1)</button>
+              <button type="button" data-preset="pca" class="eda-preset" aria-pressed="false">Biplot PCA (77,1% Varians)</button>
+              <button type="button" data-preset="carbon" class="eda-preset" aria-pressed="false">Intensitas Energi vs Emisi CO2</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2 id="eda-chart-title">Paradoks Biomassa pada Indikator Energi Terbarukan</h2>
+                <p class="muted" style="font-size:13px" id="eda-chart-sub">Klik titik negara untuk menyinkronkan inspeksi. Negara R1 memiliki pangsa EBT tinggi akibat kayu bakar tradisional, bukan pembangkit bersih modern.</p>
+              </div>
+            </div>
+            <div class="svg-chart-wrap" id="eda-svg-wrap"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2 id="h-eda-diag">Uji Kelayakan Data &amp; Penanganan Kemencengan</h2>
+                <p class="muted" style="font-size:13px" id="p-eda-diag">Ringkasan audit prapengolahan sebelum pemodelan (bebas kebocoran data).</p>
+              </div>
+            </div>
+            <div id="eda-diagnostics-box"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 3: 4-METHOD COMPARISON -->
+    <div role="tabpanel" id="panel-models" aria-labelledby="tab-models" hidden="until-found">
+      <div class="panel-inner">
+        <div class="controls-row">
+          <div class="field">
+            <label for="metric-select" id="lbl-metric-select">Metrik Validasi Klaster (k = 2 s/d 6)</label>
+            <select id="metric-select">
+              <option value="jaccard_mean">Stabilitas Jaccard Bootstrap (B = 500, lebih tinggi lebih stabil)</option>
+              <option value="silhouette">Average Silhouette Width (lebih tinggi lebih kompak)</option>
+              <option value="davies_bouldin">Davies-Bouldin Index (lebih rendah lebih terpisah)</option>
+              <option value="calinski_harabasz">Calinski-Harabasz Pseudo-F (lebih tinggi lebih baik)</option>
+              <option value="dunn">Dunn Index (rasio pemisahan terburuk, lebih tinggi lebih baik)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2 id="h-model-curve">Kurva Perbandingan Empat Algoritma Clustering</h2>
+                <p class="muted" style="font-size:13px" id="p-model-curve">Garis vertikal k = 4 menandai titik optimal: semua klaster K-Means melampaui ambang stabilitas Jaccard 0,80 sebelum turun tajam pada k = 5.</p>
+              </div>
+            </div>
+            <div class="svg-chart-wrap" id="model-curve-wrap"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2 id="h-why-kmeans">Spesifikasi Kovarians: K-Means &amp; Ward's D2 vs GMM</h2>
+                <p class="muted" style="font-size:13px" id="p-why-kmeans">Konsentrasi pengamatan di batas atas 100% dan sensitivitas terhadap asumsi kovarians.</p>
+              </div>
+            </div>
+            <div id="model-insight-box"></div>
+          </section>
+        </div>
+
+        <section class="card" style="margin-top:var(--s4)">
+          <div class="card-head">
+            <h2 id="h-eval-all">Tabel Evaluasi Lengkap 20 Konfigurasi Model (4 Metode x 5 Nilai k)</h2>
+          </div>
+          <div class="table-wrapper" tabindex="0" role="region" aria-labelledby="h-eval-all">
+            <table class="compact-table" id="eval-full-table"></table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- PANEL 4: 2015-2023 TRANSITION & INDONESIA / ASEAN -->
+    <div role="tabpanel" id="panel-asean" aria-labelledby="tab-asean" hidden="until-found">
+      <div class="panel-inner">
+        <div class="two-col">
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2 id="h-mig-card">Matriks Migrasi Rezim Pasca-Paris (2015 ke 2023)</h2>
+                <p class="muted" style="font-size:13px" id="p-mig-card">Klik sel matriks untuk menampilkan daftar negara yang berpindah atau bertahan pada rezim tersebut.</p>
+              </div>
+            </div>
+            <div id="mig-matrix-box"></div>
+            <div id="mig-list-box" style="margin-top:var(--s3);font-size:13px"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2 id="h-asean-chart">Bauran Kapasitas Listrik EBT Negara ASEAN (SDG 7.b.1)</h2>
+                <p class="muted" style="font-size:13px" id="p-asean-chart">Kapasitas pembangkit terpasang dalam Watt per kapita menurut teknologi (IRENA, 2023).</p>
+              </div>
+            </div>
+            <div class="svg-chart-wrap" id="asean-bars-wrap"></div>
+          </section>
+        </div>
+
+        <section class="card" style="margin-top:var(--s4)">
+          <div class="card-head">
+            <div>
+              <h2 id="h-idn-policy">Sintesis Kebijakan untuk Indonesia: Lulus Akses Dasar, Tertahan di Kapasitas EBT</h2>
+              <p class="muted" style="font-size:13px" id="p-idn-policy">Implikasi berbasis bukti dari perbandingan lintas-waktu 2015 ke 2023 dan benchmark ASEAN.</p>
+            </div>
+          </div>
+          <div id="idn-policy-content"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- PANEL 5: FULL SORTABLE TABLE & METHODOLOGY -->
+    <div role="tabpanel" id="panel-data" aria-labelledby="tab-data" hidden="until-found">
+      <div class="panel-inner">
+        <div class="controls-row">
+          <div class="field">
+            <label for="table-search" id="lbl-t-search">Cari Negara / Kode ISO3</label>
+            <input type="search" id="table-search" placeholder="Mis. Indonesia, IDN, VNM...">
+          </div>
+          <div class="field">
+            <label for="table-regime" id="lbl-t-regime">Filter Rezim 2023</label>
+            <select id="table-regime">
+              <option value="ALL">Semua Rezim</option>
+              <option value="R1">R1 · Defisit &amp; Biomassa</option>
+              <option value="R2">R2 · Transisi Akses</option>
+              <option value="R3">R3 · Elektrifikasi Efisien</option>
+              <option value="R4">R4 · Intensif Fosil</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="table-region" id="lbl-t-region">Filter Wilayah</label>
+            <select id="table-region">
+              <option value="ALL">Semua Wilayah Dunia</option>
+              <option value="ASEAN">Khusus Anggota ASEAN (11)</option>
+            </select>
+          </div>
+          <button type="button" class="btn" id="reset-table-btn">Reset Filter</button>
+        </div>
+
+        <p id="table-sort-status" role="status" class="visually-hidden"></p>
+        <div id="table-empty" class="state-box" hidden>
+          <p id="t-empty-msg">Tidak ada negara yang cocok dengan kombinasi pencarian saat ini.</p>
+        </div>
+
+        <div tabindex="0" role="region" aria-labelledby="country-table-caption" class="table-wrapper" id="country-table-wrap">
+          <table class="data-table" id="country-table">
+            <caption id="country-table-caption">Data Lengkap 189 Negara Berdaulat: Indikator SDG 7 &amp; SDG 13 serta Hasil Klaster (2023)</caption>
+            <thead>
+              <tr>
+                <th scope="col" data-type="text"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="country">Negara</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="text"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="regime">Rezim 2023</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="text"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="r2015">2015</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="number"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="elec">Listrik (%)</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="number"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="cook">Memasak Bersih (%)</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="number"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="rsh">Pangsa EBT (%)</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="number" aria-sort="descending"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="rcap">Kapasitas EBT (W/kap)</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="number"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="eint">Intensitas (MJ/$)</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="number"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="co2">CO2 (t/kap)</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="number"><button type="button" commandfor="country-table" command="--sort"><span class="th-lbl" data-k="sil">Silhouette</span><span class="sort-icon" aria-hidden="true"></span></button></th>
+              </tr>
+            </thead>
+            <tbody id="country-tbody"></tbody>
+          </table>
+        </div>
+
+        <section class="card" style="margin-top:var(--s4)">
+          <div class="card-head">
+            <h2 id="h-method-card">Kamus Indikator Resmi &amp; Protokol Pencegahan Kebocoran Data</h2>
+          </div>
+          <div id="methodology-notes"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="tooltip" id="tooltip" hidden></div>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <p id="t-footer">
+      Sumber Data Resmi: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh nilai pada dashboard ini diekspor otomatis dari skrip R (<code>analisis_sdg_transisi_energi.R</code>, seed = 2026).
+    </p>
+  </div>
+</footer>
+
+<script src="./data/dashboard_data.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  const I18N = {
+    id: {
+      brand: "UAS Data Mining · Atlas Global SDG 7 & SDG 13",
+      themeBtn: "Tema",
+      dlCsv: "Unduh CSV (189 Negara)",
+      title: "Membongkar Paradoks Biomassa & Trilema Transisi Energi-Iklim Global",
+      subtitle: "Pemetaan multivariat 189 negara berdaulat dari portal resmi UN SDG & World Bank (2015 s/d 2023): membandingkan K-Means, PAM (K-Medoids), Hierarchical Ward's D2, dan Gaussian Mixture Model, disertai evaluasi celah transisi Indonesia di kawasan ASEAN.",
+      context: "<strong>Konteks Pengguna Kebijakan:</strong> Dirancang bagi perencana Bappenas, Kementerian ESDM, Sekretariat JETP, dan analis SDG untuk membedakan pangsa EBT semu berbasis kayu bakar tradisional (SDG 7.2.1) dari kapasitas listrik bersih modern (SDG 7.b.1) dan efisiensi karbon (SDG 7.3.1 &amp; SDG 13).",
+      tabs: ["Peta Rezim & Negara", "Eksplorasi & Paradoks Biomassa", "Evaluasi 4 Metode Data Mining", "Dinamika 2015-2023 & ASEAN", "Tabel 189 Negara & Metodologi"],
+      zoomWorld: "Dunia",
+      zoomAsean: "Fokus ASEAN",
+      mapCardTitle: "Peta Sebaran Rezim Transisi Energi-Iklim",
+      mapHint: "Klik negara mana pun pada peta untuk melihat perbandingan 6 indikator SDG dan konsensus 4 model.",
+      lblMapLayer: "Lapisan Peta & Algoritma",
+      lblMapZoom: "Cakupan Peta",
+      lblRegimeFilter: "Sorot Rezim",
+      lblCountryPicker: "Pilih Negara Inspeksi",
+      kpis: [
+        ["189 Negara", "Cakupan Global (8,02 Miliar Jiwa)", "6 indikator resmi UN SDG 7 & 13 tanpa kebocoran data"],
+        ["K-Means (k = 4)", "Puncak Multi-Rezim Jaccard 0,953", "Optimum biner kasar di k=2 (0,976) · ARI 0,795 dgn Ward's D2"],
+        ["22 Negara", "Migrasi Positif Pasca-Paris (2015 ke 2023)", "7 lepas dari R1, 8 lulus ke R3, 7 dekarbonisasi dari R4"],
+        ["47,4 W/kapita", "Kapasitas Listrik EBT Indonesia (R3)", "Akses listrik 99,4%, namun tertinggal 10x dari Vietnam (476 W)"]
+      ],
+      mapLayers: [
+        ["km2023", "2023 · K-Means (Model Utama, k=4)"],
+        ["km2_2023", "2023 · Alternatif Biner Kasar (K-Means, k=2)"],
+        ["km2015", "2015 · Baseline Kesepakatan Paris (Proyeksi k=4)"],
+        ["ward2023", "2023 · Hierarchical Ward's D2 (k=4)"],
+        ["pam2023", "2023 · PAM / K-Medoids (k=4)"],
+        ["gmm2023", "2023 · Gaussian Mixture Model / GMM (k=4)"]
+      ],
+      regimeOpts: [
+        ["ALL", "Semua Rezim (R1 s/d R4)"],
+        ["1", "R1 · Defisit Akses & Biomassa"],
+        ["2", "R2 · Transisi Akses Berkembang"],
+        ["3", "R3 · Elektrifikasi Efisien & EBT"],
+        ["4", "R4 · Intensif Fosil & Karbon Tinggi"]
+      ],
+      thLabels: {
+        country: "Negara", regime: "Rezim 2023", r2015: "2015",
+        elec: "Listrik (%)", cook: "Memasak Bersih (%)", rsh: "Pangsa EBT (%)",
+        rcap: "Kapasitas EBT (W/kap)", eint: "Intensitas (MJ/$)", co2: "CO2 (t/kap)", sil: "Silhouette"
+      },
+      noDataMap: "Tidak dianalisis (data mikro/parsial)",
+      medoidLbl: "Contoh pusat / Medoid PAM",
+      popLbl: "Populasi 2023",
+      gdpExtLbl: "Median PDB PPP (eksternal)",
+      edaPresets: {
+        paradox: ["Paradoks Biomassa: Pangsa EBT Final (SDG 7.2.1) vs Kapasitas Listrik EBT (SDG 7.b.1)", "Negara R1 tampak memiliki pangsa EBT >70% karena ketergantungan kayu bakar tradisional, padahal kapasitas listrik bersihnya di bawah 15 W/kapita."],
+        pca: ["Biplot Komponen Utama (PC1 & PC2 Menjelaskan 77,1% Varians)", "PC1 merepresentasikan kemajuan elektrifikasi dan memasak bersih; PC2 memisahkan kapasitas listrik EBT modern dari intensitas energi fosil."],
+        carbon: ["Intensitas Energi Primer (SDG 7.3.1) vs Emisi CO2 per Kapita (SDG 13)", "Rezim R4 terkunci pada pemborosan energi primer per unit PDB sekaligus emisi karbon per kapita yang sangat tinggi."]
+      },
+      footer: 'Sumber Data Resmi: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh angka diekspor langsung dari skrip R (<code>analisis_sdg_transisi_energi.R</code>, seed = 2026).'
+    },
+    en: {
+      brand: "Data Mining Final Project · SDG 7 & SDG 13 Global Atlas",
+      themeBtn: "Theme",
+      dlCsv: "Download CSV (189 Countries)",
+      title: "Unpacking the Biomass Paradox & the Global Clean Energy-Climate Trilemma",
+      subtitle: "Multivariate clustering of 189 sovereign economies from the official UN SDG Portal & World Bank (2015 to 2023): comparing K-Means, PAM (K-Medoids), Hierarchical Ward's D2, and Gaussian Mixture Models, with a policy benchmark for Indonesia and ASEAN.",
+      context: "<strong>Target Policy Users:</strong> Built for national energy planners (Bappenas, Ministry of Energy, JETP Secretariat) and UN SDG analysts to separate traditional biomass reliance in SDG 7.2.1 from modern clean power capacity (SDG 7.b.1) and carbon efficiency (SDG 7.3.1 &amp; SDG 13).",
+      tabs: ["Regime Atlas & Country Profile", "Exploration & Biomass Paradox", "4-Method Model Evaluation", "2015-2023 Dynamics & ASEAN", "189-Country Table & Methods"],
+      zoomWorld: "World",
+      zoomAsean: "ASEAN Focus",
+      mapCardTitle: "Global Clean Energy & Climate Regime Map",
+      mapHint: "Click any country on the map to inspect its 6 SDG indicators, regime median benchmark, and 4-model consensus.",
+      lblMapLayer: "Map Layer & Algorithm",
+      lblMapZoom: "Map Extent",
+      lblRegimeFilter: "Highlight Regime",
+      lblCountryPicker: "Inspect Country",
+      kpis: [
+        ["189 Countries", "Global Coverage (8.02 Billion People)", "6 official UN SDG 7 & 13 indicators, zero data leakage"],
+        ["K-Means (k = 4)", "Multi-Regime Jaccard Peak 0.953", "Coarse binary peak at k=2 (0.976) · ARI 0.795 with Ward's D2"],
+        ["22 Countries", "Positive Post-Paris Migration (2015 to 2023)", "7 exited R1, 8 graduated to R3, 7 decarbonized from R4"],
+        ["47.4 W/capita", "Indonesia Clean Power Capacity (R3)", "99.4% electricity access, yet 10x behind Viet Nam (476 W)"]
+      ],
+      mapLayers: [
+        ["km2023", "2023 · K-Means (Primary Model, k=4)"],
+        ["km2_2023", "2023 · Coarse Binary Alternative (K-Means, k=2)"],
+        ["km2015", "2015 · Paris Agreement Baseline (Projected k=4)"],
+        ["ward2023", "2023 · Hierarchical Ward's D2 (k=4)"],
+        ["pam2023", "2023 · PAM / K-Medoids (k=4)"],
+        ["gmm2023", "2023 · Gaussian Mixture Model / GMM (k=4)"]
+      ],
+      regimeOpts: [
+        ["ALL", "All Regimes (R1 to R4)"],
+        ["1", "R1 · Energy Deficit & Biomass"],
+        ["2", "R2 · Expanding Access Transition"],
+        ["3", "R3 · Efficient Electrification & Renewables"],
+        ["4", "R4 · Fossil-Locked & High Carbon"]
+      ],
+      thLabels: {
+        country: "Country", regime: "2023 Regime", r2015: "2015",
+        elec: "Electricity (%)", cook: "Clean Cooking (%)", rsh: "Renew. Share (%)",
+        rcap: "Renew. Cap. (W/cap)", eint: "Intensity (MJ/$)", co2: "CO2 (t/cap)", sil: "Silhouette"
+      },
+      noDataMap: "Not modeled (partial microstate data)",
+      medoidLbl: "Centroid / PAM Medoid",
+      popLbl: "2023 Population",
+      gdpExtLbl: "Median GDP PPP (external)",
+      edaPresets: {
+        paradox: ["The Biomass Paradox: Final Renewable Share (SDG 7.2.1) vs Modern Clean Capacity (SDG 7.b.1)", "R1 economies show >70% renewable share due to traditional wood/charcoal combustion, despite having under 15 W/capita of modern clean electricity."],
+        pca: ["Principal Component Biplot (PC1 & PC2 Explain 77.1% of Variance)", "PC1 captures electrification and clean cooking access; PC2 separates modern renewable power capacity from fossil energy intensity."],
+        carbon: ["Primary Energy Intensity (SDG 7.3.1) vs Per-Capita CO2 Emissions (SDG 13)", "Regime R4 is locked into high primary energy waste per unit of GDP alongside extreme per-capita carbon emissions."]
+      },
+      footer: 'Official Data Sources: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) &amp; World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). All figures exported directly from R (<code>analisis_sdg_transisi_energi.R</code>, seed = 2026).'
+    }
+  };
+
+  const REGIME_POLICY = {
+    id: {
+      1: "Prioritas elektrifikasi dasar (mini-grid surya perdesaan) dan program transisi tungku memasak bersih untuk mengakhiri polusi udara rumah tangga.",
+      2: "Menutup jurang 40 poin persentase antara akses listrik (80,7%) dan memasak bersih (40,4%) sembari menjaga bauran pembangkit rendah karbon.",
+      3: "Mempercepat penambahan kapasitas pembangkit surya, angin, dan panas bumi (SDG 7.b.1) serta modernisasi jaringan transmisi pintar.",
+      4: "Reformasi subsidi bahan bakar fosil, standar efisiensi energi industri berat (SDG 7.3.1), dan dekarbonisasi pembangkit termal."
+    },
+    en: {
+      1: "Prioritize decentralized solar mini-grids and clean cooking fuel programs to end acute energy poverty and household air pollution.",
+      2: "Close the 40-percentage-point gap between grid electricity (80.7%) and clean cooking access (40.4%) while expanding clean generation.",
+      3: "Accelerate utility-scale solar, wind, and geothermal capacity additions (SDG 7.b.1) and grid flexibility investments.",
+      4: "Phase out fossil fuel subsidies, enforce heavy-industry energy intensity standards (SDG 7.3.1), and decarbonize thermal fleets."
+    }
+  };
+
+  let DATA = null;
+  let state = {
+    lang: "id",
+    selectedIso: "IDN",
+    mapLayer: "km2023",
+    mapZoom: "world",
+    regimeFilter: "ALL",
+    edaPreset: "paradox",
+    evalMetric: "jaccard_mean",
+    migCell: "R4_R3"
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const fmt = (v, d = 1) => {
+    if (v === null || v === undefined || Number.isNaN(Number(v))) return "n/a";
+    return Number(v).toLocaleString(state.lang === "id" ? "id-ID" : "en-US", {
+      minimumFractionDigits: d,
+      maximumFractionDigits: d
+    });
+  };
+
+  const regimeColorVar = (r) => {
+    const n = Number(String(r).replace("R", ""));
+    return n >= 1 && n <= 4 ? `var(--r${n})` : "var(--map-na)";
+  };
+
+  /* Theme toggle (modern-web-guidance dark-mode-toggle two-state pattern) */
+  $("theme-toggle").addEventListener("click", () => {
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    const osDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    let stored = null;
+    try { stored = localStorage.getItem("color-scheme"); } catch (_) {}
+    const currentDark = stored ? stored === "dark" : osDark;
+    const target = currentDark ? "light" : "dark";
+    const targetMatchesOs = (target === "dark") === osDark;
+    try {
+      if (targetMatchesOs) localStorage.removeItem("color-scheme");
+      else localStorage.setItem("color-scheme", target);
+    } catch (_) {}
+    meta.content = targetMatchesOs ? "light dark" : target;
+  });
+
+  /* Accessible Tablist + hidden="until-found" beforematch sync */
+  const tablist = $("main-tablist");
+  const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+  const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+
+  function activateTab(selectedTab, moveFocus = false) {
+    for (const tab of tabs) {
+      const active = tab === selectedTab;
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+      tab.tabIndex = active ? 0 : -1;
+      tab.toggleAttribute("focusgroupstart", active);
+    }
+    for (const panel of panels) {
+      const active = panel.getAttribute("aria-labelledby") === selectedTab.id;
+      if (active) {
+        panel.removeAttribute("hidden");
+      } else {
+        panel.setAttribute("hidden", "until-found");
+      }
+    }
+    if (moveFocus) selectedTab.focus();
+    selectedTab.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+
+  tabs.forEach((tab, idx) => {
+    tab.addEventListener("click", () => activateTab(tab, false));
+    tab.addEventListener("keydown", (e) => {
+      if (Object.hasOwn(HTMLElement.prototype, "focusGroup")) return;
+      let nextIdx = null;
+      if (e.key === "ArrowRight") nextIdx = (idx + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") nextIdx = (idx - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") nextIdx = 0;
+      else if (e.key === "End") nextIdx = tabs.length - 1;
+      if (nextIdx !== null) {
+        e.preventDefault();
+        activateTab(tabs[nextIdx], true);
+      }
+    });
+  });
+
+  panels.forEach((panel) => {
+    panel.addEventListener("beforematch", () => {
+      const tab = $(panel.getAttribute("aria-labelledby"));
+      if (tab) activateTab(tab, false);
+    });
+  });
+
+  /* Tooltip helpers */
+  const tooltip = $("tooltip");
+  function showTip(ev, html) {
+    tooltip.innerHTML = html;
+    tooltip.hidden = false;
+    moveTip(ev);
+  }
+  function moveTip(ev) {
+    const pad = 14;
+    let x = ev.clientX + pad;
+    let y = ev.clientY + pad;
+    const rect = tooltip.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - 10) x = ev.clientX - rect.width - pad;
+    if (y + rect.height > window.innerHeight - 10) y = ev.clientY - rect.height - pad;
+    tooltip.style.left = `${Math.max(8, x)}px`;
+    tooltip.style.top = `${Math.max(8, y)}px`;
+  }
+  function hideTip() { tooltip.hidden = true; }
+
+  /* Data loading with fetch + inline JS fallback */
+  async function loadData() {
+    try {
+      const res = await fetch("./data/dashboard_data.json");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      if (window.__SDG_DASHBOARD_DATA__) {
+        return window.__SDG_DASHBOARD_DATA__;
+      }
+      throw err;
+    }
+  }
+
+  function getCountryRegime(c, layer) {
+    if (!c) return null;
+    if (layer === "km2_2023") return c.regime_k2;
+    if (layer === "km2015") return c.regime_2015;
+    if (layer === "ward2023") return c.regime_ward;
+    if (layer === "pam2023") return c.regime_pam;
+    if (layer === "gmm2023") return c.regime_gmm;
+    return c.regime_2023;
+  }
+
+  function mapFillVar(r, layer) {
+    if (layer === "km2_2023") return Number(r) === 1 ? "var(--r1)" : "var(--r3)";
+    return regimeColorVar(r);
+  }
+
+  function buildMapOnce() {
+    const svg = $("world-svg");
+    const [vx, vy, vw, vh] = DATA.meta.svg_viewbox;
+    svg.setAttribute("viewBox", `${vx} ${vy} ${vw} ${vh}`);
+    const byIso = new Map(DATA.countries.map((c) => [c.iso3, c]));
+    const frag = document.createDocumentFragment();
+
+    for (const item of DATA.world_map) {
+      const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      p.setAttribute("d", item.d);
+      p.setAttribute("class", "country-path");
+      p.dataset.iso3 = item.iso3;
+      const c = byIso.get(item.iso3);
+      if (c) {
+        p.tabIndex = 0;
+        p.setAttribute("role", "button");
+        p.setAttribute("aria-label", `${c.country_en} (${c.kode_2023})`);
+        p.addEventListener("click", () => selectCountry(c.iso3));
+        p.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            selectCountry(c.iso3);
+          }
+        });
+      }
+      p.addEventListener("pointerenter", (ev) => {
+        if (!c) {
+          showTip(ev, `<strong>${item.name_map} (${item.iso3})</strong><br><span class="muted">${I18N[state.lang].noDataMap}</span>`);
+          return;
+        }
+        const r = getCountryRegime(c, state.mapLayer);
+        const rTag = state.mapLayer === "km2_2023" ? `B${r}` : `R${r}`;
+        showTip(ev, `<strong>${c.country_en} (${c.iso3})</strong> · <span style="font-weight:700">${rTag}</span><br>` +
+          `SDG 7.1.1: ${fmt(c.elec_2023, 1)}% · SDG 7.1.2: ${fmt(c.cooking_2023, 1)}%<br>` +
+          `SDG 7.2.1: ${fmt(c.renew_share_2023, 1)}% · SDG 7.b.1: ${fmt(c.renew_cap_2023, 1)} W<br>` +
+          `SDG 7.3.1: ${fmt(c.energy_int_2023, 2)} MJ/$ · CO2: ${fmt(c.co2_pc_2023, 2)} t`);
+      });
+      p.addEventListener("pointermove", moveTip);
+      p.addEventListener("pointerleave", hideTip);
+      frag.appendChild(p);
+    }
+    svg.replaceChildren(frag);
+  }
+
+  function updateMapColorsAndZoom() {
+    const svg = $("world-svg");
+    const vb = state.mapZoom === "asean" ? DATA.meta.asean_viewbox : DATA.meta.svg_viewbox;
+    svg.setAttribute("viewBox", vb.join(" "));
+    const byIso = new Map(DATA.countries.map((c) => [c.iso3, c]));
+    let activeCount = 0;
+
+    for (const p of svg.querySelectorAll(".country-path")) {
+      const c = byIso.get(p.dataset.iso3);
+      if (!c) {
+        p.style.fill = "var(--map-na)";
+        p.classList.toggle("is-dimmed", state.regimeFilter !== "ALL");
+        continue;
+      }
+      const r = getCountryRegime(c, state.mapLayer);
+      p.style.fill = mapFillVar(r, state.mapLayer);
+      const match = state.regimeFilter === "ALL" || String(c.regime_2023) === state.regimeFilter;
+      if (match) activeCount++;
+      p.classList.toggle("is-dimmed", !match);
+      p.classList.toggle("is-selected", c.iso3 === state.selectedIso);
+    }
+    $("map-count-lbl").textContent = state.lang === "id"
+      ? `${activeCount} negara ditampilkan`
+      : `${activeCount} countries highlighted`;
+
+    const leg = $("map-legend");
+    if (state.mapLayer === "km2_2023" && DATA.regimes_k2) {
+      leg.innerHTML = DATA.regimes_k2.map((b) => {
+        const nm = state.lang === "id" ? b.nama_id : b.nama_en;
+        const col = b.regime_k2 === 1 ? "var(--r1)" : "var(--r3)";
+        return `<span class="legend-item"><span class="swatch" style="background:${col}"></span><strong>${b.kode_k2}</strong> ${nm} (${b.n_negara} · ${b.komposisi_rezim_k4})</span>`;
+      }).join("") + `<span class="legend-item"><span class="swatch" style="background:var(--map-na)"></span>${I18N[state.lang].noDataMap}</span>`;
+    } else {
+      leg.innerHTML = DATA.regimes.map((rg) => {
+        const nm = state.lang === "id" ? rg.nama_id : rg.nama_en;
+        return `<span class="legend-item"><span class="swatch" style="background:${regimeColorVar(rg.regime_km)}"></span><strong>${rg.kode_rezim}</strong> ${nm} (${rg.n_negara})</span>`;
+      }).join("") + `<span class="legend-item"><span class="swatch" style="background:var(--map-na)"></span>${I18N[state.lang].noDataMap}</span>`;
+    }
+  }
+
+  function renderInspector() {
+    const c = DATA.countries.find((d) => d.iso3 === state.selectedIso) || DATA.countries[0];
+    const rg = DATA.regimes.find((r) => r.regime_km === c.regime_2023);
+    $("insp-name").textContent = c.country_en;
+    $("insp-sub").textContent = `${c.iso3} · ${c.region} · ${c.income_group}`;
+    const b = $("insp-badge");
+    b.textContent = c.kode_2023;
+    b.className = `badge r${c.regime_2023}`;
+
+    const migTxt = state.lang === "id"
+      ? `Rezim 2015: <strong>${c.kode_2015}</strong> → 2023: <strong>${c.kode_2023}</strong> (Biner k=2: <strong>${c.kode_k2 || (c.regime_2023 <= 2 ? "B1" : "B2")}</strong>) · Populasi: <strong class="num">${fmt(c.population_m, 1)} juta</strong> · Silhouette: <strong class="num">${fmt(c.sil_width, 3)}</strong>`
+      : `2015 Regime: <strong>${c.kode_2015}</strong> → 2023: <strong>${c.kode_2023}</strong> (Binary k=2: <strong>${c.kode_k2 || (c.regime_2023 <= 2 ? "B1" : "B2")}</strong>) · Pop: <strong class="num">${fmt(c.population_m, 1)}M</strong> · Silhouette: <strong class="num">${fmt(c.sil_width, 3)}</strong>`;
+    $("insp-migration-line").innerHTML = `<span>${migTxt}</span>`;
+
+    $("insp-methods").innerHTML = [
+      ["K-Means", `R${c.regime_2023}`],
+      ["Ward D2", `R${c.regime_ward}`],
+      ["PAM", `R${c.regime_pam}`],
+      ["GMM", `R${c.regime_gmm}`]
+    ].map(([m, val]) => `<div class="method-pill"><span class="muted">${m}</span><strong style="color:${regimeColorVar(val)}">${val}</strong></div>`).join("");
+
+    const metrics = [
+      {
+        lbl: state.lang === "id" ? "Akses Listrik (SDG 7.1.1)" : "Electricity Access (SDG 7.1.1)",
+        val: c.elec_2023, med: rg.elec_median, max: 100, unit: "%", d: 1
+      },
+      {
+        lbl: state.lang === "id" ? "Memasak Bersih (SDG 7.1.2)" : "Clean Cooking (SDG 7.1.2)",
+        val: c.cooking_2023, med: rg.cooking_median, max: 100, unit: "%", d: 1
+      },
+      {
+        lbl: state.lang === "id" ? "Pangsa EBT Final (SDG 7.2.1)" : "Renewable Share TFEC (SDG 7.2.1)",
+        val: c.renew_share_2023, med: rg.renew_share_median, max: 100, unit: "%", d: 1
+      },
+      {
+        lbl: state.lang === "id" ? "Kapasitas Listrik EBT (SDG 7.b.1)" : "Renewable Power Cap. (SDG 7.b.1)",
+        val: c.renew_cap_2023, med: rg.renew_cap_median, max: 2000, unit: " W/kap", d: 1, log: true
+      },
+      {
+        lbl: state.lang === "id" ? "Intensitas Energi (SDG 7.3.1)" : "Energy Intensity (SDG 7.3.1)",
+        val: c.energy_int_2023, med: rg.energy_int_median, max: 15, unit: " MJ/$", d: 2
+      },
+      {
+        lbl: state.lang === "id" ? "Emisi CO2 per Kapita (SDG 13)" : "CO2 per Capita (SDG 13)",
+        val: c.co2_pc_2023, med: rg.co2_pc_median, max: 25, unit: " t", d: 2, log: true
+      }
+    ];
+
+    $("insp-bars").innerHTML = metrics.map((m) => {
+      const pct = m.log
+        ? Math.min(100, (Math.log1p(m.val) / Math.log1p(m.max)) * 100)
+        : Math.min(100, (m.val / m.max) * 100);
+      const medPct = m.log
+        ? Math.min(100, (Math.log1p(m.med) / Math.log1p(m.max)) * 100)
+        : Math.min(100, (m.med / m.max) * 100);
+      const medWord = state.lang === "id" ? "Median" : "Median";
+      return `<div class="mbar-row">
+        <div class="mbar-top">
+          <span>${m.lbl}</span>
+          <span class="num"><strong>${fmt(m.val, m.d)}${m.unit}</strong> <span class="muted">(${medWord} ${c.kode_2023}: ${fmt(m.med, m.d)})</span></span>
+        </div>
+        <div class="mbar-track">
+          <div class="mbar-fill" style="width:${pct.toFixed(1)}%;background:${regimeColorVar(c.regime_2023)}"></div>
+          <div class="mbar-marker" style="left:${medPct.toFixed(1)}%" title="${medWord} ${c.kode_2023}"></div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderRegimeCards() {
+    const t = I18N[state.lang];
+    $("regime-cards").innerHTML = DATA.regimes.map((rg) => {
+      const nm = state.lang === "id" ? rg.nama_id : rg.nama_en;
+      const pol = REGIME_POLICY[state.lang][rg.regime_km];
+      return `<article class="regime-card" data-r="${rg.regime_km}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <span class="badge r${rg.regime_km}">${rg.kode_rezim} · ${rg.n_negara} ${state.lang === "id" ? "Negara" : "Countries"}</span>
+          <span class="muted num" style="font-size:12px">Jaccard ${fmt(rg.jaccard_km, 3)}</span>
+        </div>
+        <h3>${nm}</h3>
+        <dl class="regime-dl">
+          <dt>${t.popLbl}</dt><dd>${fmt(rg.populasi_miliar, 2)} ${state.lang === "id" ? "Miliar" : "Bn"}</dd>
+          <dt>SDG 7.1.1 / 7.1.2</dt><dd>${fmt(rg.elec_mean, 1)}% / ${fmt(rg.cooking_mean, 1)}%</dd>
+          <dt>SDG 7.2.1 (TFEC)</dt><dd>${fmt(rg.renew_share_mean, 1)}%</dd>
+          <dt>SDG 7.b.1 (Median)</dt><dd>${fmt(rg.renew_cap_median, 1)} W/kap</dd>
+          <dt>SDG 7.3.1 / CO2</dt><dd>${fmt(rg.energy_int_mean, 2)} MJ / ${fmt(rg.co2_pc_median, 2)} t</dd>
+          <dt>${t.gdpExtLbl}</dt><dd>$${fmt(rg.gdp_ppp_median_ext, 0)}</dd>
+          <dt>${t.medoidLbl}</dt><dd>${rg.iso3_contoh_pusat} / ${rg.medoid_pam_iso3}</dd>
+        </dl>
+        <p class="muted" style="font-size:12.5px;margin-top:auto;padding-top:6px;border-top:1px solid var(--line)">${pol}</p>
+      </article>`;
+    }).join("");
+  }
+
+  /* Panel 2: Interactive SVG Scatter / Biplot + Diagnostics */
+  function renderEda() {
+    const [title, sub] = I18N[state.lang].edaPresets[state.edaPreset];
+    $("eda-chart-title").textContent = title;
+    $("eda-chart-sub").textContent = sub;
+
+    const W = 680, H = 410, padL = 62, padR = 24, padT = 22, padB = 48;
+    const pw = W - padL - padR, ph = H - padT - padB;
+    const pts = DATA.countries;
+
+    let xGet, yGet, xLbl, yLbl, xFmt, yFmt;
+    if (state.edaPreset === "paradox") {
+      xGet = (c) => c.renew_share_2023;
+      yGet = (c) => Math.log10(c.renew_cap_2023 + 1);
+      xLbl = state.lang === "id" ? "Pangsa Energi Terbarukan Final - SDG 7.2.1 (%)" : "Renewable Energy Share in TFEC - SDG 7.2.1 (%)";
+      yLbl = state.lang === "id" ? "log10(Kapasitas Listrik EBT + 1) [Watt/kapita]" : "log10(Renewable Electricity Cap. + 1) [Watts/capita]";
+      xFmt = (v) => `${v.toFixed(0)}%`;
+      yFmt = (v) => `${Math.round(Math.pow(10, v) - 1)} W`;
+    } else if (state.edaPreset === "pca") {
+      xGet = (c) => c.pc1_2023;
+      yGet = (c) => c.pc2_2023;
+      xLbl = `PC1 (${fmt(DATA.meta.pca_var_pct[0], 1)}%)`;
+      yLbl = `PC2 (${fmt(DATA.meta.pca_var_pct[1], 1)}%)`;
+      xFmt = (v) => v.toFixed(1);
+      yFmt = (v) => v.toFixed(1);
+    } else {
+      xGet = (c) => c.energy_int_2023;
+      yGet = (c) => Math.log10(c.co2_pc_2023 + 0.1);
+      xLbl = state.lang === "id" ? "Intensitas Energi Primer - SDG 7.3.1 (MJ / USD PPP)" : "Primary Energy Intensity - SDG 7.3.1 (MJ / PPP USD)";
+      yLbl = state.lang === "id" ? "Emisi CO2 per Kapita - SDG 13 (ton, skala log)" : "CO2 Emissions per Capita - SDG 13 (tonnes, log scale)";
+      xFmt = (v) => v.toFixed(1);
+      yFmt = (v) => `${(Math.pow(10, v) - 0.1).toFixed(1)} t`;
+    }
+
+    const xs = pts.map(xGet), ys = pts.map(yGet);
+    const xmin = Math.min(...xs), xmax = Math.max(...xs);
+    const ymin = Math.min(...ys), ymax = Math.max(...ys);
+    const sx = (v) => padL + ((v - xmin) / (xmax - xmin || 1)) * pw;
+    const sy = (v) => padT + ph - ((v - ymin) / (ymax - ymin || 1)) * ph;
+
+    const xTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => xmin + t * (xmax - xmin));
+    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => ymin + t * (ymax - ymin));
+
+    const labelSet = new Set(["IDN", "VNM", "MYS", "SGP", "BRN", "NOR", "ISL", "COD", "ETH", "QAT", "CHN", "USA", state.selectedIso]);
+
+    let vectorsSvg = "";
+    if (state.edaPreset === "pca") {
+      const zeroX = sx(0), zeroY = sy(0);
+      vectorsSvg += `<line x1="${zeroX}" y1="${padT}" x2="${zeroX}" y2="${padT+ph}" stroke="var(--line-strong)" stroke-dasharray="3 3"/>`;
+      vectorsSvg += `<line x1="${padL}" y1="${zeroY}" x2="${padL+pw}" y2="${zeroY}" stroke="var(--line-strong)" stroke-dasharray="3 3"/>`;
+      for (const ld of DATA.meta.pca_loadings) {
+        const vx = sx(ld.PC1 * 3.4), vy = sy(ld.PC2 * 3.4);
+        vectorsSvg += `<line x1="${zeroX}" y1="${zeroY}" x2="${vx}" y2="${vy}" stroke="var(--text)" stroke-width="1.3"/>`;
+        vectorsSvg += `<text x="${vx + (ld.PC1 >= 0 ? 5 : -5)}" y="${vy - 4}" fill="var(--text)" font-size="10.5" font-weight="600" text-anchor="${ld.PC1 >= 0 ? "start" : "end"}">${ld.feature}</text>`;
+      }
+    }
+
+    const circles = pts.map((c) => {
+      const cx = sx(xGet(c)).toFixed(1), cy = sy(yGet(c)).toFixed(1);
+      const sel = c.iso3 === state.selectedIso;
+      const r = sel ? 6.8 : Math.max(3.4, Math.min(8.5, Math.sqrt(c.population_m || 1) * 0.28 + 2.8));
+      const lbl = labelSet.has(c.iso3)
+        ? `<text x="${cx}" y="${(cy - r - 3).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--text)">${c.iso3}</text>`
+        : "";
+      return `<g class="eda-pt" data-iso="${c.iso3}" style="cursor:pointer">
+        <circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${sel ? 1 : 0.78}" stroke="${sel ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2.2 : 0.8}"/>
+        ${lbl}
+      </g>`;
+    }).join("");
+
+    $("eda-svg-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}">
+      ${yTicks.map((tv) => `<g>
+        <line x1="${padL}" y1="${sy(tv).toFixed(1)}" x2="${W - padR}" y2="${sy(tv).toFixed(1)}" stroke="var(--line)" stroke-width="0.8"/>
+        <text x="${padL - 8}" y="${(sy(tv) + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)">${yFmt(tv)}</text>
+      </g>`).join("")}
+      ${xTicks.map((tv) => `<g>
+        <line x1="${sx(tv).toFixed(1)}" y1="${padT}" x2="${sx(tv).toFixed(1)}" y2="${padT + ph}" stroke="var(--line)" stroke-width="0.6"/>
+        <text x="${sx(tv).toFixed(1)}" y="${H - 22}" text-anchor="middle" font-size="11" fill="var(--muted)">${xFmt(tv)}</text>
+      </g>`).join("")}
+      ${vectorsSvg}
+      ${circles}
+      <text x="${padL + pw / 2}" y="${H - 4}" text-anchor="middle" font-size="12" font-weight="600" fill="var(--text)">${xLbl}</text>
+      <text x="14" y="${padT + ph / 2}" transform="rotate(-90 14 ${padT + ph / 2})" text-anchor="middle" font-size="12" font-weight="600" fill="var(--text)">${yLbl}</text>
+    </svg>`;
+
+    const byIso = new Map(pts.map((c) => [c.iso3, c]));
+    $("eda-svg-wrap").querySelectorAll(".eda-pt").forEach((g) => {
+      const c = byIso.get(g.dataset.iso);
+      g.addEventListener("click", () => selectCountry(c.iso3));
+      g.addEventListener("pointerenter", (ev) => {
+        showTip(ev, `<strong>${c.country_en} (${c.kode_2023})</strong><br>SDG 7.2.1: ${fmt(c.renew_share_2023, 1)}% · SDG 7.b.1: ${fmt(c.renew_cap_2023, 1)} W/kap<br>SDG 7.3.1: ${fmt(c.energy_int_2023, 2)} MJ/$ · CO2: ${fmt(c.co2_pc_2023, 2)} t/kap`);
+      });
+      g.addEventListener("pointermove", moveTip);
+      g.addEventListener("pointerleave", hideTip);
+    });
+
+    /* Diagnostics box */
+    const m = DATA.meta;
+    const ariMiss = m.ari_missmda_189 ?? m.ari_missmda;
+    $("eda-diagnostics-box").innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px">
+        <div class="method-pill"><span class="muted">Overall KMO MSA</span><strong class="num">${fmt(m.kmo_overall, 3)}</strong></div>
+        <div class="method-pill"><span class="muted">Bartlett Chi-Sq (df=${m.bartlett_df})</span><strong class="num">${fmt(m.bartlett_chisq, 1)} (p&lt;1e-130)</strong></div>
+        <div class="method-pill"><span class="muted">Hopkins Statistic (H)</span><strong class="num">${fmt(m.hopkins, 4)}</strong></div>
+        <div class="method-pill"><span class="muted">${state.lang === "id" ? "ARI missMDA (189 kasus bersama)" : "missMDA ARI (189 shared cases)"}</span><strong class="num">${fmt(ariMiss, 4)}</strong></div>
+      </div>
+      <table class="compact-table">
+        <thead>
+          <tr>
+            <th>${state.lang === "id" ? "Fitur" : "Feature"}</th>
+            <th class="num">${state.lang === "id" ? "Skew Asli" : "Raw Skew"}</th>
+            <th class="num">${state.lang === "id" ? "Skew Model" : "Model Skew"}</th>
+            <th class="num">KMO Item</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${DATA.desc_stats.map((d) => `<tr>
+            <td><code>${d.fitur_asli}</code></td>
+            <td class="num">${fmt(d.skew_sebelum, 2)}</td>
+            <td class="num"><strong>${fmt(d.skew_sesudah_log, 2)}</strong></td>
+            <td class="num">${fmt(m.kmo_items[d.fitur_model], 3)}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+      <p class="muted" style="font-size:12.5px;margin-top:12px">
+        <strong>${state.lang === "id" ? "Pencilan Multivariat Mahalanobis" : "Mahalanobis Multivariate Outliers"} (D² &gt; 22,46):</strong>
+        ${DATA.outliers.map((o) => `${o.country_en} (${o.iso3}, D²=${fmt(o.mahalanobis_d2, 1)})`).join(", ")}.
+        ${state.lang === "id"
+          ? "Negara berdaulat ini tidak dihapus karena merepresentasikan kondisi ekstrem nyata; kemencengannya diredam melalui transformasi log(1 + x)."
+          : "These sovereign nations are retained as real global extremes; heavy tails are stabilized via log(1 + x) transformation."}
+      </p>
+    `;
+  }
+
+  /* Panel 3: Multi-Method Evaluation Curve + Statistical Insight + Full Table */
+  function renderModels() {
+    const metric = state.evalMetric;
+    const rows = DATA.eval_grid;
+    const methods = ["KMeans", "WardD2", "PAM", "GMM"];
+    const mColors = { KMeans: "var(--r3)", WardD2: "var(--r2)", PAM: "var(--r1)", GMM: "var(--r4)" };
+
+    const W = 640, H = 350, padL = 56, padR = 24, padT = 22, padB = 44;
+    const pw = W - padL - padR, ph = H - padT - padB;
+    const vals = rows.map((r) => r[metric]);
+    const ymin = Math.min(...vals) * 0.92;
+    const ymax = Math.max(...vals) * 1.06;
+    const sx = (k) => padL + ((k - 2) / 4) * pw;
+    const sy = (v) => padT + ph - ((v - ymin) / (ymax - ymin || 1)) * ph;
+    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => ymin + t * (ymax - ymin));
+
+    const linesSvg = methods.map((m) => {
+      const mRows = rows.filter((r) => r.metode === m).sort((a, b) => a.k - b.k);
+      const pts = mRows.map((r) => `${sx(r.k).toFixed(1)},${sy(r[metric]).toFixed(1)}`).join(" ");
+      const dots = mRows.map((r) => `<circle cx="${sx(r.k).toFixed(1)}" cy="${sy(r[metric]).toFixed(1)}" r="4.5" fill="${mColors[m]}" stroke="var(--surface)" stroke-width="1.2">
+        <title>${m} (k=${r.k}): ${fmt(r[metric], 3)}</title>
+      </circle>`).join("");
+      return `<polyline fill="none" stroke="${mColors[m]}" stroke-width="2.4" points="${pts}"/>${dots}`;
+    }).join("");
+
+    $("model-curve-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Kurva perbandingan metrik validasi">
+      ${yTicks.map((tv) => `<g>
+        <line x1="${padL}" y1="${sy(tv).toFixed(1)}" x2="${W - padR}" y2="${sy(tv).toFixed(1)}" stroke="var(--line)" stroke-width="0.8"/>
+        <text x="${padL - 8}" y="${(sy(tv) + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(tv, 2)}</text>
+      </g>`).join("")}
+      <line x1="${sx(2).toFixed(1)}" y1="${padT}" x2="${sx(2).toFixed(1)}" y2="${padT + ph}" stroke="var(--muted)" stroke-width="1.1" stroke-dasharray="2 3"/>
+      <text x="${(sx(2) + 5).toFixed(1)}" y="${padT + 13}" font-size="10.5" font-weight="600" fill="var(--muted)">${state.lang === "id" ? "Biner k = 2" : "Binary k = 2"}</text>
+      <line x1="${sx(4).toFixed(1)}" y1="${padT}" x2="${sx(4).toFixed(1)}" y2="${padT + ph}" stroke="var(--text)" stroke-width="1.3" stroke-dasharray="4 3"/>
+      <text x="${(sx(4) + 6).toFixed(1)}" y="${padT + 13}" font-size="11" font-weight="700" fill="var(--text)">${state.lang === "id" ? "Multi-rezim k = 4" : "Policy k = 4"}</text>
+      ${[2, 3, 4, 5, 6].map((k) => `<text x="${sx(k).toFixed(1)}" y="${H - 16}" text-anchor="middle" font-size="12" font-weight="600" fill="var(--text)">k = ${k}</text>`).join("")}
+      ${linesSvg}
+    </svg>
+    <div class="legend-row">
+      ${methods.map((m) => `<span class="legend-item"><span class="swatch" style="background:${mColors[m]}"></span><strong>${m}</strong></span>`).join("")}
+    </div>`;
+
+    const k2Html = (DATA.regimes_k2 || []).map((b) =>
+      `<tr><td><strong>${b.kode_k2}</strong> (${b.n_negara})</td><td class="num">${fmt(b.jaccard_km_k2, 3)}</td><td class="num">${fmt(b.elec_mean, 1)}% / ${fmt(b.cooking_mean, 1)}%</td><td><code>${b.komposisi_rezim_k4}</code></td></tr>`
+    ).join("");
+    const eiiSil = DATA.meta.gmm_eii_sil_k4 ?? 0.36;
+    const eiiAri = DATA.meta.gmm_eii_ari_k4 ?? 0.90;
+
+    $("model-insight-box").innerHTML = `
+      <p style="font-size:13.5px;margin-bottom:10px">
+        ${state.lang === "id"
+          ? `<strong>1. Optimum Biner (k = 2) vs Puncak Multi-Rezim (k = 4):</strong> Secara global, k = 2 mencapai nilai Jaccard tertinggi (0,976; Silhouette 0,445), tetapi terlalu kasar karena menggabungkan pemimpin EBT Nordik dengan negara pengunci fosil di dalam B2. Di antara partisi multi-rezim (k &ge; 3) yang diperlukan untuk memisahkan Paradoks Biomassa dan intensitas fosil, k = 4 mencapai puncak stabilitas lokal (Jaccard 0,953; seluruh klaster &ge; 0,911; naik dari 0,798 di k = 3 dan mengungguli k = 5 yang Silhouette-nya jatuh ke 0,267; ARI = 0,795 terhadap Ward's D2).`
+          : `<strong>1. Coarse Binary Peak (k = 2) vs Multi-Regime Peak (k = 4):</strong> Globally, k = 2 attains the highest binary Jaccard (0.976; Silhouette 0.445), yet lumps Nordic clean leaders together with fossil-locked states inside B2. Among multi-regime splits (k &ge; 3) needed to separate the Biomass Paradox from fossil lock-in, k = 4 achieves a clear local stability peak (Jaccard 0.953; all clusters &ge; 0.911; up from 0.798 at k = 3, while k = 5 drops Silhouette to 0.267; ARI = 0.795 with Ward's D2).`}
+      </p>
+      <table class="compact-table" style="margin-bottom:12px">
+        <thead><tr><th>${state.lang === "id" ? "Alternatif k=2" : "k=2 Alternative"}</th><th class="num">Jaccard</th><th class="num">SDG 7.1.1/7.1.2</th><th>${state.lang === "id" ? "Rincian di k=4" : "Split in k=4"}</th></tr></thead>
+        <tbody>${k2Html}</tbody>
+      </table>
+      <p style="font-size:13.5px;margin-bottom:12px">
+        ${state.lang === "id"
+          ? `<strong>2. Sensitivitas Spesifikasi Kovarians pada GMM (Tabel 11):</strong> Pada GMM elipsoidal pilihan BIC (VEV, k = 4), kecilnya varians terstandardisasi <code>elec_access</code> pada dua komponen (0,0030 dan 0,0031) konsisten dengan konsentrasi pengamatan di batas atas akses listrik 100%. Ketika keenam variabel dikenai asumsi kovarians sferis isotropik (<code>GMM EII</code>), Silhouette Euclidean berubah dari 0,198 menjadi <strong>${fmt(eiiSil, 3)}</strong> (ARI terhadap K-Means bergeser dari 0,367 menjadi <strong>${fmt(eiiAri, 3)}</strong>), sehingga perbedaan skor ini mencerminkan sensitivitas hasil terhadap spesifikasi kovarians di seluruh enam fitur.`
+          : `<strong>2. Sensitivity to Covariance Specification in GMM (Table 11):</strong> Under BIC-selected ellipsoidal GMM (VEV, k = 4), the tiny standardized <code>elec_access</code> variances in two components (0.0030 and 0.0031) are consistent with observation concentration at the 100% electricity ceiling. Imposing isotropic spherical covariance across all six variables (<code>GMM EII</code>) shifts Euclidean Silhouette from 0.198 to <strong>${fmt(eiiSil, 3)}</strong> (and ARI vs K-Means from 0.367 to <strong>${fmt(eiiAri, 3)}</strong>), showing that the score difference reflects sensitivity to covariance specification across all six features.`}
+      </p>
+      <h3 style="margin-bottom:6px">${state.lang === "id" ? "Matriks Kesepakatan ARI Antar-Metode (k = 4)" : "Cross-Method ARI Agreement Matrix (k = 4)"}</h3>
+      <table class="compact-table">
+        <thead><tr><th>Metode</th><th class="num">KMeans</th><th class="num">WardD2</th><th class="num">PAM</th><th class="num">GMM</th></tr></thead>
+        <tbody>
+          ${DATA.ari_matrix.map((r) => `<tr>
+            <td><strong>${r.metode}</strong></td>
+            <td class="num">${fmt(r.KMeans, 3)}</td>
+            <td class="num">${fmt(r.WardD2, 3)}</td>
+            <td class="num">${fmt(r.PAM, 3)}</td>
+            <td class="num">${fmt(r.GMM, 3)}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    `;
+
+    $("eval-full-table").innerHTML = `
+      <thead>
+        <tr>
+          <th>Metode</th>
+          <th class="num">k</th>
+          <th class="num">Silhouette ↑</th>
+          <th class="num">Davies-Bouldin ↓</th>
+          <th class="num">Calinski-Harabasz ↑</th>
+          <th class="num">Dunn ↑</th>
+          <th class="num">Jaccard Mean ↑</th>
+          <th class="num">Jaccard Min ↑</th>
+          <th class="num">Boot OK</th>
+          <th class="num">Min n</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((r) => `<tr style="${r.metode === "KMeans" && r.k === 4 ? "background:var(--accent-soft);font-weight:650" : ""}">
+          <td>${r.metode}</td>
+          <td class="num">${r.k}</td>
+          <td class="num">${fmt(r.silhouette, 3)}</td>
+          <td class="num">${fmt(r.davies_bouldin, 3)}</td>
+          <td class="num">${fmt(r.calinski_harabasz, 1)}</td>
+          <td class="num">${fmt(r.dunn, 3)}</td>
+          <td class="num">${fmt(r.jaccard_mean, 3)}</td>
+          <td class="num">${fmt(r.jaccard_min, 3)}</td>
+          <td class="num">${r.boot_berhasil ?? 500}/${r.boot_total ?? 500}</td>
+          <td class="num">${r.ukuran_klaster_min}</td>
+        </tr>`).join("")}
+      </tbody>
+    `;
+  }
+
+  /* Panel 4: 2015-2023 Migration Matrix + ASEAN Clean Tech Stacked Bars + Indonesia Policy */
+  function renderAseanAndTransition() {
+    const migMap = new Map(DATA.migration.map((m) => [`${m.kode_2015}_${m.kode_2023}`, m.n]));
+    const codes = ["R1", "R2", "R3", "R4"];
+
+    let gridHtml = `<div class="mig-grid"><div class="mig-hdr">2015 \\ 2023</div>` +
+      codes.map((c) => `<div class="mig-hdr">→ ${c}</div>`).join("");
+
+    for (const r15 of codes) {
+      gridHtml += `<div class="mig-hdr">${r15}</div>`;
+      for (const r23 of codes) {
+        const key = `${r15}_${r23}`;
+        const cnt = migMap.get(key) || 0;
+        const pressed = state.migCell === key;
+        gridHtml += `<button type="button" class="mig-cell" data-cell="${key}" aria-pressed="${pressed}">
+          <strong>${cnt}</strong>
+          <span>${r15}→${r23}</span>
+        </button>`;
+      }
+    }
+    gridHtml += `</div>`;
+    $("mig-matrix-box").innerHTML = gridHtml;
+
+    $("mig-matrix-box").querySelectorAll(".mig-cell").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.migCell = btn.dataset.cell;
+        renderAseanAndTransition();
+      });
+    });
+
+    const [f15, t23] = state.migCell.split("_");
+    const matched = DATA.countries.filter((c) => c.kode_2015 === f15 && c.kode_2023 === t23);
+    $("mig-list-box").innerHTML = matched.length === 0
+      ? `<p class="muted">${state.lang === "id" ? `Tidak ada negara pada perpindahan ${f15} ke ${t23}.` : `Zero countries transitioned from ${f15} to ${t23}.`}</p>`
+      : `<p style="margin-bottom:6px"><strong>${f15} → ${t23} (${matched.length} ${state.lang === "id" ? "negara" : "countries"}):</strong></p>
+         <div style="display:flex;flex-wrap:wrap;gap:6px">
+           ${matched.map((c) => `<button type="button" class="btn" style="min-height:36px;padding:0 10px;font-size:12.5px" data-pick="${c.iso3}">${c.country_en} (${c.iso3})</button>`).join("")}
+         </div>`;
+
+    $("mig-list-box").querySelectorAll("[data-pick]").forEach((b) => {
+      b.addEventListener("click", () => {
+        selectCountry(b.dataset.pick);
+        activateTab($("tab-atlas"), false);
+      });
+    });
+
+    /* ASEAN Stacked Horizontal SVG Chart */
+    const asean = DATA.countries.filter((c) => c.is_asean).sort((a, b) => b.renew_cap_2023 - a.renew_cap_2023);
+    const techs = [
+      { key: "cap_hydro_wpc", lbl: "Hydro", col: "#0284C7" },
+      { key: "cap_solar_wpc", lbl: "Solar", col: "#F59E0B" },
+      { key: "cap_wind_wpc", lbl: "Wind", col: "#10B981" },
+      { key: "cap_geothermal_wpc", lbl: "Geothermal", col: "#DC2626" },
+      { key: "cap_bioenergy_wpc", lbl: "Bioenergy", col: "#8B5CF6" }
+    ];
+    const maxW = Math.max(...asean.map((c) => c.renew_cap_2023), 500);
+    const W = 620, rowH = 30, padL = 148, padR = 68, padT = 14, padB = 30;
+    const H = padT + asean.length * rowH + padB;
+    const barW = W - padL - padR;
+
+    const barsSvg = asean.map((c, i) => {
+      const y = padT + i * rowH;
+      let accX = padL;
+      const segs = techs.map((t) => {
+        const v = Math.max(0, c[t.key] || 0);
+        const w = (v / maxW) * barW;
+        const rect = w > 0.4 ? `<rect x="${accX.toFixed(1)}" y="${y + 5}" width="${w.toFixed(1)}" height="19" fill="${t.col}"><title>${c.country_en} · ${t.lbl}: ${fmt(v, 1)} W/kap</title></rect>` : "";
+        accX += w;
+        return rect;
+      }).join("");
+      const isIdn = c.iso3 === "IDN";
+      return `<g style="cursor:pointer" data-asean="${c.iso3}">
+        <text x="${padL - 8}" y="${y + 19}" text-anchor="end" font-size="12" font-weight="${isIdn ? 700 : 500}" fill="${isIdn ? "var(--accent)" : "var(--text)"}">${c.country_en} (${c.kode_2023})</text>
+        ${segs}
+        <text x="${(accX + 6).toFixed(1)}" y="${y + 19}" font-size="11.5" font-weight="${isIdn ? 700 : 500}" fill="var(--text)">${fmt(c.renew_cap_2023, 1)} W</text>
+      </g>`;
+    }).join("");
+
+    $("asean-bars-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Bauran teknologi listrik EBT negara ASEAN">
+      ${barsSvg}
+    </svg>
+    <div class="legend-row">
+      ${techs.map((t) => `<span class="legend-item"><span class="swatch" style="background:${t.col}"></span>${t.lbl}</span>`).join("")}
+    </div>`;
+
+    $("asean-bars-wrap").querySelectorAll("[data-asean]").forEach((g) => {
+      g.addEventListener("click", () => {
+        selectCountry(g.dataset.asean);
+        activateTab($("tab-atlas"), false);
+      });
+    });
+
+    /* Indonesia Policy Synthesis */
+    const idn = DATA.countries.find((c) => c.iso3 === "IDN");
+    const vnm = DATA.countries.find((c) => c.iso3 === "VNM");
+    const mys = DATA.countries.find((c) => c.iso3 === "MYS");
+    $("idn-policy-content").innerHTML = state.lang === "id"
+      ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;font-size:13.5px">
+          <div>
+            <h3>1. Capaian Dasar 2015 ke 2023</h3>
+            <p class="muted" style="margin-top:4px">Indonesia konsisten berada di <strong>Rezim R3</strong> berkat lonjakan akses memasak bersih dari <strong>${fmt(idn.cooking_2015, 0)}%</strong> (2015) menjadi <strong>${fmt(idn.cooking_2023, 0)}%</strong> (2023) serta elektrifikasi <strong>${fmt(idn.elec_2023, 1)}%</strong> dan intensitas energi yang relatif efisien (<strong>${fmt(idn.energy_int_2023, 2)} MJ/$</strong>).</p>
+          </div>
+          <div>
+            <h3>2. Celah Kritis Kapasitas EBT (SDG 7.b.1)</h3>
+            <p class="muted" style="margin-top:4px">Di dalam Rezim R3 (median 552 W/kapita), kapasitas listrik EBT Indonesia baru mencapai <strong>${fmt(idn.renew_cap_2023, 1)} W/kapita</strong> (tenaga air ${fmt(idn.cap_hydro_wpc, 1)} W, bioenergi ${fmt(idn.cap_bioenergy_wpc, 1)} W, panas bumi ${fmt(idn.cap_geothermal_wpc, 1)} W, surya hanya <strong>${fmt(idn.cap_solar_wpc, 1)} W</strong>), tertinggal jauh dari Vietnam (<strong>${fmt(vnm.renew_cap_2023, 0)} W/kapita</strong>) dan Malaysia (<strong>${fmt(mys.renew_cap_2023, 0)} W/kapita</strong>, yang sukses berpindah dari R4 ke R3).</p>
+          </div>
+          <div>
+            <h3>3. Rekomendasi Kebijakan Berbasis Bukti</h3>
+            <p class="muted" style="margin-top:4px">Pendanaan JETP dan RUPTL perlu difokuskan pada percepatan PLTS atap/skala utilitas (mengadopsi skema pengadaan transparan), interkoneksi jaringan antarpulau untuk menyerap potensi panas bumi &amp; hidro, serta elektrifikasi kepulauan 3T agar sisa 0,6% populasi tanpa listrik tuntas tanpa generator diesel.</p>
+          </div>
+        </div>`
+      : `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;font-size:13.5px">
+          <div>
+            <h3>1. Baseline Gains (2015 to 2023)</h3>
+            <p class="muted" style="margin-top:4px">Indonesia sits in <strong>Regime R3</strong> driven by expanding clean cooking from <strong>${fmt(idn.cooking_2015, 0)}%</strong> (2015) to <strong>${fmt(idn.cooking_2023, 0)}%</strong> (2023), <strong>${fmt(idn.elec_2023, 1)}%</strong> electricity access, and moderate energy intensity (<strong>${fmt(idn.energy_int_2023, 2)} MJ/$</strong>).</p>
+          </div>
+          <div>
+            <h3>2. The Renewable Power Bottleneck (SDG 7.b.1)</h3>
+            <p class="muted" style="margin-top:4px">Within Regime R3 (median 552 W/capita), Indonesia installs only <strong>${fmt(idn.renew_cap_2023, 1)} W/capita</strong> (hydro ${fmt(idn.cap_hydro_wpc, 1)} W, bioenergy ${fmt(idn.cap_bioenergy_wpc, 1)} W, geothermal ${fmt(idn.cap_geothermal_wpc, 1)} W, solar just <strong>${fmt(idn.cap_solar_wpc, 1)} W</strong>), 10x behind Viet Nam (<strong>${fmt(vnm.renew_cap_2023, 0)} W/capita</strong>) and behind Malaysia (<strong>${fmt(mys.renew_cap_2023, 0)} W/capita</strong>, which decoupled from R4 to R3).</p>
+          </div>
+          <div>
+            <h3>3. Evidence-Based Policy Actions</h3>
+            <p class="muted" style="margin-top:4px">Channel JETP and RUPTL capital toward utility/rooftop solar PV procurement reform, inter-island transmission grids to unlock geothermal and hydro baseload, and solar mini-grids to close the final 0.6% rural island electrification gap without diesel lock-in.</p>
+          </div>
+        </div>`;
+  }
+
+  /* Panel 5: Accessible Sortable Table (existing DOM rows moved via moveBefore / append) */
+  function buildTableOnce() {
+    const tbody = $("country-tbody");
+    const regions = [...new Set(DATA.countries.map((c) => c.region))].sort();
+    const regSel = $("table-region");
+    for (const rg of regions) {
+      const opt = document.createElement("option");
+      opt.value = rg;
+      opt.textContent = rg;
+      regSel.appendChild(opt);
+    }
+
+    const sortedInit = [...DATA.countries].sort((a, b) => b.renew_cap_2023 - a.renew_cap_2023);
+    const frag = document.createDocumentFragment();
+
+    for (const c of sortedInit) {
+      const tr = document.createElement("tr");
+      tr.dataset.iso = c.iso3;
+      tr.dataset.regime = c.kode_2023;
+      tr.dataset.region = c.region;
+      tr.dataset.asean = c.is_asean ? "1" : "0";
+      tr.dataset.search = `${c.country_en} ${c.iso3} ${c.region}`.toLowerCase();
+      tr.classList.toggle("is-active", c.iso3 === state.selectedIso);
+
+      tr.innerHTML = `
+        <th scope="row" data-value="${c.country_en}">${c.country_en} <span class="muted">(${c.iso3})</span></th>
+        <td data-value="${c.kode_2023}"><span class="badge r${c.regime_2023}">${c.kode_2023}</span></td>
+        <td data-value="${c.kode_2015}">${c.kode_2015}</td>
+        <td class="num" data-value="${c.elec_2023}">${fmt(c.elec_2023, 1)}</td>
+        <td class="num" data-value="${c.cooking_2023}">${fmt(c.cooking_2023, 1)}</td>
+        <td class="num" data-value="${c.renew_share_2023}">${fmt(c.renew_share_2023, 1)}</td>
+        <td class="num" data-value="${c.renew_cap_2023}">${fmt(c.renew_cap_2023, 1)}</td>
+        <td class="num" data-value="${c.energy_int_2023}">${fmt(c.energy_int_2023, 2)}</td>
+        <td class="num" data-value="${c.co2_pc_2023}">${fmt(c.co2_pc_2023, 2)}</td>
+        <td class="num" data-value="${c.sil_width}">${fmt(c.sil_width, 3)}</td>
+      `;
+      tr.addEventListener("click", () => selectCountry(c.iso3));
+      frag.appendChild(tr);
+    }
+    tbody.replaceChildren(frag);
+
+    const table = $("country-table");
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+
+    function reorderDom(container, orderedRows) {
+      const move = Object.hasOwn(Element.prototype, "moveBefore")
+        ? (node) => container.moveBefore(node, null)
+        : (node) => container.append(node);
+      for (const row of orderedRows) move(row);
+    }
+
+    function sortByButton(button) {
+      const th = button.closest("th");
+      const direction = th.getAttribute("aria-sort") === "ascending" ? "descending" : "ascending";
+      for (const h of table.tHead.rows[0].cells) h.removeAttribute("aria-sort");
+      th.setAttribute("aria-sort", direction);
+
+      const idx = th.cellIndex;
+      const type = th.dataset.type;
+      const factor = direction === "ascending" ? 1 : -1;
+      const rows = [...tbody.rows];
+      const valMap = new Map(rows.map((r) => [r, r.cells[idx].dataset.value]));
+
+      rows.sort((a, b) => {
+        const va = valMap.get(a), vb = valMap.get(b);
+        return factor * (type === "number" ? Number(va) - Number(vb) : collator.compare(va, vb));
+      });
+
+      reorderDom(tbody, rows);
+      const visibleCount = rows.filter((r) => !r.hidden).length;
+      $("table-sort-status").textContent = `Diurutkan berdasarkan ${button.textContent.trim()}, ${direction}, ${visibleCount} baris`;
+    }
+
+    table.addEventListener("command", (ev) => {
+      if (ev.command === "--sort") sortByButton(ev.source);
+    });
+    if (!("commandForElement" in HTMLButtonElement.prototype)) {
+      for (const btn of table.tHead.querySelectorAll('button[command="--sort"]')) {
+        btn.addEventListener("click", () => sortByButton(btn));
+      }
+    }
+
+    const filterTable = () => {
+      const q = $("table-search").value.trim().toLowerCase();
+      const rf = $("table-regime").value;
+      const rgf = $("table-region").value;
+      let shown = 0;
+      for (const tr of tbody.rows) {
+        const okQ = !q || tr.dataset.search.includes(q);
+        const okR = rf === "ALL" || tr.dataset.regime === rf;
+        const okReg = rgf === "ALL" || (rgf === "ASEAN" ? tr.dataset.asean === "1" : tr.dataset.region === rgf);
+        const vis = okQ && okR && okReg;
+        tr.hidden = !vis;
+        if (vis) shown++;
+      }
+      $("table-empty").hidden = shown > 0;
+      $("country-table-wrap").hidden = shown === 0;
+    };
+
+    $("table-search").addEventListener("input", filterTable);
+    $("table-regime").addEventListener("change", filterTable);
+    $("table-region").addEventListener("change", filterTable);
+    $("reset-table-btn").addEventListener("click", () => {
+      $("table-search").value = "";
+      $("table-regime").value = "ALL";
+      $("table-region").value = "ALL";
+      filterTable();
+    });
+  }
+
+  function renderMethodology() {
+    const enLabels = [
+      "Electricity Access (SDG 7.1.1, %)",
+      "Clean Cooking (SDG 7.1.2, %)",
+      "Final Renewable Share (SDG 7.2.1, %)",
+      "Renewable Power Capacity (SDG 7.b.1, W/cap)",
+      "Primary Energy Intensity (SDG 7.3.1, MJ/$)",
+      "Per-Capita CO2 Emissions (SDG 13, t/cap)"
+    ];
+    $("methodology-notes").innerHTML = `
+      <table class="compact-table" style="margin-bottom:14px">
+        <thead>
+          <tr>
+            <th>${state.lang === "id" ? "Indikator" : "Indicator"}</th>
+            <th>${state.lang === "id" ? "Kode Variabel" : "Variable Code"}</th>
+            <th class="num">${state.lang === "id" ? "Cakupan 2023" : "2023 Coverage"}</th>
+            <th class="num">${state.lang === "id" ? "Median Global" : "Global Median"}</th>
+            <th>${state.lang === "id" ? "Peran & Transformasi" : "Role & Transformation"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${DATA.audit_data.map((a, i) => `<tr>
+            <td><strong>${state.lang === "id" ? a.label_id : enLabels[i]}</strong></td>
+            <td><code>${a.variabel}</code></td>
+            <td class="num">${a.n_tersedia_2023} / ${a.n_total_ekonomi_wb}</td>
+            <td class="num">${fmt(a.median_2023, 2)}</td>
+            <td>${i >= 3
+              ? (state.lang === "id" ? "log(1 + x) lalu Z-score (2023)" : "log(1 + x) then Z-score (2023)")
+              : "Z-score (2023)"}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+      <p class="muted" style="font-size:13px">
+        ${state.lang === "id"
+          ? `<strong>Protokol Anti-Kebocoran Data (Zero Data Leakage):</strong> (1) PDB per kapita PPP (uji Kruskal-Wallis eksternal H = ${fmt(DATA.meta.kw_gdp_chisq, 1)}, p &lt; 1e-24), tingkat urbanisasi, dan klasifikasi wilayah Bank Dunia ditahan sepenuhnya di luar pembentukan klaster; (2) Data baseline Paris 2015 ditransformasi dan distandardisasi memakai rata-rata serta simpangan baku tahun 2023 sebelum dipetakan ke centroid terdekat agar batas rezim konsisten lintas waktu.`
+          : `<strong>Zero Data Leakage Protocol:</strong> (1) Per-capita GDP PPP (external Kruskal-Wallis H = ${fmt(DATA.meta.kw_gdp_chisq, 1)}, p &lt; 1e-24), urbanization rate, and World Bank region classifications are strictly excluded from cluster formation; (2) 2015 Paris baseline observations are transformed and standardized using 2023 means and standard deviations before nearest-centroid projection so regime boundaries stay fixed over time.`}
+      </p>
+    `;
+  }
+
+  function selectCountry(iso3) {
+    state.selectedIso = iso3;
+    $("country-picker").value = iso3;
+    renderInspector();
+    updateMapColorsAndZoom();
+    renderEda();
+    for (const tr of $("country-tbody").rows) {
+      tr.classList.toggle("is-active", tr.dataset.iso === iso3);
+    }
+  }
+
+  function applyLanguage() {
+    const t = I18N[state.lang];
+    document.documentElement.lang = state.lang;
+    $("lang-id").setAttribute("aria-pressed", state.lang === "id" ? "true" : "false");
+    $("lang-en").setAttribute("aria-pressed", state.lang === "en" ? "true" : "false");
+
+    $("t-brand").textContent = t.brand;
+    $("t-theme-btn").textContent = t.themeBtn;
+    $("t-dl-csv").textContent = t.dlCsv;
+    $("t-title").textContent = t.title;
+    $("t-subtitle").textContent = t.subtitle;
+    $("t-context").innerHTML = t.context;
+    $("t-footer").innerHTML = t.footer;
+
+    tabs.forEach((tab, i) => { tab.textContent = t.tabs[i]; });
+    $("zoom-world").textContent = t.zoomWorld;
+    $("zoom-asean").textContent = t.zoomAsean;
+    $("h-map-card").textContent = t.mapCardTitle;
+    $("p-map-hint").textContent = t.mapHint;
+    $("lbl-map-layer").textContent = t.lblMapLayer;
+    $("lbl-map-zoom").textContent = t.lblMapZoom;
+    $("lbl-regime-filter").textContent = t.lblRegimeFilter;
+    $("lbl-country-picker").textContent = t.lblCountryPicker;
+
+    t.kpis.forEach(([v, l, s], idx) => {
+      const n = idx + 1;
+      $(`kpi-${n}-val`).textContent = v;
+      $(`kpi-${n}-lbl`).textContent = l;
+      $(`kpi-${n}-sub`).textContent = s;
+    });
+
+    const layerSel = $("map-layer-select");
+    t.mapLayers.forEach(([val, txt], i) => { if (layerSel.options[i]) layerSel.options[i].textContent = txt; });
+    const regFilterSel = $("atlas-regime-filter");
+    t.regimeOpts.forEach(([val, txt], i) => { if (regFilterSel.options[i]) regFilterSel.options[i].textContent = txt; });
+
+    document.querySelectorAll(".th-lbl").forEach((el) => {
+      const k = el.dataset.k;
+      if (t.thLabels[k]) el.textContent = t.thLabels[k];
+    });
+
+    $("h-eda-diag").textContent = state.lang === "id" ? "Uji Kelayakan Data & Penanganan Kemencengan" : "Data Adequacy & Skewness Diagnostics";
+    $("p-eda-diag").textContent = state.lang === "id" ? "Ringkasan audit prapengolahan sebelum pemodelan (bebas kebocoran data)." : "Pre-modeling audit summary under zero data leakage.";
+    $("lbl-eda-preset").textContent = state.lang === "id" ? "Tampilan Eksplorasi Utama" : "Primary Exploratory View";
+    const edaBtns = document.querySelectorAll(".eda-preset");
+    const edaBtnTxt = state.lang === "id"
+      ? ["Paradoks Biomassa (SDG 7.2.1 vs 7.b.1)", "Biplot PCA (77,1% Varians)", "Intensitas Energi vs Emisi CO2"]
+      : ["Biomass Paradox (SDG 7.2.1 vs 7.b.1)", "PCA Biplot (77.1% Variance)", "Energy Intensity vs CO2"];
+    edaBtns.forEach((b, i) => { if (edaBtnTxt[i]) b.textContent = edaBtnTxt[i]; });
+
+    $("lbl-metric-select").textContent = state.lang === "id" ? "Metrik Validasi Klaster (k = 2 s/d 6)" : "Cluster Validation Metric (k = 2 to 6)";
+    const metSel = $("metric-select");
+    const metOpts = state.lang === "id"
+      ? [
+          "Stabilitas Jaccard Bootstrap (B = 500, lebih tinggi lebih stabil)",
+          "Average Silhouette Width (lebih tinggi lebih kompak)",
+          "Davies-Bouldin Index (lebih rendah lebih terpisah)",
+          "Calinski-Harabasz Pseudo-F (lebih tinggi lebih baik)",
+          "Dunn Index (rasio pemisahan terburuk, lebih tinggi lebih baik)"
+        ]
+      : [
+          "Bootstrap Jaccard Stability (B = 500, higher is more stable)",
+          "Average Silhouette Width (higher is more compact)",
+          "Davies-Bouldin Index (lower is better separated)",
+          "Calinski-Harabasz Pseudo-F (higher is better)",
+          "Dunn Index (worst-case separation ratio, higher is better)"
+        ];
+    metOpts.forEach((txt, i) => { if (metSel.options[i]) metSel.options[i].textContent = txt; });
+
+    $("h-model-curve").textContent = state.lang === "id" ? "Kurva Perbandingan Empat Algoritma Clustering" : "Four-Algorithm Validation Curves";
+    $("p-model-curve").textContent = state.lang === "id"
+      ? "Garis titik-titik k = 2 menandai optimum biner kasar; garis putus-putus k = 4 menandai puncak stabilitas multi-rezim."
+      : "Dotted k = 2 marks the coarse binary peak; dashed k = 4 marks the multi-regime stability peak.";
+    $("lbl-t-search").textContent = state.lang === "id" ? "Cari Negara / Kode ISO3" : "Search Country / ISO3 Code";
+    $("table-search").placeholder = state.lang === "id" ? "Mis. Indonesia, IDN, VNM..." : "e.g. Indonesia, IDN, VNM...";
+    $("lbl-t-regime").textContent = state.lang === "id" ? "Filter Rezim 2023" : "Filter 2023 Regime";
+    $("lbl-t-region").textContent = state.lang === "id" ? "Filter Wilayah" : "Filter Region";
+    $("reset-table-btn").textContent = state.lang === "id" ? "Reset Filter" : "Reset Filters";
+    $("t-empty-msg").textContent = state.lang === "id"
+      ? "Tidak ada negara yang cocok dengan kombinasi pencarian saat ini."
+      : "No countries match the current filter combination.";
+    const trSel = $("table-regime");
+    const trOpts = state.lang === "id"
+      ? ["Semua Rezim", "R1 · Defisit & Biomassa", "R2 · Transisi Akses", "R3 · Elektrifikasi Efisien", "R4 · Intensif Fosil"]
+      : ["All Regimes", "R1 · Deficit & Biomass", "R2 · Expanding Access", "R3 · Efficient Electrification", "R4 · Fossil-Locked"];
+    trOpts.forEach((txt, i) => { if (trSel.options[i]) trSel.options[i].textContent = txt; });
+    const regTblSel = $("table-region");
+    if (regTblSel.options[0]) regTblSel.options[0].textContent = state.lang === "id" ? "Semua Wilayah Dunia" : "All World Regions";
+    if (regTblSel.options[1]) regTblSel.options[1].textContent = state.lang === "id" ? "Khusus Anggota ASEAN (11)" : "ASEAN Members Only (11)";
+    $("h-why-kmeans").textContent = state.lang === "id" ? "Spesifikasi Kovarians: K-Means & Ward's D2 vs GMM" : "Covariance Specification: K-Means & Ward's D2 vs GMM";
+    $("p-why-kmeans").textContent = state.lang === "id" ? "Konsentrasi pengamatan di batas atas 100% dan sensitivitas terhadap asumsi kovarians." : "100% boundary concentration and sensitivity to covariance structure.";
+    $("h-eval-all").textContent = state.lang === "id" ? "Tabel Evaluasi Lengkap 20 Konfigurasi Model (4 Metode x 5 Nilai k)" : "Complete Evaluation Table Across 20 Configurations (4 Methods x 5 k)";
+    $("h-mig-card").textContent = state.lang === "id" ? "Matriks Migrasi Rezim Pasca-Paris (2015 ke 2023)" : "Post-Paris Regime Migration Matrix (2015 to 2023)";
+    $("p-mig-card").textContent = state.lang === "id" ? "Klik sel matriks untuk menampilkan daftar negara yang berpindah atau bertahan." : "Click any matrix cell to list countries in that transition.";
+    $("h-asean-chart").textContent = state.lang === "id" ? "Bauran Kapasitas Listrik EBT Negara ASEAN (SDG 7.b.1)" : "ASEAN Renewable Power Capacity Mix (SDG 7.b.1)";
+    $("p-asean-chart").textContent = state.lang === "id" ? "Kapasitas pembangkit terpasang dalam Watt per kapita menurut teknologi (IRENA, 2023)." : "Installed generating capacity in Watts per capita by technology (IRENA, 2023).";
+    $("h-idn-policy").textContent = state.lang === "id" ? "Sintesis Kebijakan untuk Indonesia: Lulus Akses Dasar, Tertahan di Kapasitas EBT" : "Policy Synthesis for Indonesia: Universal Access Achieved, Clean Power Capacity Lagging";
+    $("p-idn-policy").textContent = state.lang === "id" ? "Implikasi berbasis bukti dari perbandingan lintas-waktu 2015 ke 2023 dan benchmark ASEAN." : "Evidence-based implications from 2015-to-2023 trajectory and ASEAN benchmarking.";
+    $("country-table-caption").textContent = state.lang === "id" ? "Data Lengkap 189 Negara Berdaulat: Indikator SDG 7 & SDG 13 serta Hasil Klaster (2023)" : "Complete 189 Sovereign Countries Dataset: SDG 7 & SDG 13 Indicators and Cluster Assignments (2023)";
+    $("h-method-card").textContent = state.lang === "id" ? "Kamus Indikator Resmi & Protokol Pencegahan Kebocoran Data" : "Official Indicator Dictionary & Zero Data Leakage Protocol";
+
+    renderInspector();
+    updateMapColorsAndZoom();
+    renderRegimeCards();
+    renderEda();
+    renderModels();
+    renderAseanAndTransition();
+    renderMethodology();
+  }
+
+  /* CSV export */
+  $("download-csv-btn").addEventListener("click", () => {
+    if (!DATA) return;
+    const cols = ["iso3", "country_en", "region", "income_group", "kode_2015", "kode_2023",
+      "elec_2023", "cooking_2023", "renew_share_2023", "renew_cap_2023",
+      "energy_int_2023", "co2_pc_2023", "gdp_pc_ppp", "sil_width"];
+    const lines = [cols.join(",")];
+    for (const c of DATA.countries) {
+      lines.push(cols.map((k) => {
+        const v = c[k];
+        if (v === null || v === undefined) return "";
+        const s = String(v);
+        return s.includes(",") ? `"${s.replace(/"/g, '""')}"` : s;
+      }).join(","));
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "sdg7_sdg13_189_negara_hasil_klaster.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  /* Wire controls */
+  $("lang-id").addEventListener("click", () => { state.lang = "id"; applyLanguage(); });
+  $("lang-en").addEventListener("click", () => { state.lang = "en"; applyLanguage(); });
+
+  $("map-layer-select").addEventListener("change", (e) => {
+    state.mapLayer = e.target.value;
+    updateMapColorsAndZoom();
+  });
+  $("zoom-world").addEventListener("click", () => {
+    state.mapZoom = "world";
+    $("zoom-world").setAttribute("aria-pressed", "true");
+    $("zoom-asean").setAttribute("aria-pressed", "false");
+    updateMapColorsAndZoom();
+  });
+  $("zoom-asean").addEventListener("click", () => {
+    state.mapZoom = "asean";
+    $("zoom-world").setAttribute("aria-pressed", "false");
+    $("zoom-asean").setAttribute("aria-pressed", "true");
+    updateMapColorsAndZoom();
+  });
+  $("atlas-regime-filter").addEventListener("change", (e) => {
+    state.regimeFilter = e.target.value;
+    updateMapColorsAndZoom();
+  });
+  $("country-picker").addEventListener("change", (e) => selectCountry(e.target.value));
+
+  document.querySelectorAll(".eda-preset").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.edaPreset = btn.dataset.preset;
+      document.querySelectorAll(".eda-preset").forEach((b) => {
+        b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+      });
+      renderEda();
+    });
+  });
+
+  $("metric-select").addEventListener("change", (e) => {
+    state.evalMetric = e.target.value;
+    renderModels();
+  });
+
+  /* Boot */
+  loadData().then((payload) => {
+    DATA = payload;
+    const picker = $("country-picker");
+    const sorted = [...DATA.countries].sort((a, b) => a.country_en.localeCompare(b.country_en));
+    for (const c of sorted) {
+      const opt = document.createElement("option");
+      opt.value = c.iso3;
+      opt.textContent = `${c.country_en} (${c.iso3} · ${c.kode_2023})`;
+      picker.appendChild(opt);
+    }
+    picker.value = state.selectedIso;
+
+    $("app-state").hidden = true;
+    $("panels-root").hidden = false;
+
+    buildMapOnce();
+    buildTableOnce();
+    applyLanguage();
+  }).catch((err) => {
+    const box = $("app-state");
+    box.classList.add("error");
+    $("state-msg").innerHTML = `<strong>Gagal memuat berkas data dashboard.</strong><br>Jalankan server lokal di folder <code>dashboard</code> dengan perintah <code>python -m http.server 8000</code> lalu buka <code>http://localhost:8000</code>.<br><span class="muted">Detail: ${String(err)}</span>`;
+  });
+})();
+</script>
+</body>
+</html>

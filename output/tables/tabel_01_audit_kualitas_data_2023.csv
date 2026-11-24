@@ -1,0 +1,7 @@
+variabel,label_id,n_total_ekonomi_wb,n_tersedia_2023,n_hilang_2023,persen_hilang_2023,min_2023,median_2023,maks_2023,persen_nilai_100
+elec_access,"Akses Listrik (SDG 7.1.1, %)",215,214,1,0.47,5.4,100,100,59.3
+clean_cooking,"Memasak Bersih (SDG 7.1.2, %)",215,192,23,10.7,0,92.5,100,22.9
+renew_share_tfec,"Pangsa EBT Final (SDG 7.2.1, %)",215,213,2,0.93,0,19.79,95.89,0
+renew_cap_wpc,"Kapasitas Listrik EBT (SDG 7.b.1, W/kap)",215,207,8,3.72,0,157.71,7598.7,0
+energy_intensity,"Intensitas Energi Primer (SDG 7.3.1, MJ/$)",215,205,10,4.65,0.42,3.17,28.54,0
+co2_per_capita,"Emisi CO2 per Kapita (SDG 13, t/kap)",215,207,8,3.72,0,2.558,78.857,0

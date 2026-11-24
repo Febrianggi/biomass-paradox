@@ -1,0 +1,5 @@
+regime_km,kode_rezim,nama_id,nama_en,jaccard_km,n_negara,populasi_miliar,elec_mean,elec_median,cooking_mean,cooking_median,renew_share_mean,renew_share_median,renew_cap_mean,renew_cap_median,energy_int_mean,energy_int_median,co2_pc_mean,co2_pc_median,gdp_ppp_median_ext,urban_mean_ext,negara_contoh_pusat,iso3_contoh_pusat,medoid_pam_iso3
+1,R1,Defisit Akses & Perangkap Biomassa,Acute Energy Deficit & Biomass Trap,0.965,27,0.696,38.14,40.5,7.19,5,75.45,78.98,24,11.6,5.81,5.1,0.27,0.17,2758,36.4,Tanzania,TZA,TZA
+2,R2,Transisi Akses Berkembang,"Expanding Access, Cooking-Lag Transition",0.963,41,1.332,80.66,83.6,40.41,44,41.24,40.35,98.2,53.2,3.63,3.47,0.92,0.74,6468,48.5,Senegal,SEN,PAK
+3,R3,Elektrifikasi Efisien & Transisi EBT,Efficient Electrification & Modern Renewables,0.974,95,3.905,99.73,100,94.49,98,20.94,17.14,817.7,552.2,2.68,2.64,4.12,3.67,27237,67.2,Hungary,HUN,JAM
+4,R4,Intensif Fosil & Emisi Tinggi,Fossil-Locked & High-Carbon Intensive,0.911,26,2.087,98,100,96.19,100,7.3,1.31,621.9,114.7,7.69,5.85,15.76,11.99,32950,76.9,"Iran, Islamic Rep.",IRN,SVN

@@ -1,0 +1,16 @@
+variabel,kode_resmi,target_sdg,indikator_sdg,kustodian,satuan,peran_analisis,transformasi_model
+elec_access,EG_ACS_ELEC,SDG 7.1,7.1.1,World Bank / ESMAP (UNSD),% populasi,Fitur Inti Clustering (X1),Z-score
+clean_cooking,EG_EGY_CLEAN,SDG 7.1,7.1.2,WHO (UNSD),% populasi,Fitur Inti Clustering (X2),Z-score
+renew_share_tfec,EG_FEC_RNEW,SDG 7.2,7.2.1,IEA / IRENA / UNSD,% konsumsi energi final,Fitur Inti Clustering (X3),Z-score
+renew_cap_wpc,EG_EGY_RNEW (ALL),SDG 7.b,7.b.1 / 12.a.1,IRENA (UNSD),Watt per kapita,Fitur Inti Clustering (X4),log(1 + x) lalu Z-score
+energy_intensity,EG_EGY_PRIM,SDG 7.3,7.3.1,IEA / UNSD,MJ per USD PPP konstan 2021,Fitur Inti Clustering (X5),log(1 + x) lalu Z-score
+co2_per_capita,EN.GHG.CO2.PC.CE.AR5 / EN_ATM_CO2,SDG 13.2 / 9.4,13.2.2 / 9.4.1,EC-JRC EDGAR AR5 (WB) & IEA (UNSD),ton CO2 per kapita,Fitur Inti Clustering (X6),log(1 + x) lalu Z-score
+elec_rural,EG_ACS_ELEC (RURAL),SDG 7.1,7.1.1,World Bank / UNSD,% populasi perdesaan,Eksplorasi Ketimpangan Desa,Tidak masuk fit model (eksternal)
+cap_solar_wpc,EG_EGY_RNEW (SOLAR),SDG 7.b,7.b.1,IRENA (UNSD),Watt per kapita,Bauran Teknologi EBT,Tidak masuk fit model (eksternal)
+cap_wind_wpc,EG_EGY_RNEW (WIND),SDG 7.b,7.b.1,IRENA (UNSD),Watt per kapita,Bauran Teknologi EBT,Tidak masuk fit model (eksternal)
+cap_hydro_wpc,EG_EGY_RNEW (HYDRO),SDG 7.b,7.b.1,IRENA (UNSD),Watt per kapita,Bauran Teknologi EBT,Tidak masuk fit model (eksternal)
+cap_geothermal_wpc,EG_EGY_RNEW (GEOTH),SDG 7.b,7.b.1,IRENA (UNSD),Watt per kapita,Bauran Teknologi EBT,Tidak masuk fit model (eksternal)
+cap_bioenergy_wpc,EG_EGY_RNEW (BIO),SDG 7.b,7.b.1,IRENA (UNSD),Watt per kapita,Bauran Teknologi EBT,Tidak masuk fit model (eksternal)
+gdp_pc_ppp,NY.GDP.PCAP.PP.KD,SDG 8.1,8.1.1 (proksi),World Bank WDI,USD PPP konstan 2021,Validasi Eksternal (Bebas Bocor),Tidak masuk fit model
+urban_pct,SP.URB.TOTL.IN.ZS,SDG 11,Konteks,UN Population Div / WB,% populasi perkotaan,Validasi Eksternal (Bebas Bocor),Tidak masuk fit model
+population,SP.POP.TOTL,Konteks,Konteks,UN Population Div / WB,Jiwa,Bobot Populasi & Per Kapita,Tidak masuk fit model

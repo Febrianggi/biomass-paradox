@@ -1,0 +1,7 @@
+fitur_asli,fitur_model,mean_asli,sd_asli,median_asli,iqr_asli,skew_sebelum,skew_sesudah_log
+elec_access,elec_access,86.556,23.468,100,18.7,-1.738,-1.738
+clean_cooking,clean_cooking,70.524,35.922,92,55,-0.858,-0.858
+renew_share_tfec,renew_share_tfec,31.256,26.727,23.29,40.5,0.758,0.758
+renew_cap_wpc,log_renew_cap,521.268,968.762,150.806,620.073,4.441,-0.366
+energy_intensity,log_energy_int,4.021,2.932,3.23,2.18,3.91,0.887
+co2_per_capita,log_co2_pc,4.475,7.816,2.485,4.475,5.868,0.598
