@@ -803,11 +803,48 @@ ggsave(file.path(fig_dir, "fig06_migration_matrix_2015_2023.png"), p6, width = 8
 # TAHAP 6: EKSPOR JSON & PETA SVG ROBINSON UNTUK DASHBOARD INTERAKTIF
 # ==============================================================================
 sf_use_s2(FALSE)
-world_sf <- ne_countries(scale = "medium", returnclass = "sf") |>
+robin_crs <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+# Kebijakan batas: Natural Earth 1:50m (de facto), dikoreksi ke batas negara yang diakui PBB.
+# - Krimea & Sevastopol (UA-43, UA-40) -> Ukraina (Resolusi MU PBB 68/262).
+# - Wilayah pecahan tanpa kode ISO 3166-1 -> negara induk: Somaliland -> SOM, Siprus Utara -> CYP.
+# - Wilayah bersengketa lain (Sahara Barat, Kosovo, Siachen, garis kontrol Kashmir) dan dependensi
+#   yang berkode sendiri digambar terpisah sebagai "tanpa data" kecuali termasuk 189 negara analisis.
+fold_iso3 <- c(SOL = "SOM", CYN = "CYP")
+world_src <- ne_countries(scale = "medium", returnclass = "sf") |>
   filter(adm0_a3 != "ATA") |>
-  mutate(iso3_map = ifelse(!is.na(iso_a3_eh) & iso_a3_eh != "-99", iso_a3_eh, adm0_a3)) |>
-  st_transform("+proj=robin +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs") |>
+  mutate(iso3_map = ifelse(!is.na(iso_a3_eh) & iso_a3_eh != "-99", iso_a3_eh, adm0_a3),
+         iso3_map = ifelse(iso3_map %in% names(fold_iso3), fold_iso3[iso3_map], iso3_map)) |>
+  st_transform(robin_crs)
+crimea <- st_as_sf(rnaturalearthdata::states50) |>
+  filter(iso_3166_2 %in% c("UA-43", "UA-40")) |>
+  st_union() |>
+  st_transform(robin_crs)
+stopifnot("Poligon Krimea (UA-43, UA-40) tidak ditemukan!" = !st_is_empty(crimea))
+
+# Sederhanakan jaringan batas SEKALI agar dua negara bertetangga berbagi garis yang identik
+# (tanpa celah/tumpang tindih), lalu bentuk ulang poligon dan beri label dari sumber aslinya.
+edges <- st_geometry(world_src) |> st_boundary() |> st_union() |> st_line_merge() |>
   st_simplify(dTolerance = 25000, preserveTopology = TRUE)
+faces <- st_sf(geometry = st_collection_extract(st_polygonize(edges), "POLYGON"))
+faces$face <- seq_len(nrow(faces))
+# Label = negara dengan tumpang tindih terluas. Muka dengan porsi daratan <25% adalah perairan yang
+# tertutup garis pantai (Laut Kaspia 1%, Pamlico Sound 15%) dan dibuang; pulau tipis/atol yang
+# bergeser karena simplifikasi tetap >=28% (Bahama, Kiribati, Diego Garcia).
+face_lab <- st_intersection(faces, world_src["iso3_map"]) |>
+  mutate(a = as.numeric(st_area(geometry))) |>
+  st_drop_geometry() |>
+  group_by(face, iso3_map) |> summarise(a = sum(a), .groups = "drop") |>
+  slice_max(a, n = 1, by = face, with_ties = FALSE)
+lab <- face_lab[match(faces$face, face_lab$face), ]
+faces$iso3_map <- ifelse(!is.na(lab$a) & lab$a >= 0.25 * as.numeric(st_area(faces)), lab$iso3_map, NA)
+faces$iso3_map[!is.na(faces$iso3_map) & lengths(st_intersects(st_point_on_surface(faces), crimea)) > 0] <- "UKR"
+map_names <- world_src |> st_drop_geometry() |>
+  arrange(adm0_a3 != iso3_map) |> distinct(iso3_map, .keep_all = TRUE) |> select(iso3_map, name)
+world_sf <- faces |>
+  filter(!is.na(iso3_map)) |>
+  group_by(iso3_map) |>
+  summarise(.groups = "drop") |>
+  left_join(map_names, by = "iso3_map")
 
 bb_world <- st_bbox(world_sf)
 W_svg <- 1000
@@ -817,7 +854,8 @@ geom_to_svg <- function(geom, bb, W, H) {
   if (st_is_empty(geom)) return("")
   xy <- st_coordinates(geom)
   if (nrow(xy) < 3) return("")
-  ring_id <- paste(xy[, ncol(xy) - 1], xy[, ncol(xy)], sep = "_")
+  # Semua kolom L (cincin, poligon, fitur): tiap batas luar & lubang menjadi subpath sendiri
+  ring_id <- do.call(paste, c(as.data.frame(xy[, -(1:2), drop = FALSE]), sep = "_"))
   rings <- split(seq_len(nrow(xy)), ring_id)
   parts <- vapply(rings, function(idx) {
     if (length(idx) < 3) return("")
@@ -836,6 +874,27 @@ map_df <- tibble(iso3 = world_sf$iso3_map, name_map = world_sf$name, d = svg_pat
   filter(nzchar(d)) |>
   group_by(iso3) |>
   summarise(name_map = first(name_map), d = paste(d, collapse = " "), .groups = "drop")
+
+# Pemeriksaan geometri peta
+svg_rings <- function(d) regmatches(d, gregexpr("M[^MZ]*Z", d))[[1]]
+ring_pts <- function(s) sort(unique(strsplit(trimws(gsub("[MLZ]", " ", s)), "\\s+")[[1]]))
+lso_rings <- svg_rings(map_df$d[map_df$iso3 == "LSO"])
+zaf_rings <- svg_rings(map_df$d[map_df$iso3 == "ZAF"])
+stopifnot(
+  "Ada negara analisis tanpa path peta!" = all(migration_df$iso3 %in% map_df$iso3),
+  "Lesotho harus satu cincin tertutup!" = length(lso_rings) == 1L,
+  "Lubang Lesotho di ZAF harus subpath sendiri dengan titik identik (tanpa garis penghubung)!" =
+    sum(vapply(zaf_rings, function(s) identical(ring_pts(s), ring_pts(lso_rings)), logical(1))) == 1L,
+  "Krimea harus masuk UKR dan Laut Kaspia tidak boleh menjadi daratan!" = {
+    pts <- st_transform(st_sfc(st_point(c(34.1, 45.0)), st_point(c(51.0, 42.0)), crs = 4326), robin_crs)
+    owner <- lapply(st_intersects(pts, world_sf), function(i) world_sf$iso3_map[i])
+    identical(owner, list("UKR", character(0)))
+  },
+  "Segmen melintasi peta (antimeridian)!" = all(vapply(unlist(lapply(map_df$d, svg_rings)), function(s) {
+    x <- as.numeric(sub(",.*", "", strsplit(trimws(gsub("[MLZ]", " ", s)), "\\s+")[[1]]))
+    all(abs(diff(c(x, x[1]))) < W_svg / 4)
+  }, logical(1)))
+)
 
 asean_sf <- world_sf |> filter(iso3_map %in% asean_bench$iso3)
 bb_asean <- st_bbox(asean_sf)
