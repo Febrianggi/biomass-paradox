@@ -54,7 +54,7 @@ try {
   --map-na-l: #D2D2CA; --map-na-d: #2F4237;
   --map-stroke-l: #FFFFFF; --map-stroke-d: #0B1711;
 
-  --bg: var(--bg-l); --surface: var(--surface-l); --surface-2: var(--surface2-l);
+  --bg: var(--bg-l); --page-bg: var(--bg-l); --surface: var(--surface-l); --surface-2: var(--surface2-l);
   --line: var(--line-l); --line-strong: var(--line-strong-l);
   --text: var(--text-l); --muted: var(--muted-l); --link: var(--link-l); --ink-soft: var(--ink-soft-l);
   --focus: var(--focus-l); --sel: var(--sel-l); --bar-shadow: var(--bar-shadow-l);
@@ -76,7 +76,7 @@ try {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: var(--bg-d); --surface: var(--surface-d); --surface-2: var(--surface2-d);
+    --bg: var(--bg-d); --page-bg: var(--bg-d); --surface: var(--surface-d); --surface-2: var(--surface2-d);
     --line: var(--line-d); --line-strong: var(--line-strong-d);
     --text: var(--text-d); --muted: var(--muted-d); --link: var(--link-d); --ink-soft: var(--ink-soft-d);
     --focus: var(--focus-d); --sel: var(--sel-d); --bar-shadow: var(--bar-shadow-d);
@@ -87,7 +87,7 @@ try {
 }
 :root:has(> head > meta[name="color-scheme"][content="dark"]) {
   color-scheme: dark;
-  --bg: var(--bg-d); --surface: var(--surface-d); --surface-2: var(--surface2-d);
+  --bg: var(--bg-d); --page-bg: var(--bg-d); --surface: var(--surface-d); --surface-2: var(--surface2-d);
   --line: var(--line-d); --line-strong: var(--line-strong-d);
   --text: var(--text-d); --muted: var(--muted-d); --link: var(--link-d); --ink-soft: var(--ink-soft-d);
   --focus: var(--focus-d); --sel: var(--sel-d); --bar-shadow: var(--bar-shadow-d);
@@ -97,7 +97,7 @@ try {
 }
 :root:has(> head > meta[name="color-scheme"][content="light"]) {
   color-scheme: light;
-  --bg: var(--bg-l); --surface: var(--surface-l); --surface-2: var(--surface2-l);
+  --bg: var(--bg-l); --page-bg: var(--bg-l); --surface: var(--surface-l); --surface-2: var(--surface2-l);
   --line: var(--line-l); --line-strong: var(--line-strong-l);
   --text: var(--text-l); --muted: var(--muted-l); --link: var(--link-l); --ink-soft: var(--ink-soft-l);
   --focus: var(--focus-l); --sel: var(--sel-l); --bar-shadow: var(--bar-shadow-l);
@@ -147,7 +147,18 @@ code, .mono { font-family: var(--mono); font-size: 0.92em; }
   --line: var(--line-d); --line-strong: var(--line-strong-d);
   --text: var(--text-d); --muted: var(--muted-d); --link: var(--link-d); --ink-soft: var(--ink-soft-d); --focus: var(--focus-d);
 }
-header.masthead { position: relative; isolation: isolate; overflow: hidden; background: var(--bg); border-bottom: 1px solid var(--line); }
+header.masthead { position: relative; isolation: isolate; overflow: hidden; background: var(--bg); }
+header.masthead::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 28px; z-index: -2; pointer-events: none;
+  background: linear-gradient(180deg, var(--bg-d) 0%, rgba(11, 23, 17, 0) 100%);
+}
+header.masthead::after {
+  content: ""; position: absolute; inset: auto 0 0 0; height: 76px; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(11, 23, 17, 0) 0%, var(--page-bg) 100%);
+  background: linear-gradient(in oklab 180deg, rgba(11, 23, 17, 0) 0%, var(--page-bg) 100%);
+}
+header.masthead .wrap { position: relative; z-index: 1; }
+@media (max-width: 640px) { header.masthead::after { height: 56px; } }
 .mast-photo { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; opacity: 0.22; }
 .mist { position: absolute; inset: -10% 0 0 0; z-index: -1; overflow: hidden; pointer-events: none; opacity: 0.22; }
 .mist-track {
@@ -240,8 +251,9 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
 .pill[aria-pressed="true"] .dot { box-shadow: 0 0 0 1.5px var(--surface); }
 .pill[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--surface); font-weight: 600; }
 
-/* Hero: title and thesis only, so the map follows directly after the tabs and controls */
-.hero { padding: var(--s3) 0 var(--s5); }
+/* Hero: title and thesis sit above the bottom fade, so text stays on dark forest while the photo melts into the page */
+.hero { padding: var(--s3) 0 84px; }
+@media (max-width: 640px) { .hero { padding: var(--s3) 0 64px; } }
 .thesis { margin-top: var(--s2); color: var(--muted); max-width: 86ch; font-size: 14.5px; }
 
 /* Key figures: a warm band below the map (the reference's stats row, flat instead of a photo overlay) */
