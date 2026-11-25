@@ -1,0 +1,7 @@
+model,mae_pp,rmse_pp,n_prediksi_di_luar_0_100,mae_pp_tanpa_potong,perbandingan,selisih_mae_pp,ci95_bawah,ci95_atas
+persistence,5.19,8.243,0,5.19,NA,NA,NA,NA
+ols_cook2015,3.791,6.036,61,4.483,NA,NA,NA,NA
+elastic_net,3.33,5.393,50,3.736,NA,NA,NA,NA
+NA,NA,NA,NA,NA,elastic_net - persistence,-1.86,-2.512,-1.193
+NA,NA,NA,NA,NA,elastic_net - ols_cook2015,-0.46,-0.826,-0.086
+NA,NA,NA,NA,NA,ols_cook2015 - persistence,-1.4,-1.997,-0.809

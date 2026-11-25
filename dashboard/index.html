@@ -270,10 +270,10 @@ dialog.context form { margin-top: var(--s4); display: flex; justify-content: fle
 .country-path {
   fill-rule: evenodd; /* holes (e.g. Lesotho inside South Africa) stay unfilled and unclickable */
   stroke: var(--map-stroke); stroke-width: 0.55px; vector-effect: non-scaling-stroke;
-  cursor: pointer; transition: fill 200ms ease, opacity 160ms ease;
+  cursor: pointer;
 }
 @media (prefers-reduced-motion: reduce) { .country-path { transition: none; } }
-.country-path:hover { stroke: var(--text); stroke-width: 1.6px; }
+.map-hover-outline { fill: none; stroke: var(--surface); stroke-width: 2.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
 .country-path.is-selected { stroke: var(--text); stroke-width: 2.2px; }
 .country-path:focus { outline: none; }
 .country-path:focus-visible { stroke: var(--text); stroke-width: 3px; stroke-dasharray: 4 2; }
@@ -439,11 +439,20 @@ table.compact-table tr.is-chosen td:not(:first-child) { box-shadow: none; }
 .tooltip[hidden] { display: none; }
 
 footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; color: var(--muted); font-size: 13px; background: var(--surface); }
+.utility-dock { position: sticky; top: 0; z-index: 30; background: var(--surface); }
+.nav-bar { top: var(--utility-height, 0px); }
+.control-bar { position: sticky; top: calc(var(--utility-height, 0px) + var(--nav-height, 49px)); z-index: 12; }
+@media (max-width: 640px), (max-height: 600px) {
+  .control-bar { max-height: 30dvh; overflow-y: auto; }
+}
+.selection-ring { fill: none; stroke: white; stroke-width: 2; filter: drop-shadow(0 0 1px #17202a); pointer-events: none; }
+.mig-grid, .table-wrapper { position: relative; }
+.selection-slide { position: absolute; z-index: 2; pointer-events: none; border-radius: 4px; border: 2px solid var(--text); background: var(--ink-soft); }
 </style>
 </head>
 <body>
 
-<header class="masthead">
+<div class="utility-dock">
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
@@ -464,6 +473,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       </div>
     </div>
 
+  </div>
+</div>
+<header class="masthead"><div class="wrap">
     <div class="hero">
       <h1 data-i18n="title">Paradoks Biomassa dalam Transisi Energi-Iklim Global</h1>
       <p class="thesis" data-i18n="thesis">Pangsa energi terbarukan yang tinggi tidak selalu berarti listrik bersih modern: 189 negara dikelompokkan dengan empat algoritma pada enam indikator SDG 7 dan SDG 13.</p>
@@ -555,6 +567,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
               <span class="badge r3" id="insp-badge">R3</span>
             </div>
             <div class="insp-meta" id="insp-migration-line"></div>
+            <div class="insp-meta" id="insp-path-line"></div>
             <div class="consensus" id="insp-methods"></div>
             <div class="dp-legend" id="insp-legend"></div>
             <div class="dp-rows" id="insp-bars"></div>
@@ -695,6 +708,29 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
             <div class="svg-chart-wrap" id="asean-bars-wrap"></div>
           </section>
         </div>
+
+        <section class="card" style="margin-top:var(--s4)" aria-labelledby="h-path">
+          <div class="card-head">
+            <div>
+              <h2 id="h-path" data-i18n="pathTitle">Jalur perubahan 2015 ke 2023 (FANNY)</h2>
+              <p data-i18n="pathSub">Klaster fuzzy atas perubahan keenam indikator, terpisah dari rezim 2023.</p>
+            </div>
+          </div>
+          <div id="path-content"></div>
+        </section>
+
+        <section class="card" style="margin-top:var(--s4)" aria-labelledby="h-fc">
+          <div class="card-head">
+            <div>
+              <h2 id="h-fc" data-i18n="fcTitle">Memprediksi memasak bersih 2023 dari kondisi 2015</h2>
+              <p data-i18n="fcSub">Validasi silang antarnegara atas satu interval historis.</p>
+            </div>
+          </div>
+          <div class="two-col">
+            <div id="fc-content"></div>
+            <div class="svg-chart-wrap" id="fc-scatter-wrap"></div>
+          </div>
+        </section>
 
         <section class="card" style="margin-top:var(--s4)" aria-labelledby="h-idn-policy">
           <div class="card-head">
@@ -920,7 +956,28 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       indicator: "Indikator", varCode: "Kode variabel", coverage: "Cakupan 2023", globalMed: "Median global", role: "Transformasi",
       leakText: (h) => `<p>(1) PDB per kapita PPP (uji Kruskal-Wallis eksternal H = ${h}, p &lt; 1e-24), tingkat urbanisasi, dan klasifikasi wilayah Bank Dunia tidak dipakai untuk membentuk klaster.</p><p style="margin-top:8px">(2) Data baseline 2015 ditransformasi dan distandardisasi dengan rata-rata serta simpangan baku 2023 sebelum dipetakan ke centroid terdekat, sehingga batas rezim tetap sama antarwaktu.</p>`,
       footer: 'Sumber data: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) dan World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh angka diekspor dari <code>sdg_energy_transition_analysis.R</code> (seed = 2026).',
-      loadError: "Gagal memuat berkas data dashboard."
+      loadError: "Gagal memuat berkas data dashboard.",
+      pathTitle: "Jalur perubahan 2015 ke 2023 (FANNY)",
+      pathSub: "Klaster fuzzy atas perubahan keenam indikator, terpisah dari rezim 2023.",
+      pathLead: (k, r, sil, jac, aPam, aRaw, aReg, weak) => `FANNY (eksponen keanggotaan ${r}) atas perubahan terstandardisasi: selisih poin persen untuk akses listrik, memasak bersih, dan pangsa EBT; selisih log(1 + x) untuk kapasitas EBT, intensitas energi, dan CO2. Aturan pemilihan memberi k = ${k} (Jaccard sub-sampel ${jac}, Silhouette ${sil}). ${weak ? `<strong>Strukturnya lemah:</strong> Silhouette di bawah 0,25, kesesuaian dengan PAM pada fitur yang sama hanya ARI ${aPam}, dan dengan selisih mentah ARI ${aRaw}. Baca jalur sebagai ringkasan arah perubahan, bukan kelompok yang tegas.` : `Kesesuaian dengan PAM ARI ${aPam}, dengan selisih mentah ARI ${aRaw}.`} Kesesuaian dengan rezim 2023 hanya ARI ${aReg}, jadi jalur ini menggambarkan hal yang berbeda dari posisi tahun 2023.`,
+      pathCols: ["Jalur", "n", "Keanggotaan rerata", "Listrik (pp)", "Memasak bersih (pp)", "Pangsa EBT (pp)", "Kapasitas EBT (W/kap)", "Intensitas (MJ/$)", "CO2 (t/kap)", "Rezim 2023"],
+      pathMedNote: "Median perubahan 2015 ke 2023 dalam satuan asli. Perubahan bersifat deskriptif, bukan dampak kebijakan.",
+      pathKSummary: "Perbandingan k = 2 sampai 6 (FANNY, PAM, dan selisih mentah)",
+      pathKCols: ["Metode", "Fitur", "k", "Ukuran", "Silhouette", "Dunn ternormalisasi", "Keanggotaan maks.", "% ambigu", "Jaccard rerata", "Jaccard min.", "ARI rerata"],
+      pathKNote: (b) => `Stabilitas: ${b} sub-sampel 80% tanpa pengembalian, label disejajarkan ke solusi penuh dengan permutasi terbaik. Ambigu: selisih dua keanggotaan tertinggi di bawah 0,2. Grid eksponen keanggotaan {2; 1,7; 1,5; 1,3; 1,2} dan ambang struktur lemah (Silhouette 0,25, Jaccard 0,75) adalah pilihan eksploratif yang ditetapkan setelah fit awal, ketika eksponen bawaan 2 menghasilkan keanggotaan seragam.`,
+      featLbl: { log_diff_std: "selisih log, z", raw_diff_std: "selisih mentah, z" },
+      pathLine: (pw, fc, c) => `Jalur perubahan <strong>${pw.pathway}</strong> (keanggotaan <strong class="num">${fmt(pw.memb_max, 2)}</strong>) · Memasak bersih 2023 <strong class="num">${fmt(c.cooking_2023, 0)}%</strong>, prediksi elastic net <strong class="num">${fmt(fc.elastic_net, 1)}%</strong>, persistensi <strong class="num">${fmt(fc.persistence, 0)}%</strong>`,
+      fcTitle: "Memprediksi memasak bersih 2023 dari kondisi 2015",
+      fcSub: "Validasi silang antarnegara atas satu interval historis.",
+      fcLead: (k) => `Target: akses memasak bersih 2023 (SDG 7.1.2). Prediktor hanya data 2015. ${k} lipatan luar yang sama untuk ketiga model; alpha dan lambda elastic net dipilih di lipatan dalam, dan standardisasi dipelajari dari data latih saja. Prediksi di luar 0 sampai 100 dipotong ke rentang itu, aturan yang ditetapkan sebelum fit. Hasil ini adalah validasi antarnegara untuk satu interval (2015 ke 2023), bukan peramalan tahun mendatang.`,
+      fcModels: { persistence: "Persistensi (nilai 2015)", ols_cook2015: "Regresi linear, memasak 2015", elastic_net: "Elastic net, enam indikator 2015" },
+      fcCols: ["Model", "MAE (pp)", "RMSE (pp)", "Prediksi mentah di luar 0-100"],
+      fcCmpCols: ["Perbandingan", "Selisih MAE (pp)", "IK 95% (sampel ulang berpasangan galat out-of-fold)"],
+      fcVerdict: (dP, loP, hiP, dO, loO, hiO) => `Pada interval ini, MAE elastic net lebih rendah daripada persistensi (selisih ${dP} pp, IK 95% ${loP} sampai ${hiP}) dan daripada regresi memasak 2015 (selisih ${dO} pp, IK 95% ${loO} sampai ${hiO}). Interval berasal dari pengambilan sampel ulang berpasangan atas galat out-of-fold yang sudah ada. Perbandingan dengan regresi mengubah prediktor sekaligus metode estimasi, jadi selisihnya mengukur kinerja model secara keseluruhan dan tidak memisahkan sumbangan lima indikator tambahan.`,
+      fcScatterNote: "Warna titik = rezim 2023. Garis putus-putus = prediksi sama dengan nilai aktual. Klik titik untuk memilih negara.",
+      fcTip: (c, f) => `<strong>${c.country_en} (${c.iso3})</strong> · ${c.kode_2023}<br>Aktual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistensi: ${fmt(f.persistence, 0)}%`,
+      fcAxisX: "Aktual 2023 (%)", fcAxisY: "Prediksi out-of-fold elastic net (%)",
+      fcScatterAria: "Memasak bersih 2023 aktual terhadap prediksi out-of-fold elastic net, 189 negara",
     },
     en: {
       pageTitle: "Clean Energy & Climate Transition Atlas (SDG 7 & 13)",
@@ -1059,7 +1116,28 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       indicator: "Indicator", varCode: "Variable code", coverage: "2023 coverage", globalMed: "Global median", role: "Transformation",
       leakText: (h) => `<p>(1) GDP per person PPP (external Kruskal-Wallis H = ${h}, p &lt; 1e-24), urbanisation and World Bank regions are excluded from cluster formation.</p><p style="margin-top:8px">(2) 2015 baseline values are transformed and standardised with the 2023 means and standard deviations before nearest-centroid projection, so regime boundaries stay fixed over time.</p>`,
       footer: 'Data: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) and World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). All figures are exported from <code>sdg_energy_transition_analysis.R</code> (seed = 2026).',
-      loadError: "Could not load the dashboard data file."
+      loadError: "Could not load the dashboard data file.",
+      pathTitle: "Change pathways, 2015 to 2023 (FANNY)",
+      pathSub: "Fuzzy clusters of the change in all six indicators, kept separate from the 2023 regimes.",
+      pathLead: (k, r, sil, jac, aPam, aRaw, aReg, weak) => `FANNY (membership exponent ${r}) on standardised changes: percentage-point differences for electricity access, clean cooking and renewable share; differences of log(1 + x) for renewable capacity, energy intensity and CO2. The selection rule gives k = ${k} (subsample Jaccard ${jac}, Silhouette ${sil}). ${weak ? `<strong>The structure is weak:</strong> Silhouette is below 0.25, agreement with PAM on the same features is only ARI ${aPam}, and with raw differences ARI ${aRaw}. Read the pathways as a summary of the direction of change, not as sharply separated groups.` : `Agreement with PAM is ARI ${aPam}, with raw differences ARI ${aRaw}.`} Agreement with the 2023 regimes is only ARI ${aReg}, so the pathways describe something different from the 2023 position.`,
+      pathCols: ["Pathway", "n", "Mean membership", "Electricity (pp)", "Clean cooking (pp)", "Renewable share (pp)", "Renewable capacity (W/cap)", "Intensity (MJ/$)", "CO2 (t/cap)", "2023 regimes"],
+      pathMedNote: "Median change from 2015 to 2023 in original units. Changes are descriptive, not policy effects.",
+      pathKSummary: "Comparison of k = 2 to 6 (FANNY, PAM and raw differences)",
+      pathKCols: ["Method", "Features", "k", "Sizes", "Silhouette", "Normalised Dunn", "Max. membership", "% ambiguous", "Mean Jaccard", "Min. Jaccard", "Mean ARI"],
+      pathKNote: (b) => `Stability: ${b} subsamples of 80% without replacement, labels aligned to the full solution by the best permutation. Ambiguous: gap between the two highest memberships below 0.2. The membership exponent grid {2, 1.7, 1.5, 1.3, 1.2} and the weak-structure thresholds (Silhouette 0.25, Jaccard 0.75) are exploratory choices made after initial fits, when the default exponent of 2 gave equal memberships.`,
+      featLbl: { log_diff_std: "log differences, z", raw_diff_std: "raw differences, z" },
+      pathLine: (pw, fc, c) => `Change pathway <strong>${pw.pathway}</strong> (membership <strong class="num">${fmt(pw.memb_max, 2)}</strong>) · Clean cooking 2023 <strong class="num">${fmt(c.cooking_2023, 0)}%</strong>, elastic net prediction <strong class="num">${fmt(fc.elastic_net, 1)}%</strong>, persistence <strong class="num">${fmt(fc.persistence, 0)}%</strong>`,
+      fcTitle: "Predicting 2023 clean cooking from 2015 conditions",
+      fcSub: "Cross-country validation over one historical interval.",
+      fcLead: (k) => `Target: clean cooking access in 2023 (SDG 7.1.2). Predictors use 2015 data only. The same ${k} outer folds serve all three models; elastic net alpha and lambda are tuned in inner folds, and standardisation is learned from training data only. Predictions outside 0 to 100 are clipped to that range, a rule fixed before fitting. This is cross-country validation over one interval (2015 to 2023), not a forecast of future years.`,
+      fcModels: { persistence: "Persistence (2015 value)", ols_cook2015: "Linear regression, 2015 cooking", elastic_net: "Elastic net, six 2015 indicators" },
+      fcCols: ["Model", "MAE (pp)", "RMSE (pp)", "Raw predictions outside 0-100"],
+      fcCmpCols: ["Comparison", "MAE difference (pp)", "95% CI (paired resampling of out-of-fold errors)"],
+      fcVerdict: (dP, loP, hiP, dO, loO, hiO) => `Over this interval, the elastic net has lower MAE than persistence (difference ${dP} pp, 95% CI ${loP} to ${hiP}) and than the 2015 cooking-only regression (difference ${dO} pp, 95% CI ${loO} to ${hiO}). The intervals come from paired resampling of the existing out-of-fold errors. The comparison with the regression changes both the predictors and the estimation method, so the difference measures overall model performance and does not isolate the contribution of the five extra indicators.`,
+      fcScatterNote: "Point colour = 2023 regime. Dashed line = prediction equals the actual value. Click a point to select a country.",
+      fcTip: (c, f) => `<strong>${c.country_en} (${c.iso3})</strong> · ${c.kode_2023}<br>Actual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistence: ${fmt(f.persistence, 0)}%`,
+      fcAxisX: "Actual 2023 (%)", fcAxisY: "Elastic net out-of-fold prediction (%)",
+      fcScatterAria: "Actual 2023 clean cooking against elastic net out-of-fold predictions, 189 countries",
     }
   };
 
@@ -1091,6 +1169,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   let DATA = null;
   let BY_ISO = new Map();
+  let PATH_BY_ISO = new Map(), FC_BY_ISO = new Map();
   let GLOBAL = { med: {}, max: {} };
   const state = {
     lang: "id",
@@ -1145,6 +1224,16 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   /* Accessible tablist + hidden="until-found" sync */
   const tablist = $("main-tablist");
+  const dock = document.querySelector(".utility-dock");
+  const nav = document.querySelector(".nav-bar");
+  const updateStickyOffsets = () => {
+    document.documentElement.style.setProperty("--utility-height", dock.offsetHeight + "px");
+    document.documentElement.style.setProperty("--nav-height", nav.offsetHeight + "px");
+  };
+  const stickyObserver = new ResizeObserver(updateStickyOffsets);
+  stickyObserver.observe(dock);
+  stickyObserver.observe(nav);
+  updateStickyOffsets();
   const tabs = [...tablist.querySelectorAll('[role="tab"]')];
   const panels = [...document.querySelectorAll('[role="tabpanel"]')];
 
@@ -1315,6 +1404,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   function buildMapOnce() {
     const svg = $("world-svg");
     const frag = document.createDocumentFragment();
+    const hoverOutline = document.createElementNS(svg.namespaceURI, "path");
+    hoverOutline.setAttribute("class", "map-hover-outline");
+    hoverOutline.setAttribute("aria-hidden", "true");
     for (const item of DATA.world_map) {
       const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
       p.setAttribute("d", item.d);
@@ -1334,6 +1426,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         });
       }
       p.addEventListener("pointerenter", (ev) => {
+        if (ev.pointerType !== "touch") hoverOutline.setAttribute("d", item.d);
         if (!c) {
           showTip(ev, `<strong>${item.name_map} (${item.iso3})</strong><br><span class="muted">${T().noDataMap}</span>`);
           return;
@@ -1343,14 +1436,14 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         showTip(ev, countryTip(c).replace(`<strong>${c.kode_2023}</strong>`, `<strong>${tag}</strong>`));
       });
       p.addEventListener("pointermove", moveTip);
-      p.addEventListener("pointerleave", hideTip);
+      p.addEventListener("pointerleave", () => { hoverOutline.removeAttribute("d"); hideTip(); });
       frag.appendChild(p);
     }
     const outline = document.createElementNS("http://www.w3.org/2000/svg", "path");
     outline.id = "map-sel-outline";
     outline.setAttribute("class", "sel-outline");
     outline.setAttribute("aria-hidden", "true");
-    frag.appendChild(outline);
+    frag.append(hoverOutline, outline);
     svg.replaceChildren(frag);
   }
 
@@ -1433,6 +1526,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     b.textContent = c.kode_2023;
     b.className = `badge r${c.regime_2023}`;
     $("insp-migration-line").innerHTML = `<span>${t.migLine(c, c.kode_k2)}</span>`;
+    $("insp-path-line").innerHTML = `<span>${t.pathLine(PATH_BY_ISO.get(c.iso3), FC_BY_ISO.get(c.iso3), c)}</span>`;
 
     const methods = [["K-Means", c.regime_2023], ["Ward D2", c.regime_ward], ["PAM", c.regime_pam], ["GMM", c.regime_gmm]];
     const agree = methods.filter(([, r]) => r === c.regime_2023).length;
@@ -1517,6 +1611,59 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     box.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => selectCountry(b.dataset.pick)));
   }
 
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  function ringPosition(wrap) {
+    const ring = wrap.querySelector(".selection-ring");
+    if (!ring || !ring.getBoundingClientRect().width) return null;
+    return [ring.cx.animVal.value, ring.cy.animVal.value];
+  }
+  function drawRing(wrap, previous) {
+    const point = wrap.querySelector('[data-iso="' + state.selectedIso + '"]');
+    if (!point) return;
+    const dot = point.matches("circle") ? point : point.querySelector("circle");
+    const ring = document.createElementNS(dot.namespaceURI, "ellipse");
+    ring.setAttribute("class", "selection-ring");
+    ring.setAttribute("aria-hidden", "true");
+    ring.setAttribute("rx", dot.r.baseVal.value + 2);
+    ring.setAttribute("ry", dot.r.baseVal.value + 2);
+    dot.ownerSVGElement.append(ring);
+    ["cx", "cy"].forEach((axis, i) => {
+      const to = dot.getAttribute(axis);
+      ring.setAttribute(axis, to);
+      if (!previous || reduceMotion.matches || previous[i] === Number(to)) return;
+      const motion = document.createElementNS(dot.namespaceURI, "animate");
+      motion.setAttribute("attributeName", axis);
+      motion.setAttribute("from", previous[i]);
+      motion.setAttribute("to", to);
+      motion.setAttribute("dur", "0.24s");
+      motion.setAttribute("begin", "indefinite");
+      ring.append(motion);
+      motion.beginElement();
+    });
+  }
+  function slideSelection(host, from, to) {
+    if (!from || !to || from === to || reduceMotion.matches) return;
+    const active = host.querySelector(".selection-slide");
+    const start = (active || from).getBoundingClientRect();
+    const end = to.getBoundingClientRect();
+    active?.remove();
+    if (!start.width || !end.width) return;
+    const bounds = host.getBoundingClientRect();
+    const slide = document.createElement("div");
+    slide.className = "selection-slide";
+    slide.setAttribute("aria-hidden", "true");
+    Object.assign(slide.style, {
+      left: end.left - bounds.left + host.scrollLeft - host.clientLeft + "px",
+      top: end.top - bounds.top + host.scrollTop - host.clientTop + "px",
+      width: end.width + "px", height: end.height + "px"
+    });
+    host.append(slide);
+    const motion = slide.animate([
+      { transform: "translate(" + (start.left - end.left) + "px," + (start.top - end.top) + "px)" },
+      { transform: "translate(0,0)" }
+    ], { duration: 240, easing: "ease-out" });
+    motion.onfinish = () => slide.remove();
+  }
   function renderEda() {
     const t = T();
     const [title, sub] = t.edaPresets[state.edaPreset];
@@ -1598,6 +1745,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       </g>`;
     }).join("");
 
+    const previousRing = ringPosition($("eda-svg-wrap"));
     $("eda-svg-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}">
       ${yTicks.map((tv) => `<g>
         <line x1="${padL}" y1="${sy(tv).toFixed(1)}" x2="${W - padR}" y2="${sy(tv).toFixed(1)}" stroke="var(--line)" stroke-width="0.8"/>
@@ -1613,6 +1761,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       <text x="14" y="${padT + ph / 2}" transform="rotate(-90 14 ${padT + ph / 2})" text-anchor="middle" font-size="12" font-weight="600" fill="var(--text)">${yLbl}</text>
     </svg>`;
 
+    drawRing($("eda-svg-wrap"), previousRing);
     $("eda-svg-wrap").querySelectorAll(".eda-pt").forEach((g) => {
       const c = BY_ISO.get(g.dataset.iso);
       g.addEventListener("click", () => selectCountry(c.iso3));
@@ -1769,6 +1918,86 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     }));
   }
 
+  /* Panel 4: change pathways and clean cooking prediction */
+  function renderPathways() {
+    const t = T(), P = DATA.pathways;
+    const best = P.k_comparison.find((r) => r.metode === "FANNY" && r.fitur === "log_diff_std" && r.k === P.k);
+    const rows = P.profiles.map((p) => `<tr><td><strong>${p.pathway}</strong></td><td class="num">${p.n_negara}</td><td class="num">${fmt(p.keanggotaan_rerata, 2)}</td>
+      <td class="num">${fmt(p.med_d_elec_pp, 1)}</td><td class="num">${fmt(p.med_d_cook_pp, 1)}</td><td class="num">${fmt(p.med_d_rshare_pp, 1)}</td>
+      <td class="num">${fmt(p.med_d_cap_wpc, 1)}</td><td class="num">${fmt(p.med_d_int_mj, 2)}</td><td class="num">${fmt(p.med_d_co2_t, 2)}</td><td><code>${p.rezim_2023}</code></td></tr>`).join("");
+    const kRows = P.k_comparison.map((r) => `<tr${r.metode === "FANNY" && r.fitur === "log_diff_std" && r.k === P.k ? ' class="is-chosen"' : ""}>
+      <td>${r.metode}</td><td>${t.featLbl[r.fitur]}</td><td class="num">${r.k}</td><td class="num">${r.ukuran_klaster}</td><td class="num">${fmt(r.silhouette, 3)}</td>
+      <td class="num">${r.dunn_normalized === null ? "" : fmt(r.dunn_normalized, 3)}</td><td class="num">${r.keanggotaan_maks_rerata === null ? "" : fmt(r.keanggotaan_maks_rerata, 3)}</td>
+      <td class="num">${r.persen_ambigu === null ? "" : fmt(r.persen_ambigu, 1)}</td><td class="num">${fmt(r.jaccard_rerata, 3)}</td><td class="num">${fmt(r.jaccard_min, 3)}</td><td class="num">${fmt(r.ari_rerata, 3)}</td></tr>`).join("");
+    const open = $("path-k-details") && $("path-k-details").open ? " open" : "";
+    $("path-content").innerHTML = `<p style="font-size:13.5px;margin-bottom:10px">${t.pathLead(P.k, fmt(P.memb_exp, 1), fmt(best.silhouette, 3), fmt(best.jaccard_rerata, 3), fmt(P.ari_vs_pam, 3), fmt(P.ari_vs_raw, 3), fmt(P.ari_vs_regime_2023, 3), P.weak)}</p>
+      <div class="table-wrapper" tabindex="0" role="region" aria-labelledby="h-path"><table class="compact-table">
+        <thead><tr>${t.pathCols.map((h, i) => `<th${i > 0 && i < 9 ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+      <p class="muted small" style="margin-top:8px">${t.pathMedNote}</p>
+      <details class="acc" id="path-k-details"${open}>
+        <summary>${t.pathKSummary}</summary>
+        <div class="acc-body">
+          <p>${t.pathKNote(P.b_subsample)}</p>
+          <div style="overflow-x:auto;margin-top:10px"><table class="compact-table">
+            <thead><tr>${t.pathKCols.map((h, i) => `<th${i > 1 ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead>
+            <tbody>${kRows}</tbody>
+          </table></div>
+        </div>
+      </details>`;
+  }
+
+  function renderForecast() {
+    const t = T(), F = DATA.cooking_forecast;
+    const mRows = F.metrics.map((m) => `<tr><td>${t.fcModels[m.model]}</td><td class="num">${fmt(m.mae_pp, 2)}</td><td class="num">${fmt(m.rmse_pp, 2)}</td><td class="num">${m.n_prediksi_di_luar_0_100}</td></tr>`).join("");
+    const cmpLbl = (s) => s.split(" - ").map((k) => t.fcModels[k]).join(" vs ");
+    const cRows = F.comparisons.map((c) => `<tr><td>${cmpLbl(c.perbandingan)}</td><td class="num">${fmt(c.selisih_mae_pp, 2)}</td><td class="num">[${fmt(c.ci95_bawah, 2)}; ${fmt(c.ci95_atas, 2)}]</td></tr>`).join("");
+    const en = F.comparisons.find((c) => c.perbandingan === "elastic_net - persistence");
+    const enOls = F.comparisons.find((c) => c.perbandingan === "elastic_net - ols_cook2015");
+    $("fc-content").innerHTML = `<p style="font-size:13.5px;margin-bottom:10px">${t.fcLead(F.k_outer)}</p>
+      <div style="overflow-x:auto"><table class="compact-table" style="margin-bottom:14px">
+        <thead><tr>${t.fcCols.map((h, i) => `<th${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${mRows}</tbody>
+      </table></div>
+      <div style="overflow-x:auto"><table class="compact-table">
+        <thead><tr>${t.fcCmpCols.map((h, i) => `<th${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${cRows}</tbody>
+      </table></div>
+      <p style="font-size:13.5px;margin-top:10px">${t.fcVerdict(fmt(en.selisih_mae_pp, 2), fmt(en.ci95_bawah, 2), fmt(en.ci95_atas, 2), fmt(enOls.selisih_mae_pp, 2), fmt(enOls.ci95_bawah, 2), fmt(enOls.ci95_atas, 2))}</p>`;
+
+    const W = 380, H = 340, padL = 44, padR = 12, padT = 12, padB = 40, pw = W - padL - padR, ph = H - padT - padB;
+    const sx = (v) => padL + (v / 100) * pw, sy = (v) => padT + ph - (v / 100) * ph;
+    const ticks = [0, 25, 50, 75, 100];
+    const pts = DATA.countries.map((c) => ({ c, f: FC_BY_ISO.get(c.iso3) }))
+      .sort((a, b) => (a.c.iso3 === state.selectedIso) - (b.c.iso3 === state.selectedIso));
+    const dots = pts.map(({ c, f }) => {
+      const sel = c.iso3 === state.selectedIso;
+      const cx = sx(c.cooking_2023), cy = sy(f.elastic_net);
+      const lx = c.cooking_2023 > 84 ? (cx - 9).toFixed(1) : (cx + 8).toFixed(1);
+      const anchor = c.cooking_2023 > 84 ? "end" : "start";
+      const ly = f.elastic_net > 92 ? (cy + 14).toFixed(1) : (cy - 8).toFixed(1);
+      return `<circle class="eda-pt" data-iso="${c.iso3}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${sel ? 6 : 3.2}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${sel ? 1 : 0.7}" stroke="${sel ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2 : 0.6}"><title>${c.country_en} (${c.iso3}): ${fmt(c.cooking_2023, 0)}% / ${fmt(f.elastic_net, 1)}%</title></circle>` +
+        (sel ? `<text class="iso" x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="11" font-weight="600" fill="var(--text)">${c.iso3}</text>` : "");
+    }).join("");
+    const previousRing = ringPosition($("fc-scatter-wrap"));
+    $("fc-scatter-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.fcScatterAria}">
+      ${ticks.map((v) => `<line x1="${padL}" y1="${sy(v)}" x2="${W - padR}" y2="${sy(v)}" stroke="var(--line)" stroke-width="0.8"/>
+        <text x="${padL - 6}" y="${sy(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>
+        <text x="${sx(v)}" y="${padT + ph + 16}" text-anchor="middle" font-size="11" fill="var(--muted)">${v}</text>`).join("")}
+      <line x1="${sx(0)}" y1="${sy(0)}" x2="${sx(100)}" y2="${sy(100)}" stroke="var(--line-strong)" stroke-dasharray="4 4"/>
+      ${dots}
+      <text x="${padL + pw / 2}" y="${H - 6}" text-anchor="middle" font-size="11.5" fill="var(--text)">${t.fcAxisX}</text>
+      <text transform="translate(12 ${padT + ph / 2}) rotate(-90)" text-anchor="middle" font-size="11.5" fill="var(--text)">${t.fcAxisY}</text>
+    </svg><p class="muted small" style="margin-top:6px">${t.fcScatterNote}</p>`;
+    drawRing($("fc-scatter-wrap"), previousRing);
+    $("fc-scatter-wrap").querySelectorAll(".eda-pt").forEach((dot) => {
+      const c = BY_ISO.get(dot.dataset.iso), f = FC_BY_ISO.get(dot.dataset.iso);
+      dot.addEventListener("click", () => selectCountry(c.iso3));
+      dot.addEventListener("pointerenter", (ev) => showTip(ev, t.fcTip(c, f)));
+      dot.addEventListener("pointermove", moveTip);
+      dot.addEventListener("pointerleave", hideTip);
+    });
+  }
+
   function renderAseanAndTransition() {
     const t = T();
     const migMap = new Map(DATA.migration.map((m) => [`${m.kode_2015}_${m.kode_2023}`, m.n]));
@@ -1797,6 +2026,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
     $("mig-matrix-box").querySelectorAll(".mig-cell").forEach((btn) => {
       btn.addEventListener("click", () => {
+        const grid = btn.closest(".mig-grid");
+        slideSelection(grid, grid.querySelector('[aria-pressed="true"]'), btn);
         state.migCell = btn.dataset.cell;
         state.migPreview = null;
         $("mig-matrix-box").querySelectorAll(".mig-cell").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
@@ -2003,6 +2234,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   function pickerLabel(c) { return `${c.country_en} (${c.iso3})`; }
   function selectCountry(iso3) {
     if (!BY_ISO.has(iso3)) return;
+    const body = $("country-tbody");
+    slideSelection(body.closest(".table-wrapper"), body.querySelector(".is-active"), body.querySelector('[data-iso="' + iso3 + '"]'));
     state.selectedIso = iso3;
     const picker = $("country-picker");
     picker.value = pickerLabel(BY_ISO.get(iso3));
@@ -2010,6 +2243,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     renderInspector();
     updateMapColorsAndZoom();
     renderEda();
+    renderForecast();
     for (const tr of $("country-tbody").rows) tr.classList.toggle("is-active", tr.dataset.iso === iso3);
   }
   function resolvePicker(raw) {
@@ -2060,6 +2294,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     renderEdaDiagnostics();
     renderModels();
     renderAseanAndTransition();
+    renderPathways();
     renderTableNumbers();
     renderMethodology();
     selectCountry(state.selectedIso);
@@ -2140,6 +2375,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   loadData().then((payload) => {
     DATA = payload;
     BY_ISO = new Map(DATA.countries.map((c) => [c.iso3, c]));
+    PATH_BY_ISO = new Map(DATA.pathways.countries.map((r) => [r.iso3, r]));
+    FC_BY_ISO = new Map(DATA.cooking_forecast.countries.map((r) => [r.iso3, r]));
     for (const m of INDICATORS) {
       const vals = DATA.countries.map((c) => c[m.key]);
       GLOBAL.med[m.key] = median(vals);

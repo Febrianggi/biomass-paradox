@@ -15,6 +15,7 @@ suppressPackageStartupMessages({
   library(scales)
   library(psych)
   library(cluster)
+  library(glmnet)
   library(mclust)
   library(fpc)
   library(hopkins)
@@ -800,6 +801,216 @@ p6 <- ggplot(mig_long, aes(x = kode_2023, y = factor(kode_2015, levels = paste0(
 ggsave(file.path(fig_dir, "fig06_migration_matrix_2015_2023.png"), p6, width = 8.5, height = 6, dpi = 300)
 
 # ==============================================================================
+# TAHAP 5B: JALUR PERUBAHAN 2015-2023 (FANNY) & PREDIKSI MEMASAK BERSIH 2023 (ELASTIC NET)
+# ==============================================================================
+# Kohort: 189 negara yang sama (lengkap 2015 & 2023), nilai mentah tanpa pembulatan dari migration_df.
+chg_raw <- with(migration_df, data.frame(
+  d_elec   = elec_2023 - elec_2015,
+  d_cook   = cooking_2023 - cooking_2015,
+  d_rshare = renew_share_2023 - renew_share_2015,
+  d_cap    = renew_cap_2023 - renew_cap_2015,
+  d_int    = energy_int_2023 - energy_int_2015,
+  d_co2    = co2_pc_2023 - co2_pc_2015
+))
+# Fitur utama: selisih poin persen untuk tiga pangsa, selisih log1p untuk tiga fitur miring
+chg_feat <- transform(chg_raw,
+  d_cap = log1p(migration_df$renew_cap_2023) - log1p(migration_df$renew_cap_2015),
+  d_int = log1p(migration_df$energy_int_2023) - log1p(migration_df$energy_int_2015),
+  d_co2 = log1p(migration_df$co2_pc_2023) - log1p(migration_df$co2_pc_2015))
+stopifnot("Selisih tidak cocok dengan kolom delta yang diekspor!" =
+  max(abs(round(chg_raw$d_cook, 2) - migration_df$delta_cooking)) < 1e-9 &&
+  max(abs(round(chg_raw$d_cap, 2) - migration_df$delta_renew_cap)) < 1e-9 &&
+  max(abs(round(chg_raw$d_int, 2) - migration_df$delta_energy_int)) < 1e-9 &&
+  max(abs(round(chg_raw$d_co2, 2) - migration_df$delta_co2_pc)) < 1e-9)
+Z_chg <- scale(chg_feat)
+Z_raw <- scale(chg_raw)
+rownames(Z_chg) <- rownames(Z_raw) <- migration_df$iso3
+
+# Eksponen keanggotaan: nilai terbesar dari grid yang memberi k klaster tegas berbeda untuk semua k = 2..6.
+# Grid ini dan ambang struktur lemah di bawah adalah pilihan eksploratif yang dibuat setelah fit awal.
+# Bawaan fanny (2) menghasilkan keanggotaan seragam 1/k pada data ini, sehingga dilaporkan sebagai degenerasi.
+memb_grid <- c(2, 1.7, 1.5, 1.3, 1.2)
+fanny_fit <- function(Z, k, r) suppressWarnings(fanny(Z, k, memb.exp = r, maxit = 1000))
+memb_check <- sapply(memb_grid, function(r) all(sapply(2:6, function(k) length(unique(fanny_fit(Z_chg, k, r)$clustering)) == k)))
+MEMB_EXP <- memb_grid[which(memb_check)[1]]
+stopifnot("Tidak ada eksponen keanggotaan yang menghasilkan k klaster!" = !is.na(MEMB_EXP))
+
+perms <- function(v) if (length(v) <= 1) list(v) else
+  do.call(c, lapply(seq_along(v), function(i) lapply(perms(v[-i]), function(p) c(v[i], p))))
+align_labels <- function(lab, ref, k) {
+  # Label sampel ulang dipetakan ke label referensi dengan permutasi yang memaksimalkan kecocokan
+  P <- perms(seq_len(k))
+  best <- P[[which.max(vapply(P, function(p) sum(p[lab] == ref), numeric(1)))]]
+  best[lab]
+}
+fit_cl <- function(Z, k, method) if (method == "FANNY") fanny_fit(Z, k, MEMB_EXP)$clustering else pam(Z, k)$clustering
+
+B_SUB <- 200L
+stability <- function(Z, k, method, ref) {
+  set.seed(2026)
+  res <- replicate(B_SUB, {
+    s <- sort(sample(nrow(Z), floor(0.8 * nrow(Z))))
+    lab <- fit_cl(Z[s, , drop = FALSE], k, method)
+    al <- align_labels(lab, ref[s], k)
+    c(vapply(seq_len(k), function(g) {
+      A <- ref[s] == g; Bq <- al == g
+      if (!any(A | Bq)) NA_real_ else sum(A & Bq) / sum(A | Bq)
+    }, numeric(1)), mclust::adjustedRandIndex(lab, ref[s]))
+  })
+  list(jac = rowMeans(res[seq_len(k), , drop = FALSE], na.rm = TRUE), ari = mean(res[k + 1, ]))
+}
+
+path_configs <- list(
+  list(method = "FANNY", fitur = "log_diff_std", Z = Z_chg),
+  list(method = "PAM",   fitur = "log_diff_std", Z = Z_chg),
+  list(method = "FANNY", fitur = "raw_diff_std", Z = Z_raw)
+)
+path_fits <- list()
+path_eval <- bind_rows(lapply(path_configs, function(cfg) bind_rows(lapply(2:6, function(k) {
+  if (cfg$method == "FANNY") {
+    f <- fanny_fit(cfg$Z, k, MEMB_EXP); cl <- f$clustering; U <- f$membership
+    conv <- unname(f$convergence["converged"] == 1); iters <- unname(f$convergence["iterations"])
+    dunn_n <- unname(f$coeff["normalized"])
+  } else {
+    f <- pam(cfg$Z, k); cl <- f$clustering; U <- NULL; conv <- NA; iters <- NA_integer_; dunn_n <- NA_real_
+  }
+  path_fits[[paste(cfg$method, cfg$fitur, k)]] <<- list(cl = cl, U = U)
+  top2 <- if (is.null(U)) NULL else t(apply(U, 1, function(u) sort(u, decreasing = TRUE)[1:2]))
+  st <- stability(cfg$Z, k, cfg$method, cl)
+  tibble(
+    metode = cfg$method, fitur = cfg$fitur, k = k,
+    memb_exp = if (cfg$method == "FANNY") MEMB_EXP else NA_real_,
+    konvergen = conv, iterasi = iters,
+    n_klaster_tegas = length(unique(cl)),
+    ukuran_klaster = paste(as.integer(table(factor(cl, levels = seq_len(k)))), collapse = "/"),
+    ukuran_min = min(as.integer(table(factor(cl, levels = seq_len(k))))),
+    silhouette = round(mean(silhouette(cl, dist(cfg$Z))[, "sil_width"]), 4),
+    dunn_normalized = round(dunn_n, 4),
+    keanggotaan_maks_rerata = if (is.null(U)) NA_real_ else round(mean(top2[, 1]), 4),
+    persen_ambigu = if (is.null(U)) NA_real_ else round(100 * mean(top2[, 1] - top2[, 2] < 0.2), 1),
+    jaccard_rerata = round(mean(st$jac), 4),
+    jaccard_min = round(min(st$jac), 4),
+    ari_rerata = round(st$ari, 4)
+  )
+}))))
+write_csv(path_eval, file.path(tab_dir, "table_12_change_pathways_k_comparison.csv"))
+
+# Aturan pemilihan: FANNY pada fitur utama, ukuran klaster minimum >= 10, Jaccard rerata tertinggi.
+# Struktur dilaporkan lemah bila Silhouette < 0,25 (Kaufman & Rousseeuw, 1990) atau Jaccard < 0,75 (Hennig, 2007).
+cand <- path_eval |> filter(metode == "FANNY", fitur == "log_diff_std", n_klaster_tegas == k, ukuran_min >= 10)
+K_PATH <- cand$k[which.max(cand$jaccard_rerata)]
+path_weak <- with(cand[which.max(cand$jaccard_rerata), ], silhouette < 0.25 || jaccard_rerata < 0.75)
+fz <- path_fits[[paste("FANNY", "log_diff_std", K_PATH)]]
+# Urutan jalur: median kenaikan memasak bersih menurun (P1 = kenaikan terbesar)
+path_order <- order(-tapply(chg_raw$d_cook, fz$cl, median), -tabulate(fz$cl, K_PATH))
+path_id <- match(fz$cl, path_order)
+U_path <- fz$U[, path_order, drop = FALSE]
+colnames(U_path) <- paste0("memb_P", seq_len(K_PATH))
+pam_k <- path_fits[[paste("PAM", "log_diff_std", K_PATH)]]$cl
+raw_k <- path_fits[[paste("FANNY", "raw_diff_std", K_PATH)]]$cl
+ari_path_pam <- round(mclust::adjustedRandIndex(path_id, pam_k), 4)
+ari_path_raw <- round(mclust::adjustedRandIndex(path_id, raw_k), 4)
+ari_path_regime <- round(mclust::adjustedRandIndex(path_id, migration_df$regime_2023), 4)
+
+path_df <- tibble(iso3 = migration_df$iso3, country_en = migration_df$country_en,
+                  kode_2015 = migration_df$kode_2015, kode_2023 = migration_df$kode_2023,
+                  pathway = paste0("P", path_id), memb_max = round(apply(U_path, 1, max), 4)) |>
+  bind_cols(as_tibble(round(U_path, 4)), as_tibble(chg_raw))
+write_csv(path_df, file.path(tab_dir, "table_14_change_pathway_memberships.csv"))
+
+Z_centroid <- apply(Z_chg, 2, function(z) tapply(z, path_id, mean))
+path_profiles <- path_df |>
+  group_by(pathway) |>
+  summarise(
+    n_negara = n(),
+    keanggotaan_rerata = round(mean(memb_max), 3),
+    med_d_elec_pp = round(median(d_elec), 2), med_d_cook_pp = round(median(d_cook), 2),
+    med_d_rshare_pp = round(median(d_rshare), 2), med_d_cap_wpc = round(median(d_cap), 2),
+    med_d_int_mj = round(median(d_int), 3), med_d_co2_t = round(median(d_co2), 3),
+    rezim_2023 = paste(sapply(paste0("R", 1:4), function(r) sprintf("%s=%d", r, sum(kode_2023 == r))), collapse = ", "),
+    .groups = "drop"
+  ) |>
+  bind_cols(as_tibble(round(Z_centroid, 3), .name_repair = ~ paste0("z_", names(chg_raw))))
+write_csv(path_profiles, file.path(tab_dir, "table_13_change_pathway_profiles.csv"))
+
+cat(sprintf("\n[Tahap 5B] Jalur perubahan FANNY (memb.exp = %.1f): k = %d dipilih, Jaccard rerata = %.4f%s\n",
+            MEMB_EXP, K_PATH, max(cand$jaccard_rerata), if (path_weak) " (STRUKTUR LEMAH)" else ""))
+cat(sprintf("  ARI jalur vs PAM = %.4f, vs FANNY selisih mentah = %.4f, vs rezim 2023 = %.4f\n",
+            ari_path_pam, ari_path_raw, ari_path_regime))
+print(path_profiles |> select(pathway, n_negara, keanggotaan_rerata, starts_with("med_")))
+
+# Prediksi memasak bersih 2023 dari kondisi 2015 saja. Lipatan luar yang sama untuk ketiga model;
+# alpha dan lambda dipilih di lipatan dalam; standardisasi glmnet hanya memakai data latih.
+# Prediksi di luar 0-100 dipotong ke [0, 100] untuk semua model (ditetapkan sebelum fit).
+X15 <- with(migration_df, cbind(
+  elec = elec_2015, cook = cooking_2015, rshare = renew_share_2015,
+  log_cap = log1p(renew_cap_2015), log_int = log1p(energy_int_2015), log_co2 = log1p(co2_pc_2015)))
+y23 <- migration_df$cooking_2023
+K_OUTER <- 10L
+alpha_grid <- seq(0.1, 1, by = 0.1)
+set.seed(2026)
+fold_out <- sample(rep(seq_len(K_OUTER), length.out = nrow(X15)))
+tune_enet <- function(X, y, foldid) {
+  cvs <- lapply(alpha_grid, function(a) cv.glmnet(X, y, alpha = a, foldid = foldid, standardize = TRUE))
+  best <- which.min(vapply(cvs, function(cv) min(cv$cvm), numeric(1)))
+  list(cv = cvs[[best]], alpha = alpha_grid[best])
+}
+pred_raw <- matrix(NA_real_, nrow(X15), 3, dimnames = list(NULL, c("persistence", "ols_cook2015", "elastic_net")))
+tune_rows <- list()
+for (f in seq_len(K_OUTER)) {
+  tr <- fold_out != f; te <- !tr
+  pred_raw[te, "persistence"] <- X15[te, "cook"]
+  ols <- lm(y ~ cook, data = data.frame(y = y23[tr], cook = X15[tr, "cook"]))
+  pred_raw[te, "ols_cook2015"] <- predict(ols, newdata = data.frame(cook = X15[te, "cook"]))
+  set.seed(2026 + f)
+  tn <- tune_enet(X15[tr, ], y23[tr], sample(rep(1:10, length.out = sum(tr))))
+  pred_raw[te, "elastic_net"] <- as.numeric(predict(tn$cv, X15[te, , drop = FALSE], s = "lambda.min"))
+  cf <- as.numeric(coef(tn$cv, s = "lambda.min"))
+  tune_rows[[f]] <- tibble(lipatan = as.character(f), n_latih = sum(tr), n_uji = sum(te), alpha = tn$alpha,
+                           lambda = signif(tn$cv$lambda.min, 4), cv_mse = round(min(tn$cv$cvm), 3),
+                           n_koef_nonnol = sum(cf[-1] != 0), !!!setNames(as.list(round(cf, 5)), c("intercept", colnames(X15))))
+}
+# Model seluruh data (deskriptif, bukan untuk skor): koefisien pada skala asli
+set.seed(2026)
+tn_all <- tune_enet(X15, y23, sample(rep(1:10, length.out = nrow(X15))))
+cf_all <- as.numeric(coef(tn_all$cv, s = "lambda.min"))
+tune_tbl <- bind_rows(tune_rows, tibble(lipatan = "semua_data", n_latih = nrow(X15), n_uji = 0L, alpha = tn_all$alpha,
+  lambda = signif(tn_all$cv$lambda.min, 4), cv_mse = round(min(tn_all$cv$cvm), 3), n_koef_nonnol = sum(cf_all[-1] != 0),
+  !!!setNames(as.list(round(cf_all, 5)), c("intercept", colnames(X15)))))
+write_csv(tune_tbl, file.path(tab_dir, "table_17_clean_cooking_forecast_tuning.csv"))
+
+pred_clip <- pmin(pmax(pred_raw, 0), 100)
+abs_err <- abs(pred_clip - y23)
+set.seed(2026)
+boot_idx <- replicate(2000, sample(nrow(abs_err), replace = TRUE))
+# IK selisih MAE: sampel ulang berpasangan atas galat out-of-fold yang sudah ada (model tidak di-fit ulang)
+paired_ci <- function(a, b) {
+  d <- abs_err[, a] - abs_err[, b]
+  ci <- quantile(apply(boot_idx, 2, function(i) mean(d[i])), c(0.025, 0.975))
+  c(mean(d), ci)
+}
+fc_metrics <- tibble(
+  model = colnames(pred_clip),
+  mae_pp = round(colMeans(abs_err), 3),
+  rmse_pp = round(sqrt(colMeans((pred_clip - y23)^2)), 3),
+  n_prediksi_di_luar_0_100 = colSums(pred_raw < 0 | pred_raw > 100),
+  mae_pp_tanpa_potong = round(colMeans(abs(pred_raw - y23)), 3)
+)
+cmp <- rbind(paired_ci("elastic_net", "persistence"), paired_ci("elastic_net", "ols_cook2015"), paired_ci("ols_cook2015", "persistence"))
+fc_compare <- tibble(
+  perbandingan = c("elastic_net - persistence", "elastic_net - ols_cook2015", "ols_cook2015 - persistence"),
+  selisih_mae_pp = round(cmp[, 1], 3), ci95_bawah = round(cmp[, 2], 3), ci95_atas = round(cmp[, 3], 3)
+)
+write_csv(bind_rows(fc_metrics, fc_compare), file.path(tab_dir, "table_15_clean_cooking_forecast_metrics.csv"))
+fc_oof <- tibble(iso3 = migration_df$iso3, country_en = migration_df$country_en, lipatan = fold_out,
+                 cooking_2015 = X15[, "cook"], cooking_2023_aktual = y23) |>
+  bind_cols(as_tibble(round(pred_clip, 2)), as_tibble(round(pred_raw, 2), .name_repair = ~ paste0(.x, "_tanpa_potong")))
+write_csv(fc_oof, file.path(tab_dir, "table_16_clean_cooking_forecast_oof.csv"))
+
+cat(sprintf("\n[Tahap 5B] Prediksi memasak bersih 2023 (validasi silang %d lipatan antarnegara, satu interval 2015-2023):\n", K_OUTER))
+print(fc_metrics); print(fc_compare)
+
+# ==============================================================================
 # TAHAP 6: EKSPOR JSON & PETA SVG ROBINSON UNTUK DASHBOARD INTERAKTIF
 # ==============================================================================
 sf_use_s2(FALSE)
@@ -934,6 +1145,17 @@ dashboard_payload <- list(
   regimes       = regime_profiles,
   regimes_k2    = k2_profiles,
   gmm_ceiling   = gmm_ceiling_diag,
+  pathways      = list(
+    memb_exp = MEMB_EXP, k = K_PATH, weak = path_weak, b_subsample = B_SUB,
+    ari_vs_pam = ari_path_pam, ari_vs_raw = ari_path_raw, ari_vs_regime_2023 = ari_path_regime,
+    k_comparison = path_eval, profiles = path_profiles,
+    countries = path_df |> select(iso3, pathway, memb_max, starts_with("memb_P"))
+  ),
+  cooking_forecast = list(
+    k_outer = K_OUTER, alpha_grid = alpha_grid,
+    metrics = fc_metrics, comparisons = fc_compare, tuning = tune_tbl,
+    countries = fc_oof |> select(iso3, lipatan, persistence, ols_cook2015, elastic_net)
+  ),
   centroids_z   = as_tibble(round(centers_km4, 4), rownames = "kode_rezim"),
   eval_grid     = eval_table,
   ari_matrix    = ari_df,
@@ -960,6 +1182,6 @@ writeLines(paste0("window.__SDG_DASHBOARD_DATA__ = ", json_txt, ";"),
            file.path(dash_dir, "dashboard_data.js"), useBytes = TRUE)
 
 cat("\n======================================================================\n")
-cat("SELESAI! Seluruh 11 tabel CSV, 6 grafik PNG (300 DPI), dan data JSON\n")
+cat("SELESAI! Seluruh 17 tabel CSV, 6 grafik PNG (300 DPI), dan data JSON\n")
 cat("dashboard berhasil dibangun ulang secara konsisten.\n")
 cat("======================================================================\n")

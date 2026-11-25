@@ -1,0 +1,3 @@
+pathway,n_negara,keanggotaan_rerata,med_d_elec_pp,med_d_cook_pp,med_d_rshare_pp,med_d_cap_wpc,med_d_int_mj,med_d_co2_t,rezim_2023,z_d_elec,z_d_cook,z_d_rshare,z_d_cap,z_d_int,z_d_co2
+P1,100,0.722,6.9,7,-2.19,15.83,-0.14,0.128,"R1=22, R2=36, R3=33, R4=9",0.495,0.475,-0.535,-0.208,0.242,0.565
+P2,89,0.803,0,1,2.74,143.22,-0.45,-0.53,"R1=5, R2=5, R3=62, R4=17",-0.556,-0.534,0.601,0.233,-0.272,-0.635

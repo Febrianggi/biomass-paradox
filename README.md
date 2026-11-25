@@ -2,7 +2,7 @@
 
 **English** · [Bahasa Indonesia](README.id.md)
 
-Clustering of 189 sovereign economies on six clean energy and emissions indicators (SDG 7 and SDG 13) for 2023, comparing four clustering methods with bootstrap stability checks.
+Clustering of 189 sovereign economies on six clean energy and emissions indicators (SDG 7 and SDG 13) for 2023, comparing four clustering methods with bootstrap stability checks. The repository also clusters the changes from 2015 to 2023 and tests whether 2015 conditions predict clean cooking access in 2023.
 
 Interactive dashboard (ID/EN): https://febrianggi.github.io/biomass-paradox/
 
@@ -13,6 +13,8 @@ Rankings built on a single indicator can mislead. On SDG 7.2.1 (renewable share 
 1. Which regimes emerge when 189 economies are clustered jointly on six SDG 7 and SDG 13 indicators for 2023?
 2. How stable are those regimes, and how much do they depend on the choice of method?
 3. Where does each economy sit in 2015 when mapped onto the 2023 regime structure?
+4. Do the changes from 2015 to 2023 form distinct pathways?
+5. Do 2015 conditions predict 2023 clean cooking access better than simple persistence?
 
 ## Data
 
@@ -43,6 +45,8 @@ Every step is in [`sdg_energy_transition_analysis.R`](sdg_energy_transition_anal
 5. **Sensitivity checks.** (a) Missing data are imputed with `missMDA::imputePCA` on the 207 economies that have at least 4 of the 6 indicators, and the result is compared on the 189 shared economies. (b) GMM covariance specification: the unconstrained BIC choice (VEV) is compared with a spherical EII model ([`table_11`](output/tables/table_11_gmm_covariance_sensitivity.csv)).
 6. **External validation.** Kruskal-Wallis tests for GDP per capita (PPP) and urbanisation across regimes.
 7. **2015 versus 2023.** The 2015 data are scaled with the 2023 parameters, and each economy is assigned to the nearest 2023 K-Means centroid. This way the model is not refitted on 2015 data.
+8. **Change pathways.** For the same 189 economies, the change from 2015 to 2023 is computed for all six indicators: percentage-point differences for the three shares, and differences of log(1 + x) for renewable capacity, energy intensity and CO2. The columns are standardised and clustered with fuzzy FANNY (`cluster::fanny`) for k = 2 to 6. The membership exponent is the largest value in {2, 1.7, 1.5, 1.3, 1.2} that yields k distinct clusters for every k; the default of 2 collapses to equal memberships on these data. Candidates are compared on Silhouette, normalised Dunn coefficient, membership ambiguity, convergence, cluster sizes and stability over 200 subsamples of 80% with labels aligned to the full solution. The rule picks the most stable k with every cluster of at least 10 economies, and the structure is called weak when Silhouette is below 0.25 or mean Jaccard below 0.75. The exponent grid and these weak-structure thresholds are exploratory choices, made after initial fits showed the default exponent collapsing. PAM on the same features and FANNY on raw (untransformed) differences are sensitivity checks ([`table_12`](output/tables/table_12_change_pathways_k_comparison.csv)).
+9. **Predicting 2023 clean cooking.** The target is clean cooking access in 2023, and the predictors use 2015 data only. Three models share the same 10 outer folds of countries: persistence (the 2015 value), a linear regression on 2015 clean cooking, and an elastic net (`glmnet`) on all six 2015 indicators. Elastic net alpha (0.1 to 1) and lambda are tuned in 10 inner folds, and standardisation is learned from the training folds only. Predictions outside 0 to 100 are clipped to that range for all models, a rule fixed before fitting. Confidence intervals for MAE differences come from paired resampling of the existing out-of-fold errors (2,000 resamples of countries); the models are not refitted.
 
 ## Main results
 
@@ -67,6 +71,10 @@ R1 shows the biomass paradox: it has the highest median renewable share (78.98%)
 
 **2015 versus 2023** ([`table_08`](output/tables/table_08_migration_matrix_2015_2023.csv)): 165 of 189 economies sit in the same regime. 7 economies moved from R1 to R2, 8 from R2 to R3, 7 from R4 to R3, and 2 from R3 to R4. This is a descriptive comparison of positions against the 2023 regime structure, not an estimate of the effect of any policy.
 
+**Change pathways, 2015 to 2023** ([`table_12`](output/tables/table_12_change_pathways_k_comparison.csv), [`table_13`](output/tables/table_13_change_pathway_profiles.csv), [`table_14`](output/tables/table_14_change_pathway_memberships.csv)): The selection rule picks k = 2 (FANNY, membership exponent 1.3, mean subsample Jaccard 0.9334), but the structure is weak: Silhouette is 0.2047, agreement with PAM on the same features is ARI 0.208, and agreement with FANNY on raw differences is ARI 0.6195. Pathway P1 (100 economies) gained access, with median changes of +6.9 percentage points in electricity access and +7 points in clean cooking, while the renewable share fell by 2.19 points and CO2 per capita rose by 0.128 t. Pathway P2 (89 economies) had little access left to gain (median +0 points in electricity, +1 point in clean cooking) and moved toward lower carbon: the renewable share rose by 2.74 points, renewable capacity by 143.22 W per capita, and CO2 per capita fell by 0.53 t. Agreement with the 2023 regimes is only ARI 0.112: P2 holds 62 R3 and 17 R4 economies, while P1 spans all four regimes. The pathways summarise the direction of change; they are not sharply separated groups.
+
+**Predicting 2023 clean cooking** ([`table_15`](output/tables/table_15_clean_cooking_forecast_metrics.csv), [`table_16`](output/tables/table_16_clean_cooking_forecast_oof.csv), [`table_17`](output/tables/table_17_clean_cooking_forecast_tuning.csv)): Out-of-fold MAE is 5.19 percentage points for persistence, 3.79 for the linear regression on 2015 clean cooking, and 3.33 for the elastic net (RMSE 8.24, 6.04, and 5.39). Over this interval, the elastic net has lower MAE than persistence by 1.86 points (95% CI 1.19 to 2.51) and than the cooking-only regression by 0.46 points (95% CI 0.086 to 0.826), with intervals from paired resampling of the out-of-fold errors. The comparison with the regression changes both the predictors and the estimation method, so it measures overall model performance and does not isolate the contribution of the five extra indicators. Before clipping, 61 linear-regression predictions and 50 elastic-net predictions fell outside 0 to 100. This is cross-country validation over one interval, not a forecast of later years.
+
 **Indonesia and ASEAN** ([`table_09`](output/tables/table_09_indonesia_asean_benchmark.csv)): Indonesia is in R3, with 99.4% electricity access in 2023 and renewable electricity capacity of 47.39 W per capita. For comparison, Viet Nam has 476.30 W per capita.
 
 ## Limitations
@@ -77,6 +85,8 @@ R1 shows the biomass paradox: it has the highest median renewable share (78.98%)
 - The 2015 assignment uses the 2023 centroids. It describes relative position, not the regimes that would emerge if 2015 were clustered on its own.
 - The CO2 series combines two sources (EDGAR and IEA) with different methods.
 - Data providers can revise their API data, so re-downloading may give slightly different numbers from the saved panel.
+- The change pathways cover a single interval of eight years. Economies already at 100% electricity or clean cooking access cannot gain further, which shapes the pathways.
+- The clean cooking prediction is cross-country validation over one historical interval (2015 to 2023). It does not show how well the model would forecast later years.
 
 ## Repository structure
 
@@ -88,7 +98,7 @@ R1 shows the biomass paradox: it has the highest median renewable share (78.98%)
 │   ├── sdg_energy_climate_panel_2015_2023.csv
 │   └── sdg_data_dictionary.csv
 ├── output/
-│   ├── tables/    table_01 to table_11 (CSV)
+│   ├── tables/    table_01 to table_17 (CSV)
 │   ├── figures/   fig01 to fig06 (PNG, 300 DPI)
 │   └── console_summary.txt
 ├── dashboard/
@@ -108,7 +118,7 @@ Required R packages:
 ```r
 install.packages(c(
   "dplyr", "tidyr", "readr", "ggplot2", "scales", "psych", "cluster",
-  "mclust", "fpc", "hopkins", "missMDA", "jsonlite",
+  "mclust", "fpc", "hopkins", "missMDA", "jsonlite", "glmnet",
   "rnaturalearth", "rnaturalearthdata", "sf"
 ))
 ```
