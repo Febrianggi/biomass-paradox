@@ -90,7 +90,7 @@ const css = `
   max-height: min(640px, calc(100dvh - 32px)); display: flex; flex-direction: column;
   background: light-dark(#FFFFFF, #12211A); color: light-dark(#15231B, #F3F0E4);
   border: 1px solid light-dark(#D9D5C6, #2A3F33); border-radius: 16px; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
-  font: 500 14px/1.55 "Inter", "Manrope", system-ui, sans-serif;
+  font: 500 14px/1.55 "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 .bp-bot[hidden], .bp-bot [hidden] { display: none !important; }
 .bp-bot :focus-visible { outline: 3px solid light-dark(#3F6212, #A9D85A); outline-offset: 2px; }
@@ -115,7 +115,7 @@ const css = `
 .bp-msg.bot { border: 1px solid light-dark(#D9D5C6, #2A3F33); }
 .bp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .bp-chip {
-  font: 500 13px/1.3 "Inter", system-ui, sans-serif; min-height: 36px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  font: 500 13px/1.3 "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif; min-height: 36px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
   border: 1px solid light-dark(#8C8C85, #6F8A79); background: transparent; color: inherit; text-align: left; position: relative;
 }
 .bp-chip::after { content: ""; position: absolute; inset: -4px 0; }

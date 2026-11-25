@@ -12,10 +12,10 @@ try {
   }
 } catch (_) {}
 </script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='%230F172A'/%3E%3Ccircle cx='11' cy='12' r='3' fill='%23F59E0B'/%3E%3Ccircle cx='21' cy='12' r='3' fill='%2338BDF8'/%3E%3Ccircle cx='11' cy='21' r='3' fill='%2310B981'/%3E%3Ccircle cx='21' cy='21' r='3' fill='%23FB7185'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='8' fill='%230B1711' stroke='%232A3F33' stroke-width='1.5'/%3E%3Cpath d='M7.5 24.5l4-4' stroke='%23A9D85A' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M24.5 7.5C15.5 7.5 9.2 12.2 8.2 21.8c-.1 1 .7 1.8 1.7 1.7 9.6-1 14.6-7.2 14.6-16Z' fill='%23A9D85A'/%3E%3Cpath d='M16.5 11.2c2.5 2.7 3.8 5 3.8 7.1a4.3 4.3 0 0 1-8.6 0c0-2.1 1.3-4.4 4.8-7.1Z' fill='%230B1711'/%3E%3Cpath d='M16.2 13.1c1.7 2 2.7 3.7 2.7 5.2a2.9 2.9 0 0 1-5.8 0c0-1.5 1-3.2 3.1-5.2Z' fill='%23F59E0B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;600;700&display=swap">
 <title>Atlas Transisi Energi Bersih &amp; Iklim Global (SDG 7 &amp; 13)</title>
 <style>
 /*
@@ -63,8 +63,9 @@ try {
   --map-na: var(--map-na-l); --map-hover: #5B21B6; --map-stroke: var(--map-stroke-l);
 
   --display: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
   --radius: 6px; --radius-card: 12px; --pill: 999px;
   --stick-top: var(--utility-height, 0px);
@@ -159,20 +160,33 @@ header.masthead:not(.is-home) .mist { display: none; }
 @keyframes drift { to { transform: translateX(-50%); } }
 @media (max-width: 640px) { .mist { opacity: 0.14; } }
 @media (prefers-reduced-motion: reduce) { .mist-track { animation: none; } }
-.brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text); text-decoration: none; font-family: var(--display); font-weight: 700; font-size: 16px; letter-spacing: -0.01em; }
-.home-link { color: var(--muted); font-size: 13.5px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 var(--s2); border-radius: var(--pill); }
-.home-link:hover { color: var(--text); background: var(--ink-soft); }
+.brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text); text-decoration: none; font: 700 17px/1 var(--display); letter-spacing: -0.01em; }
+.brand-logo { width: 28px; height: 28px; flex: none; display: block; }
 .brand-group { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: var(--s2) var(--s4); padding: var(--s2) 0;
 }
-.brand-mark { width: 12px; height: 12px; border-radius: 50%; background: var(--lime); flex: none; }
 .brand-tag {
   font: 600 11.5px/1 var(--mono); padding: 5px 9px; border-radius: var(--pill);
   background: var(--surface-2); color: var(--muted);
 }
 .top-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2); }
+/* Match landing page language & theme toggle controls */
+.topbar .seg {
+  display: inline-flex; padding: 2px; gap: 2px; border: 0; border-radius: 12px;
+  background: rgba(243, 240, 228, 0.08);
+}
+.topbar .seg button, .icon-btn {
+  font: 600 13px/1 var(--mono); min-height: 44px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 10px;
+  background: transparent; color: #C3C9BC; cursor: pointer; touch-action: manipulation;
+  transition: background-color 300ms var(--ease), color 300ms var(--ease);
+}
+.topbar .seg button:hover, .icon-btn:hover { color: #F3F0E4; background: rgba(243, 240, 228, 0.1); }
+.topbar .seg button[aria-pressed="true"] { background: #F3F0E4; color: #0B1711; font-weight: 600; box-shadow: none; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.icon-btn svg { width: 18px; height: 18px; }
+@media (prefers-reduced-motion: reduce) { .topbar .seg button, .icon-btn { transition: none; } }
 
 .btn, select, input[type="search"] {
   font: inherit; font-size: 13.5px; min-height: 44px; max-width: 100%;
@@ -188,7 +202,7 @@ header.masthead:not(.is-home) .mist { display: none; }
 .btn:hover { background: var(--surface-2); border-color: var(--text); }
 .btn:active { background: var(--ink-soft); }
 /* The one filled chromatic control: leaf green with forest ink in both themes (about 11:1). */
-.btn.primary { background: var(--lime); border-color: var(--lime); color: var(--on-lime); font-weight: 600; }
+.btn.primary { background: var(--lime); border-color: var(--lime); color: var(--on-lime); font-weight: 700; border-radius: 12px; }
 .btn.primary:hover { background: var(--lime-hover); border-color: var(--lime-hover); }
 .btn.primary:active { box-shadow: inset 0 0 0 1px var(--on-lime); }
 .btn-icon { width: 16px; height: 16px; flex: none; }
@@ -264,24 +278,6 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
   pointer-events: none;
 }
 .tip.is-open .tip-body { display: block; }
-
-/* Context dialog with one documentary photo (reserved aspect ratio, so no layout shift) */
-dialog.context {
-  max-width: min(680px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); border: 0;
-  border-radius: var(--radius-card); background: var(--surface); color: var(--text); padding: var(--s5);
-  box-shadow: 0 11px 33px rgba(0, 0, 0, 0.2);
-}
-dialog.context::backdrop { background: rgba(11, 23, 17, 0.6); }
-dialog.context p { margin-top: var(--s3); font-size: 14.5px; max-width: 70ch; }
-dialog.context form { margin-top: var(--s4); display: flex; justify-content: flex-end; }
-.context-photo { margin: var(--s4) 0 0; }
-.context-photo img {
-  display: block; width: 100%; height: auto; aspect-ratio: 1240 / 823; object-fit: cover;
-  border-radius: var(--radius-card); background: var(--surface-2);
-}
-.context-photo figcaption { margin-top: var(--s2); font-size: 12.5px; line-height: 1.45; color: var(--muted); }
-.context-photo figcaption a { color: var(--link); }
-@media (max-width: 640px) { dialog.context { padding: var(--s4); } }
 
 /* Tabs */
 .nav-bar { position: sticky; top: 0; z-index: 25; background: var(--bg); border-bottom: 1px solid var(--line); }
@@ -553,25 +549,19 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   <div class="wrap">
     <div class="topbar">
       <div class="brand-group">
-        <a class="brand" href="../" data-home-link>
-          <span class="brand-mark" aria-hidden="true"></span>
+        <a class="brand" id="brand-home-link" href="../" data-home-link title="Kembali ke beranda">
+          <svg class="brand-logo" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" fill="#0B1711" stroke="#2A3F33" stroke-width="1.5"/><path d="M7.5 24.5l4-4" stroke="#A9D85A" stroke-width="2" stroke-linecap="round"/><path d="M24.5 7.5C15.5 7.5 9.2 12.2 8.2 21.8c-.1 1 .7 1.8 1.7 1.7 9.6-1 14.6-7.2 14.6-16Z" fill="#A9D85A"/><path d="M16.5 11.2c2.5 2.7 3.8 5 3.8 7.1a4.3 4.3 0 0 1-8.6 0c0-2.1 1.3-4.4 4.8-7.1Z" fill="#0B1711"/><path d="M16.2 13.1c1.7 2 2.7 3.7 2.7 5.2a2.9 2.9 0 0 1-5.8 0c0-1.5 1-3.2 3.1-5.2Z" fill="#F59E0B"/></svg>
           <span>Biomass Paradox</span>
         </a>
         <span class="brand-tag" data-i18n="brand">Atlas SDG 7 · 13</span>
-        <a class="home-link" href="../" data-home-link>
-          <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3.5M7.5 4l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span data-i18n="homeLink">Kembali ke beranda</span>
-        </a>
       </div>
       <div class="top-actions">
-        <button type="button" class="btn" id="context-btn" aria-haspopup="dialog" data-i18n="contextBtn">Konteks Kebijakan</button>
         <div class="seg" id="lang-group" role="group" aria-label="Bahasa">
           <button type="button" id="lang-id" aria-pressed="true">ID</button>
           <button type="button" id="lang-en" aria-pressed="false">EN</button>
         </div>
-        <button type="button" class="btn" id="theme-toggle">
-          <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
-          <span data-i18n="themeBtn">Tema</span>
+        <button type="button" class="icon-btn" id="theme-toggle" aria-label="Ganti tema terang atau gelap">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
         </button>
         <button type="button" class="btn primary" id="download-csv-btn">
           <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0L4.75 6.75M8 10l3.25-3.25M2.75 11.5v1.75h10.5V11.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -594,27 +584,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     </div>
   </div>
 </header>
-
-<dialog class="context" id="context-dialog" aria-labelledby="context-title">
-  <h2 id="context-title" data-i18n="contextTitle">Konteks Kebijakan</h2>
-  <p data-i18n="contextBody">Dirancang bagi perencana energi nasional dan analis SDG untuk membedakan pangsa energi terbarukan yang bersumber dari kayu bakar tradisional (SDG 7.2.1) dari kapasitas listrik bersih modern (SDG 7.b.1) serta efisiensi energi dan karbon (SDG 7.3.1 dan SDG 13).</p>
-  <p class="muted small" data-i18n="contextNote">Pengelompokan ini deskriptif. Perbedaan antarnegara dan perpindahan 2015 ke 2023 bukan estimasi dampak kebijakan.</p>
-  <figure class="context-photo">
-    <img id="context-photo-img" src="img/laos-wood-stove-640.webp"
-      srcset="img/laos-wood-stove-640.webp 640w, img/laos-wood-stove-1240.webp 1240w"
-      sizes="(max-width: 712px) calc(100vw - 64px), 632px"
-      width="1240" height="823" loading="lazy" decoding="async"
-      alt="Seorang perempuan Brau berjongkok di samping tungku kayu, merebus rebung dalam panci di atas api terbuka dengan tumpukan kayu bakar di belakangnya.">
-    <figcaption>
-      <span data-i18n="photoCaption">Memasak dengan kayu bakar di Provinsi Attapeu, Laos (2013): wujud sehari-hari dari pangsa energi terbarukan yang tinggi tanpa akses memasak bersih.</span>
-      <span data-i18n="photoCredit">Foto:</span>
-      <a href="https://commons.wikimedia.org/wiki/File:Brao_woman_cooking_over_a_wood_stove.JPG" target="_blank" rel="noopener">BigBrotherMouse, Wikimedia Commons</a>,
-      <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>
-      (<span data-i18n="photoChange">ukuran diperkecil</span>).
-    </figcaption>
-  </figure>
-  <form method="dialog"><button class="btn" data-i18n="close">Tutup</button></form>
-</dialog>
 
 <div class="nav-bar">
   <div class="wrap">
@@ -950,18 +919,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       langLabel: "Bahasa",
       mapAria: "Peta dunia rezim transisi energi bersih dan iklim",
       brand: "Atlas SDG 7 · 13",
-      homeLink: "Kembali ke beranda",
-      contextBtn: "Konteks Kebijakan",
-      contextTitle: "Konteks Kebijakan",
-      contextBody: "Dirancang bagi perencana energi nasional dan analis SDG untuk membedakan pangsa energi terbarukan yang bersumber dari kayu bakar tradisional (SDG 7.2.1) dari kapasitas listrik bersih modern (SDG 7.b.1) serta efisiensi energi dan karbon (SDG 7.3.1 dan SDG 13).",
-      contextNote: "Pengelompokan ini deskriptif. Perbedaan antarnegara dan perpindahan 2015 ke 2023 bukan estimasi dampak kebijakan.",
-      photoAlt: "Seorang perempuan Brau berjongkok di samping tungku kayu, merebus rebung dalam panci di atas api terbuka dengan tumpukan kayu bakar di belakangnya.",
-      photoCaption: "Memasak dengan kayu bakar di Provinsi Attapeu, Laos (2013): wujud sehari-hari dari pangsa energi terbarukan yang tinggi tanpa akses memasak bersih.",
-      photoCredit: "Foto:",
-      photoChange: "ukuran diperkecil",
-      close: "Tutup",
-      themeBtn: "Tema",
-      themeLabel: "Ubah tema warna",
+      homeTitle: "Kembali ke beranda",
+      themeLabel: "Ganti tema terang atau gelap",
       dlCsv: "Unduh CSV (189 Negara)",
       title: "Paradoks Biomassa dalam Transisi Energi-Iklim Global",
       thesis: "Pangsa energi terbarukan yang tinggi tidak selalu berarti listrik bersih modern: 189 negara dikelompokkan dengan empat algoritma pada enam indikator SDG 7 dan SDG 13.",
@@ -1115,18 +1074,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       langLabel: "Language",
       mapAria: "World map of clean energy and climate transition regimes",
       brand: "SDG 7 · 13 atlas",
-      homeLink: "Back to home",
-      contextBtn: "Policy Context",
-      contextTitle: "Policy Context",
-      contextBody: "Built for national energy planners and SDG analysts to separate renewable shares driven by traditional biomass (SDG 7.2.1) from modern clean power capacity (SDG 7.b.1) and from energy and carbon efficiency (SDG 7.3.1 and SDG 13).",
-      contextNote: "The grouping is descriptive. Differences between countries and moves between 2015 and 2023 are not estimates of policy effects.",
-      photoAlt: "A Brau woman crouches beside a wood stove, boiling bamboo shoots in a pot over an open fire, with a stack of firewood behind her.",
-      photoCaption: "Cooking over firewood in Attapeu province, Laos (2013): what a high renewable share without clean cooking access looks like day to day.",
-      photoCredit: "Photo:",
-      photoChange: "resized",
-      close: "Close",
-      themeBtn: "Theme",
-      themeLabel: "Switch colour theme",
+      homeTitle: "Back to home",
+      themeLabel: "Switch light or dark theme",
       dlCsv: "Download CSV (189 Countries)",
       title: "The Biomass Paradox in the Global Energy and Climate Transition",
       thesis: "A high renewable share does not always mean modern clean power: 189 countries clustered with four algorithms on six SDG 7 and SDG 13 indicators.",
@@ -1359,9 +1308,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     } catch (_) {}
     meta.content = targetMatchesOs ? "light dark" : target;
   });
-
-  /* Policy context dialog */
-  $("context-btn").addEventListener("click", () => $("context-dialog").showModal());
 
   /* Accessible tablist + hidden="until-found" sync */
   const tablist = $("main-tablist");
@@ -2432,7 +2378,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       if (typeof v === "string") el.textContent = v;
     });
     $("theme-toggle").setAttribute("aria-label", t.themeLabel);
-    $("context-photo-img").alt = t.photoAlt;
+    $("brand-home-link").setAttribute("title", t.homeTitle);
     $("t-footer").innerHTML = t.footer;
     tablist.setAttribute("aria-label", t.tablistLabel);
     tabs.forEach((tab, i) => { tab.textContent = t.tabs[i]; });

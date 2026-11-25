@@ -17,7 +17,7 @@ document.documentElement.classList.add("js");
 <meta property="og:description" content="Energi terbarukan tinggi, akses memasak bersih rendah. Atlas interaktif 189 negara, SDG 7 dan SDG 13.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="dashboard/img/forest-canopy-1280.webp">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B1711'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23A9D85A'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='8' fill='%230B1711' stroke='%232A3F33' stroke-width='1.5'/%3E%3Cpath d='M7.5 24.5l4-4' stroke='%23A9D85A' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M24.5 7.5C15.5 7.5 9.2 12.2 8.2 21.8c-.1 1 .7 1.8 1.7 1.7 9.6-1 14.6-7.2 14.6-16Z' fill='%23A9D85A'/%3E%3Cpath d='M16.5 11.2c2.5 2.7 3.8 5 3.8 7.1a4.3 4.3 0 0 1-8.6 0c0-2.1 1.3-4.4 4.8-7.1Z' fill='%230B1711'/%3E%3Cpath d='M16.2 13.1c1.7 2 2.7 3.7 2.7 5.2a2.9 2.9 0 0 1-5.8 0c0-1.5 1-3.2 3.1-5.2Z' fill='%23F59E0B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@500;600;700&display=swap">
@@ -83,8 +83,8 @@ img { display: block; max-width: 100%; }
   background: rgba(11, 23, 17, 0.72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(243, 240, 228, 0.12); color: var(--cream);
 }
-.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--cream); text-decoration: none; font: 700 17px/1 var(--sans); letter-spacing: -0.01em; }
-.brand-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--leaf); flex: none; }
+.brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--cream); text-decoration: none; font: 700 17px/1 var(--sans); letter-spacing: -0.01em; }
+.brand-logo { width: 28px; height: 28px; flex: none; display: block; }
 .nav-actions { display: flex; align-items: center; gap: 4px; }
 .seg { display: inline-flex; padding: 2px; gap: 2px; border-radius: 12px; background: rgba(243, 240, 228, 0.08); }
 .seg button, .icon-btn {
@@ -219,7 +219,7 @@ footer p { max-width: 900px; }
 <a class="skip" href="#main" data-i18n="skip">Lewati ke konten</a>
 
 <nav class="nav" aria-label="Utama" data-i18n-aria="navLabel">
-  <a class="brand" href="./" data-self-link><span class="brand-dot" aria-hidden="true"></span>Biomass Paradox</a>
+  <a class="brand" href="./" data-self-link><svg class="brand-logo" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" fill="#0B1711" stroke="#2A3F33" stroke-width="1.5"/><path d="M7.5 24.5l4-4" stroke="#A9D85A" stroke-width="2" stroke-linecap="round"/><path d="M24.5 7.5C15.5 7.5 9.2 12.2 8.2 21.8c-.1 1 .7 1.8 1.7 1.7 9.6-1 14.6-7.2 14.6-16Z" fill="#A9D85A"/><path d="M16.5 11.2c2.5 2.7 3.8 5 3.8 7.1a4.3 4.3 0 0 1-8.6 0c0-2.1 1.3-4.4 4.8-7.1Z" fill="#0B1711"/><path d="M16.2 13.1c1.7 2 2.7 3.7 2.7 5.2a2.9 2.9 0 0 1-5.8 0c0-1.5 1-3.2 3.1-5.2Z" fill="#F59E0B"/></svg>Biomass Paradox</a>
   <div class="nav-actions">
     <div class="seg" role="group" aria-label="Bahasa" id="lang-group">
       <button type="button" id="lang-id" aria-pressed="true">ID</button>
