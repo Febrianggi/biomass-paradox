@@ -50,7 +50,7 @@ try {
   --text: var(--text-l); --muted: var(--muted-l); --link: var(--link-l); --ink-soft: var(--ink-soft-l);
   --r1: var(--r1-l); --r2: var(--r2-l); --r3: var(--r3-l); --r4: var(--r4-l);
   --r1t: var(--r1t-l); --r2t: var(--r2t-l); --r3t: var(--r3t-l); --r4t: var(--r4t-l);
-  --map-na: var(--map-na-l); --map-stroke: var(--map-stroke-l);
+  --map-na: var(--map-na-l); --map-hover: #5B21B6; --map-stroke: var(--map-stroke-l);
 
   --serif: "Newsreader", Georgia, "Times New Roman", serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -69,7 +69,7 @@ try {
     --text: var(--text-d); --muted: var(--muted-d); --link: var(--link-d); --ink-soft: var(--ink-soft-d);
     --r1: var(--r1-d); --r2: var(--r2-d); --r3: var(--r3-d); --r4: var(--r4-d);
     --r1t: var(--r1-d); --r2t: var(--r2-d); --r3t: var(--r3-d); --r4t: var(--r4-d);
-    --map-na: var(--map-na-d); --map-stroke: var(--map-stroke-d);
+    --map-na: var(--map-na-d); --map-hover: #D8B4FE; --map-stroke: var(--map-stroke-d);
   }
 }
 :root:has(> head > meta[name="color-scheme"][content="dark"]) {
@@ -79,7 +79,7 @@ try {
   --text: var(--text-d); --muted: var(--muted-d); --link: var(--link-d); --ink-soft: var(--ink-soft-d);
   --r1: var(--r1-d); --r2: var(--r2-d); --r3: var(--r3-d); --r4: var(--r4-d);
   --r1t: var(--r1-d); --r2t: var(--r2-d); --r3t: var(--r3-d); --r4t: var(--r4-d);
-  --map-na: var(--map-na-d); --map-stroke: var(--map-stroke-d);
+  --map-na: var(--map-na-d); --map-hover: #D8B4FE; --map-stroke: var(--map-stroke-d);
 }
 :root:has(> head > meta[name="color-scheme"][content="light"]) {
   color-scheme: light;
@@ -88,7 +88,7 @@ try {
   --text: var(--text-l); --muted: var(--muted-l); --link: var(--link-l); --ink-soft: var(--ink-soft-l);
   --r1: var(--r1-l); --r2: var(--r2-l); --r3: var(--r3-l); --r4: var(--r4-l);
   --r1t: var(--r1t-l); --r2t: var(--r2t-l); --r3t: var(--r3t-l); --r4t: var(--r4t-l);
-  --map-na: var(--map-na-l); --map-stroke: var(--map-stroke-l);
+  --map-na: var(--map-na-l); --map-hover: #5B21B6; --map-stroke: var(--map-stroke-l);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -273,7 +273,8 @@ dialog.context form { margin-top: var(--s4); display: flex; justify-content: fle
   cursor: pointer;
 }
 @media (prefers-reduced-motion: reduce) { .country-path { transition: none; } }
-.map-hover-outline { fill: none; stroke: var(--surface); stroke-width: 2.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
+.map-hover-outline, .map-hover-halo { fill: none; stroke: var(--map-hover); stroke-width: 2.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
+.map-hover-halo { stroke: var(--surface); stroke-width: 4.5px; }
 .country-path.is-selected { stroke: var(--text); stroke-width: 2.2px; }
 .country-path:focus { outline: none; }
 .country-path:focus-visible { stroke: var(--text); stroke-width: 3px; stroke-dasharray: 4 2; }
@@ -1407,6 +1408,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const hoverOutline = document.createElementNS(svg.namespaceURI, "path");
     hoverOutline.setAttribute("class", "map-hover-outline");
     hoverOutline.setAttribute("aria-hidden", "true");
+    const hoverHalo = hoverOutline.cloneNode(false);
+    hoverHalo.setAttribute("class", "map-hover-halo");
+    function setHoverPath(d) {
+      hoverOutline.setAttribute("d", d);
+      hoverHalo.setAttribute("d", d);
+    }
     for (const item of DATA.world_map) {
       const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
       p.setAttribute("d", item.d);
@@ -1426,7 +1433,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         });
       }
       p.addEventListener("pointerenter", (ev) => {
-        if (ev.pointerType !== "touch") hoverOutline.setAttribute("d", item.d);
+        if (ev.pointerType !== "touch") setHoverPath(item.d);
         if (!c) {
           showTip(ev, `<strong>${item.name_map} (${item.iso3})</strong><br><span class="muted">${T().noDataMap}</span>`);
           return;
@@ -1436,14 +1443,14 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         showTip(ev, countryTip(c).replace(`<strong>${c.kode_2023}</strong>`, `<strong>${tag}</strong>`));
       });
       p.addEventListener("pointermove", moveTip);
-      p.addEventListener("pointerleave", () => { hoverOutline.removeAttribute("d"); hideTip(); });
+      p.addEventListener("pointerleave", () => { setHoverPath(""); hideTip(); });
       frag.appendChild(p);
     }
     const outline = document.createElementNS("http://www.w3.org/2000/svg", "path");
     outline.id = "map-sel-outline";
     outline.setAttribute("class", "sel-outline");
     outline.setAttribute("aria-hidden", "true");
-    frag.append(hoverOutline, outline);
+    frag.append(hoverHalo, hoverOutline, outline);
     svg.replaceChildren(frag);
   }
 
