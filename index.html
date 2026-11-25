@@ -2,11 +2,484 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="0; url=dashboard/">
-<link rel="canonical" href="dashboard/">
-<title>biomass-paradox</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script>
+try {
+  const s = localStorage.getItem("color-scheme");
+  if (s === "light" || s === "dark") document.querySelector('meta[name="color-scheme"]').content = s;
+} catch (_) {}
+document.documentElement.classList.add("js");
+</script>
+<title>Biomass Paradox: energi terbarukan tinggi, dapur masih berasap</title>
+<meta name="description" content="Lihat mengapa negara dengan pangsa energi terbarukan tinggi bisa tetap memasak dengan kayu bakar. Peta interaktif 189 negara pada enam indikator SDG 7 dan SDG 13.">
+<meta property="og:title" content="Biomass Paradox">
+<meta property="og:description" content="Energi terbarukan tinggi, akses memasak bersih rendah. Atlas interaktif 189 negara, SDG 7 dan SDG 13.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="dashboard/img/forest-canopy-1280.webp">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B1711'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23A9D85A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@500;600;700&display=swap">
+<link rel="preload" as="image" href="dashboard/img/forest-canopy-1280.webp"
+  imagesrcset="dashboard/img/forest-canopy-768.webp 768w, dashboard/img/forest-canopy-1280.webp 1280w, dashboard/img/forest-canopy-1920.webp 1920w" imagesizes="100vw">
+<style>
+/*
+  Direction: an aerial forest opening (still image), a slow mist layer behind the words,
+  and small mono labels. Below the fold, a science exhibit:
+  one large documentary photo with a few explanatory panels around it.
+  Dials: ENERGY 2, RHYTHM 2, MOTION 1 (mist drift, one-time reveals).
+  Leaf green is the only interface accent and fills only the primary action.
+  The four regime colours stay as in the dashboard and never appear on controls.
+*/
+:root {
+  --forest: #0B1711; --forest-2: #12211A; --forest-3: #1A2D23;
+  --cream: #F3F0E4; --cream-muted: #C3C9BC;
+  --leaf: #A9D85A; --leaf-hover: #BCE477; --on-leaf: #0B1711;
+  --page: light-dark(#F5F3EA, #0B1711);
+  --card: light-dark(#FFFFFF, #12211A);
+  --card-2: light-dark(#ECE9DD, #1A2D23);
+  --ink: light-dark(#15231B, #F3F0E4);
+  --muted: light-dark(#4D5A50, #B9C2B5);
+  --line: light-dark(#D9D5C6, #2A3F33);
+  --link: light-dark(#3F6212, #A9D85A);
+  --focus: light-dark(#3F6212, #A9D85A);
+  --r1: light-dark(#B45309, #F59E0B); --r2: light-dark(#0369A1, #38BDF8);
+  --r3: light-dark(#047857, #10B981); --r4: light-dark(#BE123C, #FB7185);
+  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--page); -webkit-text-size-adjust: 100%; scroll-padding-top: 96px; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 500 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+h1, h2, h3, p, figure { margin: 0; }
+a { color: var(--link); text-underline-offset: 3px; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+@media (max-width: 640px) { .wrap { padding: 0 16px; } }
+.mono { font-family: var(--mono); font-weight: 400; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip { position: absolute; left: 16px; top: -64px; z-index: 50; background: var(--leaf); color: var(--on-leaf); padding: 8px 12px; border-radius: 8px; font-weight: 600; }
+.skip:focus { top: 16px; }
+
+/* Named type styles (one family, mono only for numbers and labels) */
+.heading-1 { font: 700 clamp(34px, 4.6vw, 60px)/1.06 var(--sans); letter-spacing: -0.03em; }
+.heading-2 { font: 700 clamp(30px, 3.6vw, 48px)/1.1 var(--sans); letter-spacing: -0.02em; }
+.heading-3 { font: 600 clamp(24px, 2.4vw, 30px)/1.2 var(--sans); letter-spacing: -0.01em; }
+.title-3 { font: 600 20px/1.3 var(--sans); }
+.body-2 { font: 500 18px/1.6 var(--sans); }
+.body-4 { font: 500 16px/1.6 var(--sans); }
+.caption-3 { font: 400 13px/1.5 var(--mono); }
+.caption-4 { font: 400 12px/1.5 var(--mono); }
+
+/* Floating translucent navigation, dark in both themes (it sits over the photo first) */
+.nav {
+  position: fixed; z-index: 40; top: 12px; left: 50%; transform: translateX(-50%);
+  width: min(1176px, calc(100% - 24px)); color-scheme: dark;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 4px 4px 4px 16px; border-radius: 16px;
+  background: rgba(11, 23, 17, 0.72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(243, 240, 228, 0.12); color: var(--cream);
+}
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--cream); text-decoration: none; font: 700 17px/1 var(--sans); letter-spacing: -0.01em; }
+.brand-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--leaf); flex: none; }
+.nav-actions { display: flex; align-items: center; gap: 4px; }
+.seg { display: inline-flex; padding: 2px; gap: 2px; border-radius: 12px; background: rgba(243, 240, 228, 0.08); }
+.seg button, .icon-btn {
+  font: 600 13px/1 var(--mono); min-height: 44px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 10px;
+  background: transparent; color: var(--cream-muted); cursor: pointer; touch-action: manipulation;
+  transition: background-color 300ms var(--ease), color 300ms var(--ease);
+}
+.seg button:hover, .icon-btn:hover { color: var(--cream); background: rgba(243, 240, 228, 0.1); }
+.seg button[aria-pressed="true"] { background: var(--cream); color: var(--forest); }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; }
+.icon-btn svg { width: 18px; height: 18px; }
+
+/* Primary action: the one filled control */
+.cta {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 20px;
+  border-radius: 12px; background: var(--leaf); color: var(--on-leaf); text-decoration: none;
+  font: 700 16px/1 var(--sans); touch-action: manipulation;
+  transition: background-color 300ms var(--ease), transform 300ms var(--ease);
+}
+.cta:hover { background: var(--leaf-hover); }
+.cta:active { transform: translateY(1px); }
+.cta svg { width: 18px; height: 18px; transition: transform 300ms var(--ease); }
+.cta:hover svg { transform: translateX(3px); }
+
+/* Hero: still photo, scrim, drifting mist, then the words */
+.hero {
+  position: relative; isolation: isolate; overflow: hidden; color-scheme: dark;
+  min-height: min(100svh, 920px); display: flex; align-items: center;
+  background: var(--forest); color: var(--cream);
+}
+.hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%; z-index: -3; }
+/* The scrim is the one gradient on the page: it keeps the left text column at AA contrast over a busy photo. */
+.hero-scrim {
+  position: absolute; inset: 0; z-index: -2;
+  background: linear-gradient(90deg, rgba(11, 23, 17, 0.9) 0%, rgba(11, 23, 17, 0.74) 42%, rgba(11, 23, 17, 0.28) 78%, rgba(11, 23, 17, 0.18) 100%),
+              linear-gradient(0deg, rgb(11, 23, 17) 0%, rgba(11, 23, 17, 0) 32%);
+}
+.mist { position: absolute; inset: 14% 0 auto 0; height: 62%; z-index: -1; overflow: hidden; pointer-events: none; opacity: 0.55; }
+.mist-track {
+  position: absolute; inset: 0 auto 0 0; width: 200%;
+  background: url("dashboard/img/mist-band.webp") repeat-x 0 0 / 50% 100%;
+  animation: drift 54s linear infinite; will-change: transform;
+}
+.mist.is-paused .mist-track { animation-play-state: paused; }
+@keyframes drift { to { transform: translateX(-50%); } }
+@media (max-width: 640px) { .mist { opacity: 0.32; } }
+.hero-inner { position: relative; width: 100%; padding-top: 128px; padding-bottom: 128px; }
+.eyebrow { color: var(--cream-muted); margin-bottom: 24px; }
+.hero h1 { max-width: 760px; }
+.hero h1 .line { display: block; }
+.hero-sub { max-width: 600px; margin-top: 24px; color: var(--cream); opacity: 0.92; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin-top: 32px; }
+.proof { color: var(--cream-muted); max-width: 400px; }
+.hero-credit { position: absolute; left: 32px; bottom: 16px; color: var(--cream-muted); }
+@media (max-width: 640px) {
+  .hero { min-height: 0; }
+  .hero-photo { object-position: 34% 50%; }
+  .hero-scrim { background: linear-gradient(0deg, rgb(11, 23, 17) 0%, rgba(11, 23, 17, 0.72) 28%), rgba(11, 23, 17, 0.72); }
+  .hero-inner { padding-top: 104px; padding-bottom: 80px; }
+  .hero-credit { left: 16px; right: 16px; bottom: 12px; }
+}
+
+/* Sections */
+section { padding: 96px 0; }
+@media (max-width: 640px) { section { padding: 64px 0; } }
+/* Febri's request: the forest fades into the page instead of ending on a hard edge.
+   The fade lives on the first section (not inside the hero), so --page resolves to the
+   current theme; the heading starts below the fade, so text never sits on the mid tones. */
+.after-hero { background: linear-gradient(180deg, var(--forest) 0, var(--page) 192px); background: linear-gradient(in oklab 180deg, var(--forest) 0, var(--page) 192px); padding-top: 208px; }
+@media (max-width: 640px) { .after-hero { background: linear-gradient(180deg, var(--forest) 0, var(--page) 128px); background: linear-gradient(in oklab 180deg, var(--forest) 0, var(--page) 128px); padding-top: 144px; } }
+.section-head { max-width: 680px; margin-bottom: 48px; }
+.section-head p { margin-top: 16px; color: var(--muted); }
+
+/* Two faces of biomass: one large photo surrounded by small panels */
+.exhibit { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+@media (max-width: 960px) { .exhibit { grid-template-columns: 1fr; } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+.panel h3 { margin-bottom: 8px; }
+.panel p { color: var(--muted); }
+.panel p + p { margin-top: 12px; }
+.panel .src { margin-top: 16px; color: var(--muted); }
+.photo-panel { padding: 8px; display: flex; flex-direction: column; }
+.photo-panel img { width: 100%; height: auto; aspect-ratio: 1240 / 823; object-fit: cover; border-radius: 8px; background: var(--card-2); }
+.photo-panel .panel-body { padding: 16px 16px 12px; }
+.tag { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; color: var(--muted); }
+.tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.tag.trad { color: var(--r1); }
+.tag.modern { color: var(--r3); }
+.side { display: grid; gap: 16px; align-content: start; }
+.chips-fig { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px; align-items: start; }
+.chips-fig img { width: 132px; height: auto; aspect-ratio: 300 / 156; object-fit: cover; border-radius: 8px; }
+@media (max-width: 420px) { .chips-fig { grid-template-columns: 1fr; } .chips-fig img { width: 100%; } }
+.credit { margin-top: 8px; color: var(--muted); }
+.credit a { color: var(--link); }
+
+/* Tagline reveal */
+.tagline { padding: 64px 0 112px; }
+.tagline p { max-width: 960px; text-wrap: balance; }
+.tagline .w { opacity: 0.3; transition: opacity 400ms var(--ease); }
+.tagline .w.on, html:not(.js) .tagline .w { opacity: 1; }
+
+/* What the dashboard shows */
+/* The regime finding leads, so its panel is wider than the two that follow. */
+.facts { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 960px) { .facts { grid-template-columns: 1fr; } }
+.facts .num { font-family: var(--mono); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+.regime-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.regime-row span { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; font: 400 13px/1.5 var(--mono); color: var(--ink); }
+.regime-row i { width: 10px; height: 10px; border-radius: 50%; }
+
+/* Closing call to action: same words and target as the hero */
+.closing { color-scheme: dark; background: var(--forest-2); color: var(--cream); position: relative; overflow: hidden; isolation: isolate; }
+.closing .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px; }
+.closing p { color: var(--cream-muted); margin-top: 16px; max-width: 560px; }
+
+footer { padding: 48px 0; border-top: 1px solid var(--line); color: var(--muted); }
+footer .wrap { display: grid; gap: 12px; }
+footer p { max-width: 900px; }
+
+/* One-time scroll reveal; content stays visible without JS */
+.js .reveal { opacity: 0; transform: translateY(32px); transition: opacity 700ms var(--ease), transform 700ms var(--ease); }
+.js .reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .mist-track { animation: none; }
+  .js .reveal { opacity: 1; transform: none; transition: none; }
+  .tagline .w { opacity: 1; transition: none; }
+  .cta, .cta svg, .seg button, .icon-btn { transition: none; }
+}
+</style>
 </head>
 <body>
-<p><a href="dashboard/">Buka dashboard / Open the dashboard</a></p>
+<a class="skip" href="#main" data-i18n="skip">Lewati ke konten</a>
+
+<nav class="nav" aria-label="Utama" data-i18n-aria="navLabel">
+  <a class="brand" href="./" data-self-link><span class="brand-dot" aria-hidden="true"></span>Biomass Paradox</a>
+  <div class="nav-actions">
+    <div class="seg" role="group" aria-label="Bahasa" id="lang-group">
+      <button type="button" id="lang-id" aria-pressed="true">ID</button>
+      <button type="button" id="lang-en" aria-pressed="false">EN</button>
+    </div>
+    <button type="button" class="icon-btn" id="theme-toggle" aria-label="Ganti tema terang atau gelap">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <img class="hero-photo" src="dashboard/img/forest-canopy-1280.webp"
+    srcset="dashboard/img/forest-canopy-768.webp 768w, dashboard/img/forest-canopy-1280.webp 1280w, dashboard/img/forest-canopy-1920.webp 1920w"
+    sizes="100vw" width="1920" height="898" fetchpriority="high" decoding="async"
+    alt="Ilustrasi buatan AI: hutan tropis dilihat dari udara, dengan sungai berbatu dan kabut tipis di atas tajuk pohon." data-i18n-alt="heroAlt">
+  <div class="hero-scrim"></div>
+  <div class="mist" id="hero-mist" aria-hidden="true"><div class="mist-track"></div></div>
+  <div class="wrap hero-inner">
+    <p class="eyebrow caption-3" data-i18n="eyebrow">Atlas SDG 7 dan SDG 13</p>
+    <h1 class="heading-1" data-i18n-html="h1"><span class="line">Energi terbarukan tinggi.</span> <span class="line">Akses memasak bersih rendah.</span></h1>
+    <p class="hero-sub body-2" data-i18n="sub">Pada 2023, ada 24 negara yang lebih dari separuh energinya tercatat terbarukan. Di negara yang sama, kurang dari 20% penduduk memasak dengan bahan bakar bersih. Sebabnya, kayu bakar dan arang di tungku rumah ikut dihitung sebagai energi terbarukan.</p>
+    <div class="hero-actions">
+      <a class="cta" href="dashboard/" data-dash-link><span data-i18n="cta">Buka peta 189 negara</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9.5M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <p class="proof caption-3" data-i18n="proof">Data resmi UN SDG Indicators Database dan World Bank, tahun 2015 dan 2023.</p>
+    </div>
+  </div>
+  <p class="hero-credit caption-4" data-i18n="heroCredit">Gambar hutan: ilustrasi buatan AI, bukan lokasi tertentu.</p>
+</header>
+
+<main id="main">
+  <section class="after-hero" aria-labelledby="h-faces">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 class="heading-2" id="h-faces" data-i18n="facesTitle">Dua wajah biomassa</h2>
+        <p class="body-2" data-i18n="facesSub">Statistik energi mencatat kayu di tungku dapur dan serpih kayu di pembangkit listrik sebagai jenis energi yang sama. Bagi orang yang memasak, keduanya jauh berbeda.</p>
+      </div>
+      <div class="exhibit">
+        <figure class="panel photo-panel reveal">
+          <img src="dashboard/img/laos-wood-stove-1240.webp"
+            srcset="dashboard/img/laos-wood-stove-640.webp 640w, dashboard/img/laos-wood-stove-1240.webp 1240w"
+            sizes="(max-width: 960px) calc(100vw - 48px), 680px" width="1240" height="823" loading="lazy" decoding="async"
+            alt="Seorang perempuan Brau berjongkok di samping tungku kayu, merebus rebung dalam panci di atas api terbuka dengan tumpukan kayu bakar di belakangnya." data-i18n-alt="cookAlt">
+          <figcaption class="panel-body">
+            <span class="tag trad caption-3" data-i18n="tradTag">Biomassa tradisional</span>
+            <h3 class="title-3" data-i18n="tradTitle">Tungku kayu di rumah</h3>
+            <p class="body-4" data-i18n="tradBody">Sekitar 2,1 miliar orang masih memasak di api terbuka atau tungku sederhana dengan kayu, kotoran ternak, limbah tanaman, batu bara, atau minyak tanah, dan menghirup asapnya saat memasak. Menurut WHO, polusi udara di dalam rumah menyebabkan 2,9 juta kematian pada 2021.</p>
+            <p class="credit caption-4"><span data-i18n="photoCaption">Attapeu, Laos, 2013. Foto:</span> <a href="https://commons.wikimedia.org/wiki/File:Brao_woman_cooking_over_a_wood_stove.JPG" target="_blank" rel="noopener">BigBrotherMouse, Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a> (<span data-i18n="resized">ukuran diperkecil</span>). <span data-i18n="srcLabel">Sumber angka:</span> <a href="https://www.who.int/news-room/fact-sheets/detail/household-air-pollution-and-health" target="_blank" rel="noopener">WHO, 2025</a>.</p>
+          </figcaption>
+        </figure>
+        <div class="side">
+          <article class="panel reveal">
+            <span class="tag modern caption-3" data-i18n="modTag">Bioenergi modern</span>
+            <div class="chips-fig">
+              <img src="dashboard/img/wood-chips-600.webp" srcset="dashboard/img/wood-chips-300.webp 300w, dashboard/img/wood-chips-600.webp 600w" sizes="(max-width: 420px) calc(100vw - 82px), 132px"
+                width="600" height="312" loading="lazy" decoding="async"
+                alt="Ilustrasi buatan AI: tumpukan serpih kayu kering berwarna cokelat muda." data-i18n-alt="chipsAlt">
+              <div>
+                <h3 class="title-3" data-i18n="modTitle">Serpih kayu di pembangkit</h3>
+                <p class="body-4" data-i18n="modBody">Pelet dan serpih kayu dibuat dari sisa penebangan atau industri kayu, lalu dibakar di pembangkit untuk menghasilkan panas, listrik, atau keduanya. Pembakarannya terjadi di pembangkit, bukan di dapur. IEA Bioenergy menyebut ini bioenergi modern dan memisahkannya dari tungku kayu yang boros dan berpolusi.</p>
+              </div>
+            </div>
+            <p class="credit caption-4"><span data-i18n="chipsCredit">Gambar: ilustrasi buatan AI.</span> <span data-i18n="srcLabel">Sumber angka:</span> <a href="https://www.ieabioenergy.com/blog/publications/what-is-bioenergy/" target="_blank" rel="noopener">IEA Bioenergy</a>.</p>
+          </article>
+          <article class="panel reveal">
+            <h3 class="title-3" data-i18n="whyTitle">Karena itu, satu angka saja bisa menyesatkan</h3>
+            <p class="body-4" data-i18n="whyBody">Jika Anda hanya melihat pangsa energi terbarukan (SDG 7.2.1), negara yang memasak dengan kayu bisa tampak lebih hijau daripada negara yang punya banyak pembangkit listrik terbarukan. Karena itu peta ini menilai setiap negara dari enam indikator sekaligus: akses listrik, memasak bersih, pangsa terbarukan, kapasitas listrik terbarukan per orang, intensitas energi, dan CO2 per orang.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tagline" aria-label="Ringkasan" data-i18n-aria="taglineLabel">
+    <div class="wrap">
+      <p class="heading-2" id="tagline" data-i18n="tagline">Angka energi terbarukan memberi tahu Anda dari mana energi sebuah negara berasal. Untuk tahu apakah dapurnya masih berasap, Anda perlu angka akses memasak bersih.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-inside" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 class="heading-2" id="h-inside" data-i18n="insideTitle">Tiga hal yang akan Anda temukan di dashboard</h2>
+        <p class="body-2" data-i18n="insideSub">Setiap angka di bawah ini bisa Anda cek ulang sendiri di dashboard.</p>
+      </div>
+      <div class="facts">
+        <article class="panel reveal">
+          <h3 class="title-3" data-i18n="f1Title">Negara terbagi ke dalam empat rezim</h3>
+          <p class="body-4" data-i18n-html="f1Body">Negara yang mirip pada keenam indikator masuk ke rezim yang sama, sehingga Anda melihat pola, bukan urutan juara. Pengelompokan ini stabil: diulang pada 500 sampel acak, rerata kemiripannya (indeks Jaccard) <span class="num">0,953</span>.</p>
+          <div class="regime-row" aria-hidden="true"><span><i style="background:var(--r1)"></i>R1 · 27</span><span><i style="background:var(--r2)"></i>R2 · 41</span><span><i style="background:var(--r3)"></i>R3 · 95</span><span><i style="background:var(--r4)"></i>R4 · 26</span></div>
+        </article>
+        <article class="panel reveal">
+          <h3 class="title-3" data-i18n="f2Title">Siapa yang bergerak sejak Perjanjian Paris</h3>
+          <p class="body-4" data-i18n-html="f2Body">Antara 2015 dan 2023, <span class="num">22</span> negara pindah ke rezim dengan akses energi atau efisiensi karbon yang lebih baik. Dua negara bergeser dari R3 ke R4, dan tidak ada yang jatuh ke R1. Ini membandingkan dua titik waktu, jadi belum bisa dibaca sebagai dampak kebijakan.</p>
+        </article>
+        <article class="panel reveal">
+          <h3 class="title-3" data-i18n="f3Title">Indonesia di antara tetangga ASEAN</h3>
+          <p class="body-4" data-i18n-html="f3Body">Hampir seluruh penduduk Indonesia sudah mendapat listrik (<span class="num">99,4%</span>), dan yang memasak dengan bahan bakar bersih naik dari <span class="num">69%</span> ke <span class="num">89%</span>. Namun kapasitas listrik terbarukannya baru <span class="num">47,4</span> W per orang. Viet Nam, yang berada di rezim yang sama, punya <span class="num">476,3</span> W.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing" aria-labelledby="h-close">
+    <div class="wrap">
+      <div>
+        <h2 class="heading-3" id="h-close" data-i18n="closeTitle">Cari negara Anda dan lihat di rezim mana ia berada.</h2>
+        <p class="body-4" data-i18n="closeSub">Klik negara di peta untuk membandingkan enam indikatornya dengan median rezimnya dan median dunia. Anda juga bisa mengunduh tabel lengkap 189 negara.</p>
+      </div>
+      <a class="cta" href="dashboard/" data-dash-link><span data-i18n="cta">Buka peta 189 negara</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9.5M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="caption-3" data-i18n-html="footData">Data: <a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">UN Statistics Division SDG Indicators Database</a> dan <a href="https://data.worldbank.org" target="_blank" rel="noopener">World Bank Open Data</a>. Kode dan tabel hasil: <a href="https://github.com/Febrianggi/biomass-paradox" target="_blank" rel="noopener">GitHub</a>.</p>
+    <p class="caption-4" data-i18n="footImg">Gambar hutan dan serpih kayu adalah ilustrasi buatan AI. Foto memasak dari Wikimedia Commons dengan lisensi CC BY-SA 3.0.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const I18N = {
+    id: {
+      pageTitle: "Biomass Paradox: energi terbarukan tinggi, dapur masih berasap",
+      desc: "Lihat mengapa negara dengan pangsa energi terbarukan tinggi bisa tetap memasak dengan kayu bakar. Peta interaktif 189 negara pada enam indikator SDG 7 dan SDG 13.",
+      navLabel: "Utama", langLabel: "Bahasa", themeLabel: "Ganti tema terang atau gelap", taglineLabel: "Ringkasan"
+    },
+    en: {
+      pageTitle: "Biomass Paradox: high renewable share, smoky kitchens",
+      desc: "See why countries with a high renewable energy share can still cook with firewood. An interactive map of 189 countries on six SDG 7 and SDG 13 indicators.",
+      navLabel: "Main", langLabel: "Language", themeLabel: "Switch light or dark theme", taglineLabel: "Summary",
+      skip: "Skip to content",
+      heroAlt: "AI generated illustration: a tropical forest seen from the air, with a rocky river and thin mist over the canopy.",
+      eyebrow: "SDG 7 and SDG 13 atlas",
+      h1: '<span class="line">High renewable share.</span> <span class="line">Low access to clean cooking.</span>',
+      sub: "In 2023, 24 countries got more than half of their energy from sources counted as renewable. In those same countries, fewer than 20% of people cooked with clean fuels. That is because firewood and charcoal burned in home stoves count as renewable energy.",
+      cta: "Open the map of 189 countries",
+      proof: "Official data from the UN SDG Indicators Database and the World Bank, for 2015 and 2023.",
+      heroCredit: "Forest image: AI generated illustration, not a specific place.",
+      facesTitle: "Two faces of biomass",
+      facesSub: "Energy statistics record wood in a kitchen stove and wood chips in a power plant as the same kind of energy. For the person cooking, they are far apart.",
+      cookAlt: "A Brao woman crouches beside a wood stove, boiling bamboo shoots in a pot over an open fire with stacked firewood behind her.",
+      tradTag: "Traditional biomass",
+      tradTitle: "A wood stove at home",
+      tradBody: "Around 2.1 billion people still cook on open fires or simple stoves fuelled by wood, dung, crop waste, coal or kerosene, and breathe the smoke while they cook. WHO attributes 2.9 million deaths in 2021 to household air pollution.",
+      photoCaption: "Attapeu, Laos, 2013. Photo:",
+      resized: "resized",
+      srcLabel: "Figures:",
+      modTag: "Modern bioenergy",
+      chipsAlt: "AI generated illustration: a pile of dry, light brown wood chips.",
+      modTitle: "Wood chips in a power plant",
+      modBody: "Pellets and chips are made from logging or wood industry residues and burned in plants that produce heat, electricity or both. The burning happens in the plant, not in a kitchen. IEA Bioenergy calls this modern bioenergy and keeps it separate from inefficient, polluting wood stoves.",
+      chipsCredit: "Image: AI generated illustration.",
+      whyTitle: "So one number on its own can mislead",
+      whyBody: "If you look only at the renewable share (SDG 7.2.1), a country that cooks with wood can look greener than one with plenty of renewable power plants. So the map rates every country on six indicators at once: electricity access, clean cooking, renewable share, renewable power capacity per person, energy intensity and CO2 per person.",
+      tagline: "The renewable share tells you where a country's energy comes from. To know whether its kitchens are still full of smoke, you need clean cooking access.",
+      insideTitle: "Three things you will find in the dashboard",
+      insideSub: "You can check every figure below yourself in the dashboard.",
+      f1Title: "Countries fall into four regimes",
+      f1Body: 'Countries that look alike on all six indicators land in the same regime, so you see patterns rather than a league table. The grouping holds up: repeated on 500 random resamples, its mean similarity (Jaccard index) is <span class="num">0.953</span>.',
+      f2Title: "Who moved since the Paris Agreement",
+      f2Body: 'Between 2015 and 2023, <span class="num">22</span> countries moved to a regime with better energy access or carbon efficiency. Two shifted from R3 to R4, and none fell into R1. This compares two points in time, so it cannot be read as a policy effect.',
+      f3Title: "Indonesia among its ASEAN neighbours",
+      f3Body: 'Almost everyone in Indonesia has electricity (<span class="num">99.4%</span>), and the share cooking with clean fuels rose from <span class="num">69%</span> to <span class="num">89%</span>. Yet its renewable power capacity is only <span class="num">47.4</span> W per person. Viet Nam, in the same regime, has <span class="num">476.3</span> W.',
+      closeTitle: "Find your country and see which regime it is in.",
+      closeSub: "Click a country on the map to compare its six indicators with its regime median and the world median. You can also download the full table of 189 countries.",
+      footData: 'Data: <a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">UN Statistics Division SDG Indicators Database</a> and <a href="https://data.worldbank.org" target="_blank" rel="noopener">World Bank Open Data</a>. Code and result tables: <a href="https://github.com/Febrianggi/biomass-paradox" target="_blank" rel="noopener">GitHub</a>.',
+      footImg: "Forest and wood chip images are AI generated illustrations. Cooking photo from Wikimedia Commons under CC BY-SA 3.0."
+    }
+  };
+  // Indonesian text lives in the HTML; keep a copy so switching back restores it.
+  const pick = (sel, attr) => document.querySelectorAll(`[${sel}]`).forEach((el) => {
+    const k = el.getAttribute(sel);
+    if (!(k in I18N.id)) I18N.id[k] = attr === "html" ? el.innerHTML : attr ? el.getAttribute(attr) : el.textContent;
+  });
+  pick("data-i18n"); pick("data-i18n-html", "html"); pick("data-i18n-alt", "alt");
+
+  let lang = new URLSearchParams(location.search).get("lang");
+  if (lang !== "id" && lang !== "en") { try { lang = localStorage.getItem("lang"); } catch (_) {} }
+  if (lang !== "id" && lang !== "en") lang = "id";
+
+  function apply() {
+    const t = I18N[lang];
+    document.documentElement.lang = lang;
+    document.title = t.pageTitle;
+    document.querySelector('meta[name="description"]').content = t.desc;
+    document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t[el.dataset.i18n]; });
+    document.querySelectorAll("[data-i18n-html]").forEach((el) => { el.innerHTML = t[el.dataset.i18nHtml]; });
+    document.querySelectorAll("[data-i18n-alt]").forEach((el) => { el.alt = t[el.dataset.i18nAlt]; });
+    document.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t[el.dataset.i18nAria]));
+    document.getElementById("lang-group").setAttribute("aria-label", t.langLabel);
+    document.getElementById("theme-toggle").setAttribute("aria-label", t.themeLabel);
+    document.getElementById("lang-id").setAttribute("aria-pressed", String(lang === "id"));
+    document.getElementById("lang-en").setAttribute("aria-pressed", String(lang === "en"));
+    document.querySelectorAll("[data-dash-link]").forEach((a) => { a.href = "dashboard/?lang=" + lang; });
+    document.querySelectorAll("[data-self-link]").forEach((a) => { a.href = "./?lang=" + lang; });
+    splitTagline();
+  }
+  for (const l of ["id", "en"]) {
+    document.getElementById("lang-" + l).addEventListener("click", () => {
+      lang = l;
+      try { localStorage.setItem("lang", l); } catch (_) {}
+      apply();
+    });
+  }
+
+  /* Theme toggle: the same stored key as the dashboard, so the choice carries across */
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    const osDark = matchMedia("(prefers-color-scheme: dark)").matches;
+    const currentDark = meta.content === "dark" || (meta.content !== "light" && osDark);
+    const target = currentDark ? "light" : "dark";
+    const matchesOs = (target === "dark") === osDark;
+    try { matchesOs ? localStorage.removeItem("color-scheme") : localStorage.setItem("color-scheme", target); } catch (_) {}
+    meta.content = matchesOs ? "light dark" : target;
+  });
+
+  /* Mist drifts only while the hero is on screen and the tab is visible */
+  const mist = document.getElementById("hero-mist");
+  let mistVisible = true;
+  const syncMist = () => mist.classList.toggle("is-paused", !mistVisible || document.hidden);
+  new IntersectionObserver(([e]) => { mistVisible = e.isIntersecting; syncMist(); }).observe(mist);
+  document.addEventListener("visibilitychange", syncMist);
+
+  /* One-time reveals */
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }, { rootMargin: "0px 0px -10% 0px" });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+  /* Tagline: words light up one at a time as the line scrolls through the viewport */
+  const tagline = document.getElementById("tagline");
+  let words = [];
+  function splitTagline() {
+    const text = I18N[lang].tagline;
+    tagline.innerHTML = `<span class="visually-hidden">${text}</span><span aria-hidden="true">` +
+      text.split(" ").map((w) => `<span class="w">${w}</span>`).join(" ") + "</span>";
+    words = [...tagline.querySelectorAll(".w")];
+    lightWords();
+  }
+  function lightWords() {
+    const r = tagline.getBoundingClientRect(), vh = innerHeight;
+    const p = reduce.matches ? 1 : Math.min(1, Math.max(0, (vh * 0.9 - r.top) / (vh * 0.4)));
+    const n = Math.round(p * words.length);
+    words.forEach((w, i) => w.classList.toggle("on", i < n));
+  }
+  let ticking = false;
+  addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { lightWords(); ticking = false; });
+  }, { passive: true });
+  addEventListener("resize", lightWords);
+
+  apply();
+})();
+</script>
+<script type="module" src="dashboard/bot.js"></script>
 </body>
 </html>

@@ -103,8 +103,10 @@ R1 memperlihatkan paradoks biomassa: median pangsa energi terbarukannya paling t
 │   └── console_summary.txt
 ├── dashboard/
 │   ├── index.html
-│   └── data/      dashboard_data.json, dashboard_data.js
-└── index.html     mengarahkan ke dashboard/
+│   ├── bot.js
+│   ├── data/      dashboard_data.json, dashboard_data.js
+│   └── img/       foto, ilustrasi, dan tekstur kabut
+└── index.html     halaman pembuka yang menautkan ke dashboard/
 ```
 
 ## Reproduksi
@@ -144,7 +146,9 @@ Skrip ini menimpa kedua berkas di `data/`. Variabel lingkungan `SDG_RDS_CACHE` d
 Dashboard memuat `dashboard/data/dashboard_data.json` lewat `fetch`, dengan `dashboard_data.js` sebagai cadangan. Sebaiknya buka melalui server lokal:
 
 ```bash
-python -m http.server 8000 --directory dashboard
+python -m http.server 8000
 ```
 
-Lalu buka http://localhost:8000.
+Lalu buka http://localhost:8000 untuk halaman pembuka dan http://localhost:8000/dashboard/ untuk dashboard.
+
+Kedua halaman juga punya asisten kecil ("Tanya data") di `dashboard/bot.js`. Asisten ini tidak memakai model bahasa: ia mengenali beberapa jenis pertanyaan (satu negara, perbandingan, ASEAN, rezim, negara dengan nilai tertinggi atau terendah, perpindahan rezim sejak 2015) lalu menjawab dengan angka persis dari `dashboard/data/dashboard_data.json`.

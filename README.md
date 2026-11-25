@@ -103,8 +103,10 @@ R1 shows the biomass paradox: it has the highest median renewable share (78.98%)
 │   └── console_summary.txt
 ├── dashboard/
 │   ├── index.html
-│   └── data/      dashboard_data.json, dashboard_data.js
-└── index.html     redirects to dashboard/
+│   ├── bot.js
+│   ├── data/      dashboard_data.json, dashboard_data.js
+│   └── img/       photos, illustrations and the mist texture
+└── index.html     landing page that links to dashboard/
 ```
 
 ## Reproduction
@@ -144,7 +146,9 @@ The script overwrites both files in `data/`. Set the environment variable `SDG_R
 The dashboard loads `dashboard/data/dashboard_data.json` with `fetch`, falling back to `dashboard_data.js`. Opening it through a local server is recommended:
 
 ```bash
-python -m http.server 8000 --directory dashboard
+python -m http.server 8000
 ```
 
-Then open http://localhost:8000.
+Then open http://localhost:8000 for the landing page and http://localhost:8000/dashboard/ for the dashboard.
+
+Both pages also offer a small assistant ("Ask the data") in `dashboard/bot.js`. It uses no language model: it recognises a few kinds of question (a country, a comparison, ASEAN, a regime, the highest or lowest countries on an indicator, regime changes since 2015) and answers with the exact figures from `dashboard/data/dashboard_data.json`.

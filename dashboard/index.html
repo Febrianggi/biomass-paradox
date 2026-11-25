@@ -15,42 +15,44 @@ try {
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='%230F172A'/%3E%3Ccircle cx='11' cy='12' r='3' fill='%23F59E0B'/%3E%3Ccircle cx='21' cy='12' r='3' fill='%2338BDF8'/%3E%3Ccircle cx='11' cy='21' r='3' fill='%2310B981'/%3E%3Ccircle cx='21' cy='21' r='3' fill='%23FB7185'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@600;700&display=swap">
 <title>Atlas Transisi Energi Bersih &amp; Iklim Global (SDG 7 &amp; 13)</title>
 <style>
 /*
-  Direction: a warm editorial atlas (Ecosia style reference, adapted for a dense dashboard).
-  Newsreader carries the argument, Inter the interface, JetBrains Mono every ISO3 code and measured number.
-  The chrome is warm neutral ink; lime is the one accent and fills only the primary action (CSV download).
+  Direction: the Biomass Paradox identity from the landing page (forest base, mist, leaf green),
+  carried into the header band and dark theme; the analytical surfaces stay quiet and dense.
+  Manrope carries headings, Inter the interface, JetBrains Mono every ISO3 code and measured number.
+  Leaf green is the one interface accent and fills only the primary action (CSV download);
+  it never appears inside charts or maps, so it cannot be read as regime R3.
   Colour inside the data stays semantic: the four regimes keep their palette in both themes.
   Regime text uses darker "ink" tones in light mode, because #D97706 and #059669 fall below 4.5:1 on white.
-  State language: hover = violet outline (map) or neutral tint; selected = solid ink outline or lime tint;
+  State language: hover = violet outline (map) or neutral tint; selected = solid ink outline or leaf tint;
   keyboard focus = 3px offset ring (map paths: dashed ink), so the three never look alike.
 */
 :root {
-  --bg-l: #F8F8F6;          --bg-d: #161614;
-  --surface-l: #FFFFFF;     --surface-d: #20201D;
-  --surface2-l: #F0F0EB;    --surface2-d: #2A2A26;
-  --line-l: #E3E3DD;        --line-d: #383833;
-  --line-strong-l: #8C8C85; --line-strong-d: #7D7D75;
-  --text-l: #333333;        --text-d: #F0F0EB;
-  --muted-l: #5E5E59;       --muted-d: #B4B4AB;
-  --link-l: #3F6212;        --link-d: #D7EB80;
-  --focus-l: #4D7C0F;       --focus-d: #D7EB80;
+  --bg-l: #F8F8F6;          --bg-d: #0B1711;
+  --surface-l: #FFFFFF;     --surface-d: #12211A;
+  --surface2-l: #F0F0EB;    --surface2-d: #1A2D23;
+  --line-l: #E3E3DD;        --line-d: #2A3F33;
+  --line-strong-l: #8C8C85; --line-strong-d: #6F8A79;
+  --text-l: #22302A;        --text-d: #F3F0E4;
+  --muted-l: #5E5E59;       --muted-d: #B9C2B5;
+  --link-l: #3F6212;        --link-d: #A9D85A;
+  --focus-l: #4D7C0F;       --focus-d: #A9D85A;
   --ink-soft-l: rgba(51, 51, 51, 0.07);
-  --ink-soft-d: rgba(240, 240, 235, 0.09);
-  --sel-l: #EEF6CC;         --sel-d: #2A3117;
+  --ink-soft-d: rgba(243, 240, 228, 0.09);
+  --sel-l: #EAF3D6;         --sel-d: #243A1E;
   --bar-shadow-l: 0 4px 12px rgba(0, 0, 0, 0.06);
   --bar-shadow-d: 0 6px 16px rgba(0, 0, 0, 0.28);
-  --lime: #D7EB80; --lime-hover: #CBE36A; --on-lime: #262626;
+  --lime: #A9D85A; --lime-hover: #BCE477; --on-lime: #0B1711;
 
   --r1-l: #D97706; --r1-d: #F59E0B;
   --r2-l: #0284C7; --r2-d: #38BDF8;
   --r3-l: #059669; --r3-d: #10B981;
   --r4-l: #BE123C; --r4-d: #FB7185;
   --r1t-l: #B45309; --r2t-l: #0369A1; --r3t-l: #047857; --r4t-l: #BE123C;
-  --map-na-l: #D2D2CA; --map-na-d: #3B3B36;
-  --map-stroke-l: #FFFFFF; --map-stroke-d: #161614;
+  --map-na-l: #D2D2CA; --map-na-d: #2F4237;
+  --map-stroke-l: #FFFFFF; --map-stroke-d: #0B1711;
 
   --bg: var(--bg-l); --surface: var(--surface-l); --surface-2: var(--surface2-l);
   --line: var(--line-l); --line-strong: var(--line-strong-l);
@@ -60,7 +62,7 @@ try {
   --r1t: var(--r1t-l); --r2t: var(--r2t-l); --r3t: var(--r3t-l); --r4t: var(--r4t-l);
   --map-na: var(--map-na-l); --map-hover: #5B21B6; --map-stroke: var(--map-stroke-l);
 
-  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --display: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
@@ -119,8 +121,8 @@ body {
   overflow-x: clip;
 }
 h1, h2, h3, p { margin: 0; }
-h1 { font: 600 clamp(25px, 3.1vw, 38px)/1.1 var(--serif); letter-spacing: -0.014em; max-width: 44ch; text-wrap: balance; }
-h2 { font: 600 clamp(19px, 1.9vw, 23px)/1.2 var(--serif); }
+h1 { font: 600 clamp(25px, 3.1vw, 38px)/1.1 var(--display); letter-spacing: -0.02em; max-width: 44ch; text-wrap: balance; }
+h2 { font: 600 clamp(19px, 1.9vw, 23px)/1.2 var(--display); }
 h3 { font: 600 15px/1.3 var(--sans); }
 a { color: var(--link); text-underline-offset: 3px; }
 code, .mono { font-family: var(--mono); font-size: 0.92em; }
@@ -135,14 +137,37 @@ code, .mono { font-family: var(--mono); font-size: 0.92em; }
 }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
-/* Utility bar */
-header.masthead { background: var(--bg); }
+/* Header band: dark forest in both themes (the landing page identity), with a faint still photo
+   and a slow mist layer behind the title on the home view only. The band re-scopes the tokens,
+   so every control inside it keeps its contrast without separate rules. */
+.utility-dock, header.masthead {
+  color-scheme: dark; color: var(--text);
+  --bg: var(--bg-d); --surface: var(--surface-d); --surface-2: var(--surface2-d);
+  --line: var(--line-d); --line-strong: var(--line-strong-d);
+  --text: var(--text-d); --muted: var(--muted-d); --link: var(--link-d); --ink-soft: var(--ink-soft-d); --focus: var(--focus-d);
+}
+header.masthead { position: relative; isolation: isolate; overflow: hidden; background: var(--bg); border-bottom: 1px solid var(--line); }
+.mast-photo { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; opacity: 0.22; }
+.mist { position: absolute; inset: -10% 0 0 0; z-index: -1; overflow: hidden; pointer-events: none; opacity: 0.22; }
+.mist-track {
+  position: absolute; inset: 0 auto 0 0; width: 200%;
+  background: url("img/mist-band.webp") repeat-x 0 0 / 50% 100%;
+  animation: drift 56s linear infinite; will-change: transform;
+}
+.mist.is-paused .mist-track { animation-play-state: paused; }
+header.masthead:not(.is-home) .mist { display: none; }
+@keyframes drift { to { transform: translateX(-50%); } }
+@media (max-width: 640px) { .mist { opacity: 0.14; } }
+@media (prefers-reduced-motion: reduce) { .mist-track { animation: none; } }
+.brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text); text-decoration: none; font-family: var(--display); font-weight: 700; font-size: 16px; letter-spacing: -0.01em; }
+.home-link { color: var(--muted); font-size: 13.5px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 var(--s2); border-radius: var(--pill); }
+.home-link:hover { color: var(--text); background: var(--ink-soft); }
+.brand-group { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: var(--s2) var(--s4); padding: var(--s2) 0;
 }
-.brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 700; font-size: 14px; letter-spacing: 0.005em; }
-.brand-mark { width: 12px; height: 12px; border-radius: 50%; background: var(--lime); box-shadow: inset 0 0 0 1.5px var(--text); flex: none; }
+.brand-mark { width: 12px; height: 12px; border-radius: 50%; background: var(--lime); flex: none; }
 .brand-tag {
   font: 600 11.5px/1 var(--mono); padding: 5px 9px; border-radius: var(--pill);
   background: var(--surface-2); color: var(--muted);
@@ -162,7 +187,7 @@ header.masthead { background: var(--bg); }
 }
 .btn:hover { background: var(--surface-2); border-color: var(--text); }
 .btn:active { background: var(--ink-soft); }
-/* The one filled chromatic control: lime with dark ink in both themes (about 10:1). */
+/* The one filled chromatic control: leaf green with forest ink in both themes (about 11:1). */
 .btn.primary { background: var(--lime); border-color: var(--lime); color: var(--on-lime); font-weight: 600; }
 .btn.primary:hover { background: var(--lime-hover); border-color: var(--lime-hover); }
 .btn.primary:active { box-shadow: inset 0 0 0 1px var(--on-lime); }
@@ -202,7 +227,7 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
 .pill[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--surface); font-weight: 600; }
 
 /* Hero: title and thesis only, so the map follows directly after the tabs and controls */
-.hero { padding: var(--s2) 0 var(--s4); }
+.hero { padding: var(--s3) 0 var(--s5); }
 .thesis { margin-top: var(--s2); color: var(--muted); max-width: 86ch; font-size: 14.5px; }
 
 /* Key figures: a warm band below the map (the reference's stats row, flat instead of a photo overlay) */
@@ -225,7 +250,7 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
 .tip-btn {
   width: 28px; height: 28px; min-width: 28px; border-radius: 50%;
   border: 1px solid var(--line-strong); background: transparent; color: var(--muted);
-  font: 600 12px/1 var(--serif); font-style: italic; cursor: help; padding: 0;
+  font: 600 12px/1 var(--display); font-style: italic; cursor: help; padding: 0;
   position: relative;
 }
 .tip-btn::after { content: ""; position: absolute; inset: -8px; }
@@ -246,7 +271,7 @@ dialog.context {
   border-radius: var(--radius-card); background: var(--surface); color: var(--text); padding: var(--s5);
   box-shadow: 0 11px 33px rgba(0, 0, 0, 0.2);
 }
-dialog.context::backdrop { background: rgba(22, 22, 20, 0.55); }
+dialog.context::backdrop { background: rgba(11, 23, 17, 0.6); }
 dialog.context p { margin-top: var(--s3); font-size: 14.5px; max-width: 70ch; }
 dialog.context form { margin-top: var(--s4); display: flex; justify-content: flex-end; }
 .context-photo { margin: var(--s4) 0 0; }
@@ -368,7 +393,7 @@ dialog.context form { margin-top: var(--s4); display: flex; justify-content: fle
 .regime-card[data-r="2"] { border-top-color: var(--r2); }
 .regime-card[data-r="3"] { border-top-color: var(--r3); }
 .regime-card[data-r="4"] { border-top-color: var(--r4); }
-.regime-card h3 { font: 600 17px/1.25 var(--serif); }
+.regime-card h3 { font: 600 17px/1.25 var(--display); }
 .regime-dl { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; font-size: 12.5px; padding-top: var(--s2); border-top: 1px solid var(--line); margin: 0; }
 .regime-dl dt { color: var(--muted); }
 .regime-dl dd { margin: 0; text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
@@ -439,7 +464,7 @@ details.acc > .acc-body { padding: 0 var(--s4) var(--s4); font-size: 13.5px; }
   border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface);
 }
 table.data-table { width: 100%; min-inline-size: 900px; border-collapse: separate; border-spacing: 0; font-size: 13px; }
-table.data-table caption { text-align: left; padding: var(--s3) var(--s4); font: 600 16px/1.3 var(--serif); border-bottom: 1px solid var(--line); }
+table.data-table caption { text-align: left; padding: var(--s3) var(--s4); font: 600 16px/1.3 var(--display); border-bottom: 1px solid var(--line); }
 table.data-table thead th { position: sticky; top: 0; z-index: 3; background: var(--surface-2); }
 table.data-table th, table.data-table td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
 table.data-table td.num, table.data-table th[data-type="number"] { text-align: right; }
@@ -500,7 +525,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   :root { --stick-top: 0px; }
   .utility-dock { position: static; }
   .topbar { padding-bottom: 0; }
-  .brand { min-height: 36px; }
+  .topbar .seg button { min-height: 44px; }
+  .brand-tag { display: none; }
   .control-bar { gap: var(--s2) var(--s3); padding: var(--s3); }
   .control-bar .field { gap: 3px; }
   /* Atlas controls in three rows: layer, then scope beside search, then regime pills */
@@ -526,10 +552,16 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 <div class="utility-dock">
   <div class="wrap">
     <div class="topbar">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span data-i18n="brand">Atlas Transisi Energi Bersih</span>
-        <span class="brand-tag">SDG 7 · 13</span>
+      <div class="brand-group">
+        <a class="brand" href="../" data-home-link>
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>Biomass Paradox</span>
+        </a>
+        <span class="brand-tag" data-i18n="brand">Atlas SDG 7 · 13</span>
+        <a class="home-link" href="../" data-home-link>
+          <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3.5M7.5 4l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span data-i18n="homeLink">Kembali ke beranda</span>
+        </a>
       </div>
       <div class="top-actions">
         <button type="button" class="btn" id="context-btn" aria-haspopup="dialog" data-i18n="contextBtn">Konteks Kebijakan</button>
@@ -550,7 +582,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   </div>
 </div>
-<header class="masthead"><div class="wrap">
+<header class="masthead is-home">
+  <img class="mast-photo" src="img/forest-canopy-1280.webp"
+    srcset="img/forest-canopy-768.webp 768w, img/forest-canopy-1280.webp 1280w, img/forest-canopy-1920.webp 1920w"
+    sizes="100vw" width="1920" height="898" alt="" decoding="async">
+  <div class="mist" id="mast-mist" aria-hidden="true"><div class="mist-track"></div></div>
+  <div class="wrap">
     <div class="hero">
       <h1 data-i18n="title">Paradoks Biomassa dalam Transisi Energi-Iklim Global</h1>
       <p class="thesis" data-i18n="thesis">Pangsa energi terbarukan yang tinggi tidak selalu berarti listrik bersih modern: 189 negara dikelompokkan dengan empat algoritma pada enam indikator SDG 7 dan SDG 13.</p>
@@ -912,7 +949,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       pageTitle: "Atlas Transisi Energi Bersih & Iklim Global (SDG 7 & 13)",
       langLabel: "Bahasa",
       mapAria: "Peta dunia rezim transisi energi bersih dan iklim",
-      brand: "Atlas Transisi Energi Bersih",
+      brand: "Atlas SDG 7 · 13",
+      homeLink: "Kembali ke beranda",
       contextBtn: "Konteks Kebijakan",
       contextTitle: "Konteks Kebijakan",
       contextBody: "Dirancang bagi perencana energi nasional dan analis SDG untuk membedakan pangsa energi terbarukan yang bersumber dari kayu bakar tradisional (SDG 7.2.1) dari kapasitas listrik bersih modern (SDG 7.b.1) serta efisiensi energi dan karbon (SDG 7.3.1 dan SDG 13).",
@@ -1076,7 +1114,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       pageTitle: "Clean Energy & Climate Transition Atlas (SDG 7 & 13)",
       langLabel: "Language",
       mapAria: "World map of clean energy and climate transition regimes",
-      brand: "Clean Energy Transition Atlas",
+      brand: "SDG 7 · 13 atlas",
+      homeLink: "Back to home",
       contextBtn: "Policy Context",
       contextTitle: "Policy Context",
       contextBody: "Built for national energy planners and SDG analysts to separate renewable shares driven by traditional biomass (SDG 7.2.1) from modern clean power capacity (SDG 7.b.1) and from energy and carbon efficiency (SDG 7.3.1 and SDG 13).",
@@ -1268,8 +1307,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   let BY_ISO = new Map();
   let PATH_BY_ISO = new Map(), FC_BY_ISO = new Map();
   let GLOBAL = { med: {}, max: {} };
+  const initialLang = (() => {
+    let l = new URLSearchParams(location.search).get("lang");
+    if (l !== "id" && l !== "en") { try { l = localStorage.getItem("lang"); } catch (_) {} }
+    return l === "en" ? "en" : "id";
+  })();
   const state = {
-    lang: "id",
+    lang: initialLang,
     selectedIso: "IDN",
     mapLayer: "km2023",
     mapZoom: "world",
@@ -1335,6 +1379,11 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   stickyObserver.observe(nav);
   document.querySelectorAll(".control-bar").forEach((bar) => stickyObserver.observe(bar));
   updateStickyOffsets();
+  const mist = $("mast-mist");
+  let mistVisible = true;
+  const syncMist = () => mist.classList.toggle("is-paused", !mistVisible || document.hidden);
+  new IntersectionObserver(([e]) => { mistVisible = e.isIntersecting; syncMist(); }).observe(mist);
+  document.addEventListener("visibilitychange", syncMist);
   const tabs = [...tablist.querySelectorAll('[role="tab"]')];
   const panels = [...document.querySelectorAll('[role="tabpanel"]')];
 
@@ -1349,6 +1398,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       else panel.setAttribute("hidden", "until-found");
     }
     updateStickyOffsets();
+    document.querySelector("header.masthead").classList.toggle("is-home", selectedTab.id === "tab-atlas");
     if (moveFocus) selectedTab.focus();
     selectedTab.scrollIntoView({ block: "nearest", inline: "nearest" });
 
@@ -2375,6 +2425,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     $("world-svg").setAttribute("aria-label", t.mapAria);
     $("lang-id").setAttribute("aria-pressed", String(state.lang === "id"));
     $("lang-en").setAttribute("aria-pressed", String(state.lang === "en"));
+    // the landing page reads the same key and query parameter, so the language carries both ways
+    document.querySelectorAll("[data-home-link]").forEach((a) => { a.href = "../?lang=" + state.lang; });
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const v = t[el.dataset.i18n];
       if (typeof v === "string") el.textContent = v;
@@ -2437,8 +2489,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   });
 
   /* Wire controls */
-  $("lang-id").addEventListener("click", () => { state.lang = "id"; applyLanguage(); });
-  $("lang-en").addEventListener("click", () => { state.lang = "en"; applyLanguage(); });
+  for (const l of ["id", "en"]) {
+    $("lang-" + l).addEventListener("click", () => {
+      state.lang = l;
+      try { localStorage.setItem("lang", l); } catch (_) {}
+      applyLanguage();
+    });
+  }
   $("map-layer-select").addEventListener("change", (e) => {
     state.mapLayer = e.target.value;
     renderRegimePills();
@@ -2511,5 +2568,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   });
 })();
 </script>
+<script type="module" src="./bot.js"></script>
 </body>
 </html>
