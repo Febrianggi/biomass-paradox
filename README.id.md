@@ -106,6 +106,9 @@ R1 memperlihatkan paradoks biomassa: median pangsa energi terbarukannya paling t
 │   ├── bot.js
 │   ├── data/      dashboard_data.json, dashboard_data.js
 │   └── img/       foto, ilustrasi, dan tekstur kabut
+├── worker/
+│   ├── worker.js      proxy Cloudflare Worker opsional (Gemini utama, Groq cadangan)
+│   └── wrangler.toml
 └── index.html     halaman pembuka yang menautkan ke dashboard/
 ```
 
@@ -151,4 +154,4 @@ python -m http.server 8000
 
 Lalu buka http://localhost:8000 untuk halaman pembuka dan http://localhost:8000/dashboard/ untuk dashboard.
 
-Kedua halaman juga punya asisten kecil ("Tanya data") di `dashboard/bot.js`. Asisten ini tidak memakai model bahasa: ia mengenali beberapa jenis pertanyaan (satu negara, perbandingan, ASEAN, rezim, negara dengan nilai tertinggi atau terendah, perpindahan rezim sejak 2015) lalu menjawab dengan angka persis dari `dashboard/data/dashboard_data.json`.
+Kedua halaman juga punya asisten data hibrida ("Tanya data") di `dashboard/bot.js`. Secara bawaan asisten berjalan lokal dengan pencocokan alias dan toleransi salah ketik langsung dari `dashboard/data/dashboard_data.json` (negara, perbandingan, ASEAN, rezim, nilai ekstrem, perpindahan 2015 ke 2023, metode, jalur perubahan, prediksi memasak bersih, dan pencilan) tanpa permintaan keluar. Untuk mengaktifkan jawaban bahasa bebas berbasis AI, deploy `worker/worker.js` ke Cloudflare Workers, simpan `GEMINI_API_KEY` dan/atau `GROQ_API_KEY` sebagai Secret di Cloudflare (tidak pernah masuk ke Git), lalu isi `WORKER_URL` di bagian atas `dashboard/bot.js`; jika server sedang tidak terjangkau atau mencapai batas kuota, asisten otomatis beralih kembali ke mode lokal.

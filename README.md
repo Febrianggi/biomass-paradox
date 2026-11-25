@@ -106,6 +106,9 @@ R1 shows the biomass paradox: it has the highest median renewable share (78.98%)
 │   ├── bot.js
 │   ├── data/      dashboard_data.json, dashboard_data.js
 │   └── img/       photos, illustrations and the mist texture
+├── worker/
+│   ├── worker.js      optional Cloudflare Worker proxy (Gemini primary, Groq failover)
+│   └── wrangler.toml
 └── index.html     landing page that links to dashboard/
 ```
 
@@ -151,4 +154,4 @@ python -m http.server 8000
 
 Then open http://localhost:8000 for the landing page and http://localhost:8000/dashboard/ for the dashboard.
 
-Both pages also offer a small assistant ("Ask the data") in `dashboard/bot.js`. It uses no language model: it recognises a few kinds of question (a country, a comparison, ASEAN, a regime, the highest or lowest countries on an indicator, regime changes since 2015) and answers with the exact figures from `dashboard/data/dashboard_data.json`.
+Both pages also offer a hybrid data assistant ("Ask the data") in `dashboard/bot.js`. Out of the box it runs locally with alias and typo-tolerant matching directly against `dashboard/data/dashboard_data.json` (countries, comparisons, ASEAN, regimes, extremes, 2015 to 2023 transitions, methods, pathways, clean cooking prediction, and outliers) with zero external requests. To enable free-form natural-language answers, deploy `worker/worker.js` to Cloudflare Workers, add `GEMINI_API_KEY` and/or `GROQ_API_KEY` as Cloudflare Secrets (never committed to Git), and set `WORKER_URL` at the top of `dashboard/bot.js`; if the proxy is offline or rate-limited, the assistant falls back to local mode automatically.

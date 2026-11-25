@@ -1,0 +1,12 @@
+name = "biomass-paradox-bot"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://febrianggi.github.io,http://localhost:8000,http://127.0.0.1:8000"
+GEMINI_MODEL = "gemini-3.5-flash-lite"
+GROQ_MODEL = "llama-3.3-70b-versatile"
+
+# Store API keys as Secrets (never put keys in this file):
+#   npx wrangler secret put GEMINI_API_KEY
+#   npx wrangler secret put GROQ_API_KEY
