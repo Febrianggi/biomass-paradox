@@ -19,7 +19,7 @@ const UI = {
     label: "Pertanyaan Anda", placeholder: "Contoh: Indo gimana? atau bandingkan MY dan VN", send: "Kirim",
     you: "Anda", bot: "Data", loading: "Memuat data...", thinking: "Menyusun jawaban...",
     error: "Data gagal dimuat. Muat ulang halaman, lalu coba lagi.",
-    suggestions: ["Indo gimana?", "Bandingkan Malay dan Viet Nam", "Negara ASEAN", "Memasak bersih terendah", "Kenapa pakai K-Means bukan GMM?"],
+    suggestions: ["Indo gimana?", "Bandingkan Malay dan Vietnam", "Negara ASEAN", "Memasak bersih terendah", "Kenapa pakai K-Means bukan GMM?"],
     footLocal: "Mode lokal: Tidak ada AI yang terlibat.",
     footAi: (prov) => `Dijawab AI (${prov === "groq" ? "Groq" : "Gemini"}) berdasarkan isi dashboard.`,
     footFallback: "Mode lokal: Tidak ada AI yang terlibat.",
@@ -73,6 +73,7 @@ const UI = {
 
 // Indonesian names, casual abbreviations, and slang mapped to ISO3.
 const ALIASES = {
+  "naoero": "NRU", "lao pdr": "LAO",
   indo: "IDN", ri: "IDN", malay: "MYS", msia: "MYS", sg: "SGP", singapor: "SGP", singapura: "SGP",
   vietnam: "VNM", viet: "VNM", filipina: "PHL", filipin: "PHL", pinoy: "PHL", thai: "THA", thail: "THA",
   kamboja: "KHM", laos: "LAO", "timor leste": "TLS", timor: "TLS", brunei: "BRN", burma: "MMR",
@@ -256,7 +257,7 @@ function applyText() {
 }
 new MutationObserver(applyText).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 
-const norm = (s) => s.toLowerCase().replace(/[^\p{L}\p{N} ]/gu, " ").replace(/\s+/g, " ").trim();
+const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^\p{L}\p{N} ]/gu, " ").replace(/\s+/g, " ").trim();
 
 function buildIndexes() {
   pwByIso = new Map((data.pathways?.countries || []).map((x) => [x.iso3, x]));

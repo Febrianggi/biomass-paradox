@@ -75,7 +75,7 @@ R1 memperlihatkan paradoks biomassa: median pangsa energi terbarukannya paling t
 
 **Prediksi memasak bersih 2023** ([`table_15`](output/tables/table_15_clean_cooking_forecast_metrics.csv), [`table_16`](output/tables/table_16_clean_cooking_forecast_oof.csv), [`table_17`](output/tables/table_17_clean_cooking_forecast_tuning.csv)): MAE out-of-fold adalah 5,19 poin persen untuk persistensi, 3,79 untuk regresi linear pada memasak bersih 2015, dan 3,33 untuk elastic net (RMSE 8,24; 6,04; dan 5,39). Pada interval ini, MAE elastic net lebih rendah 1,86 poin daripada persistensi (IK 95% 1,19 sampai 2,51) dan 0,46 poin daripada regresi yang hanya memakai memasak bersih (IK 95% 0,086 sampai 0,826), dengan interval dari pengambilan sampel ulang berpasangan atas galat out-of-fold. Perbandingan dengan regresi mengubah prediktor sekaligus metode estimasi, jadi selisihnya mengukur kinerja model secara keseluruhan dan tidak memisahkan sumbangan lima indikator tambahan. Sebelum dipotong, 61 prediksi regresi linear dan 50 prediksi elastic net berada di luar 0 sampai 100. Ini validasi antarnegara pada satu interval, bukan peramalan tahun-tahun berikutnya.
 
-**Indonesia dan ASEAN** ([`table_09`](output/tables/table_09_indonesia_asean_benchmark.csv)): Indonesia berada di R3, dengan akses listrik 99,4% pada 2023 dan kapasitas listrik terbarukan 47,39 W per kapita. Sebagai pembanding, Viet Nam memiliki 476,30 W per kapita.
+**Indonesia dan ASEAN** ([`table_09`](output/tables/table_09_indonesia_asean_benchmark.csv)): Indonesia berada di R3, dengan akses listrik 99,4% pada 2023 dan kapasitas listrik terbarukan 47,39 W per kapita. Sebagai pembanding, Vietnam memiliki 476,30 W per kapita.
 
 ## Keterbatasan
 

@@ -942,7 +942,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         ["189", "negara, 8,02 miliar jiwa", "Enam indikator resmi UN SDG 7 dan 13 lengkap untuk 2015 dan 2023. Data PDB dan urbanisasi tidak dipakai untuk membentuk klaster."],
         ["k = 4", "K-Means, Jaccard 0,953", "Model empat rezim yang dipilih: rata-rata Jaccard bootstrap 0,953 (B = 500), semua klaster di atas 0,91. Alternatif biner k = 2 mencapai 0,976. ARI 0,795 terhadap Ward's D2."],
         ["22", "negara naik rezim", "7 dari R1 ke R2, 8 dari R2 ke R3, 7 dari R4 ke R3, antara 2015 dan 2023. Perbandingan observasional."],
-        ["47,4 W", "listrik EBT per kapita Indonesia", "Akses listrik Indonesia 99,4%, tetapi kapasitas listrik terbarukan per kapita sekitar sepersepuluh Viet Nam (476,3 W)."]
+        ["47,4 W", "listrik EBT per kapita Indonesia", "Akses listrik Indonesia 99,4%, tetapi kapasitas listrik terbarukan per kapita sekitar sepersepuluh Vietnam (476,3 W)."]
       ],
       kpiTip: "Rincian",
       mapLayers: [
@@ -997,7 +997,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       },
       storyText: {
         r1: (n, sh, ck, both) => `<strong>${n} negara R1</strong> disorot (keanggotaan K-Means 2023). Rata-rata kelompok R1: pangsa energi terbarukan <span class="num">${sh}%</span> dan akses memasak bersih <span class="num">${ck}%</span>. ${both} dari ${n} negara memenuhi kedua ambang ilustratif (pangsa &gt; 70% dan memasak bersih &lt; 15%); garis putus-putus menandai 70%.`,
-        asean: (idn, vnm, x) => `<strong>11 ekonomi ASEAN</strong> diberi label. Kapasitas listrik terbarukan Indonesia <span class="num">${idn} W</span> per kapita, Viet Nam <span class="num">${vnm} W</span>, sekitar ${x} kali lipat.`,
+        asean: (idn, vnm, x) => `<strong>11 ekonomi ASEAN</strong> diberi label. Kapasitas listrik terbarukan Indonesia <span class="num">${idn} W</span> per kapita, Vietnam <span class="num">${vnm} W</span>, sekitar ${x} kali lipat.`,
         outliers: (n) => `<strong>${n} pencilan multivariat</strong> (Mahalanobis D² &gt; 22,46) tetap dianalisis; ekor yang berat diredam dengan transformasi log(1 + x).`
       },
       selected: "Terpilih",
@@ -2209,7 +2209,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           <div><h3>1. Capaian dasar 2015 ke 2023</h3>
             <p class="muted" style="margin-top:4px">Indonesia berada di <strong>R3</strong> pada 2015 dan 2023. Akses memasak bersih naik dari <strong class="num">${fmt(idn.cooking_2015, 0)}%</strong> menjadi <strong class="num">${fmt(idn.cooking_2023, 0)}%</strong>, akses listrik <strong class="num">${fmt(idn.elec_2023, 1)}%</strong>, dan intensitas energi <strong class="num">${fmt(idn.energy_int_2023, 2)} MJ/$</strong>.</p></div>
           <div><h3>2. Celah kapasitas listrik terbarukan (SDG 7.b.1)</h3>
-            <p class="muted" style="margin-top:4px">Median R3 adalah <strong class="num">${fmt(r3.renew_cap_median, 1)} W</strong> per kapita, sedangkan Indonesia <strong class="num">${fmt(idn.renew_cap_2023, 1)} W</strong> (air ${fmt(idn.cap_hydro_wpc, 1)}, bioenergi ${fmt(idn.cap_bioenergy_wpc, 1)}, panas bumi ${fmt(idn.cap_geothermal_wpc, 1)}, surya <strong>${fmt(idn.cap_solar_wpc, 1)}</strong>). Viet Nam <strong class="num">${fmt(vnm.renew_cap_2023, 1)} W</strong>; Malaysia <strong class="num">${fmt(mys.renew_cap_2023, 1)} W</strong>, yang berpindah dari ${mys.kode_2015} ke ${mys.kode_2023}.</p></div>
+            <p class="muted" style="margin-top:4px">Median R3 adalah <strong class="num">${fmt(r3.renew_cap_median, 1)} W</strong> per kapita, sedangkan Indonesia <strong class="num">${fmt(idn.renew_cap_2023, 1)} W</strong> (air ${fmt(idn.cap_hydro_wpc, 1)}, bioenergi ${fmt(idn.cap_bioenergy_wpc, 1)}, panas bumi ${fmt(idn.cap_geothermal_wpc, 1)}, surya <strong>${fmt(idn.cap_solar_wpc, 1)}</strong>). Vietnam <strong class="num">${fmt(vnm.renew_cap_2023, 1)} W</strong>; Malaysia <strong class="num">${fmt(mys.renew_cap_2023, 1)} W</strong>, yang berpindah dari ${mys.kode_2015} ke ${mys.kode_2023}.</p></div>
           <div><h3>3. Implikasi kebijakan</h3>
             <p class="muted" style="margin-top:4px">Pendanaan JETP dan RUPTL dapat difokuskan pada percepatan PLTS atap dan skala utilitas dengan pengadaan yang transparan, interkoneksi antarpulau untuk menyerap potensi panas bumi dan air, serta elektrifikasi wilayah kepulauan agar sisa populasi tanpa listrik terjangkau tanpa generator diesel.</p></div>
         </div>`
@@ -2248,7 +2248,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       tr.dataset.asean = c.is_asean ? "1" : "0";
       tr.dataset.search = `${c.country_id || ""} ${c.country_en} ${c.iso3} ${c.iso2 || ""} ${c.region}`.toLowerCase();
       tr.innerHTML = `
-        <th scope="row" data-value="${c.country_en}"><button type="button" class="row-pick"><span class="cname">${c.country_en}</span> <span class="muted mono">${c.iso3}</span></button></th>
+        <th scope="row" data-value="${cName(c)}"><button type="button" class="row-pick"><span class="cname">${cName(c)}</span> <span class="muted mono">${c.iso3}</span></button></th>
         <td data-value="${c.kode_2023}"><span class="badge r${c.regime_2023}">${c.kode_2023}</span></td>
         <td data-value="${c.kode_2015}" class="mono">${c.kode_2015}</td>
         <td class="num" data-value="${c.elec_2023}"></td>
@@ -2523,7 +2523,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     }
     GLOBAL.max.sil_width = Math.max(...DATA.countries.map((c) => c.sil_width));
     $("country-list").innerHTML = [...DATA.countries]
-      .sort((a, b) => a.country_en.localeCompare(b.country_en))
+      .sort((a, b) => cName(a).localeCompare(cName(b)))
       .map((c) => `<option value="${pickerLabel(c)}"></option>`).join("");
 
     $("app-state").hidden = true;
@@ -2537,6 +2537,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   });
 })();
 </script>
-<script type="module" src="./bot.js"></script>
+<script type="module" src="./bot.js?v=2"></script>
 </body>
 </html>
