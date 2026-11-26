@@ -35,7 +35,7 @@ get_base_dir <- function() {
   if (length(file_arg) > 0) {
     return(dirname(normalizePath(sub("^--file=", "", file_arg[1]))))
   }
-  if (file.exists("data/sdg_energy_climate_panel_2015_2023.csv")) {
+  if (file.exists("data/sdg_energy_climate_panel_2023.csv")) {
     return(normalizePath(getwd()))
   }
   stop("Jalankan skrip dari folder proyek yang memuat subfolder 'data/'.")
@@ -62,7 +62,7 @@ cat("======================================================================\n\n"
 # TAHAP 1: PERUMUSAN MASALAH & PEMERIKSAAN KUALITAS DATA
 # ==============================================================================
 panel <- read_csv(
-  file.path(data_dir, "sdg_energy_climate_panel_2015_2023.csv"),
+  file.path(data_dir, "sdg_energy_climate_panel_2023.csv"),
   show_col_types = FALSE
 )
 
@@ -443,7 +443,7 @@ cat(sprintf("[Validasi Sensitivitas] ARI pada %d negara bersama (fit Complete-Ca
             nrow(d23), nrow(d23), nrow(d23_partial), ari_sens))
 
 # ==============================================================================
-# TAHAP 4: INTERPRETASI REZIM (k=4 & ALTERNATIF k=2), DINAMIKA 2015-2023, & ASEAN
+# TAHAP 4: INTERPRETASI REZIM (k=4 & ALTERNATIF k=2), DINAMIKA 2019-2023, & ASEAN
 # ==============================================================================
 # Tabel 10: Profil Alternatif Dua Rezim (k = 2) & Hubungan Bersarang terhadap k = 4
 k2_profiles <- d23 |>

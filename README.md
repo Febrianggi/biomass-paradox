@@ -140,7 +140,7 @@ Sources: UN SDG Indicators Database (UNSD API) and World Bank Open Data. Exact s
 | `energy_intensity` | SDG 7.3.1, primary energy intensity (MJ per 2021 PPP USD) | log(1 + x), then z-score |
 | `co2_per_capita` | CO2 emissions per capita (tonnes) | log(1 + x), then z-score |
 
-- The saved 2023 panel ([`data/sdg_energy_climate_panel_2015_2023.csv`](data/sdg_energy_climate_panel_2015_2023.csv), filtered strictly to `year == 2023`) and the 2019 baseline panel ([`data/sdg_energy_climate_panel_2019.csv`](data/sdg_energy_climate_panel_2019.csv)) provide 100% complete 2019 and 2023 observations for all 189 sovereign economies (8.02 billion people; [`output/console_summary.txt`](output/console_summary.txt)). Missingness in the 215-economy raw 2023 download is highest in `clean_cooking` (23 economies, 10.7%; [`table_01`](output/tables/table_01_data_quality_audit_2023.csv)).
+- The saved 2023 panel ([`data/sdg_energy_climate_panel_2023.csv`](data/sdg_energy_climate_panel_2023.csv)) and the 2019 baseline panel ([`data/sdg_energy_climate_panel_2019.csv`](data/sdg_energy_climate_panel_2019.csv)) provide 100% complete 2019 and 2023 observations for all 189 sovereign economies (8.02 billion people; [`output/console_summary.txt`](output/console_summary.txt)). Missingness in the 215-economy raw 2023 download is highest in `clean_cooking` (23 economies, 10.7%; [`table_01`](output/tables/table_01_data_quality_audit_2023.csv)).
 - Per-capita CO2 comes from World Bank (EDGAR, AR5), filled where missing by UNSD (IEA); each row's source is logged in `co2_source`.
 - GDP per capita (PPP) and urban population share are excluded from model fitting and used strictly as external validators.
 
@@ -175,7 +175,7 @@ All steps live in [`sdg_energy_transition_analysis.R`](sdg_energy_transition_ana
 ├── sdg_energy_transition_analysis.R   full R pipeline from the saved 2019 and 2023 panels
 ├── download_sdg_data.R                optional: re-download data from UNSD and World Bank APIs
 ├── data/
-│   ├── sdg_energy_climate_panel_2015_2023.csv   source panel supplying 2023 complete cases
+│   ├── sdg_energy_climate_panel_2023.csv        2023 panel (215 economies, 189 complete cases)
 │   ├── sdg_energy_climate_panel_2019.csv        complete 2019 baseline panel (189 economies)
 │   ├── iso3166_country_names.csv
 │   └── sdg_data_dictionary.csv
@@ -216,7 +216,7 @@ Then run:
 Rscript sdg_energy_transition_analysis.R
 ```
 
-This reads `data/sdg_energy_climate_panel_2019.csv` and the 2023 slice of `data/sdg_energy_climate_panel_2015_2023.csv` offline and regenerates `output/tables/`, `output/figures/`, and `dashboard/data/`.
+This reads `data/sdg_energy_climate_panel_2019.csv` and `data/sdg_energy_climate_panel_2023.csv` offline and regenerates `output/tables/`, `output/figures/`, and `dashboard/data/`.
 
 ### 2. Re-download fresh data (optional)
 

@@ -140,7 +140,7 @@ Sumber: UN SDG Indicators Database (API UNSD) dan World Bank Open Data. Kode ser
 | `energy_intensity` | SDG 7.3.1, intensitas energi primer (MJ per USD PPP 2021) | log(1 + x), lalu z-score |
 | `co2_per_capita` | Emisi CO2 per kapita (ton) | log(1 + x), lalu z-score |
 
-- Panel 2023 tersimpan ([`data/sdg_energy_climate_panel_2015_2023.csv`](data/sdg_energy_climate_panel_2015_2023.csv), disaring ketat pada `year == 2023`) dan panel baseline 2019 ([`data/sdg_energy_climate_panel_2019.csv`](data/sdg_energy_climate_panel_2019.csv)) menyediakan data 2019 dan 2023 lengkap 100% untuk 189 ekonomi berdaulat (8,02 miliar jiwa; [`output/console_summary.txt`](output/console_summary.txt)). Data hilang terbanyak pada unduhan mentah 215 ekonomi tahun 2023 berada pada `clean_cooking` (23 ekonomi, 10,7%; [`table_01`](output/tables/table_01_data_quality_audit_2023.csv)).
+- Panel 2023 tersimpan ([`data/sdg_energy_climate_panel_2023.csv`](data/sdg_energy_climate_panel_2023.csv)) dan panel baseline 2019 ([`data/sdg_energy_climate_panel_2019.csv`](data/sdg_energy_climate_panel_2019.csv)) menyediakan data 2019 dan 2023 lengkap 100% untuk 189 ekonomi berdaulat (8,02 miliar jiwa; [`output/console_summary.txt`](output/console_summary.txt)). Data hilang terbanyak pada unduhan mentah 215 ekonomi tahun 2023 berada pada `clean_cooking` (23 ekonomi, 10,7%; [`table_01`](output/tables/table_01_data_quality_audit_2023.csv)).
 - Emisi CO2 per kapita berasal dari World Bank (EDGAR, AR5) dan diisi dari seri UNSD (IEA) bila kosong; sumber tiap baris tercatat di kolom `co2_source`.
 - PDB per kapita PPP dan persentase penduduk perkotaan tidak dipakai dalam pelatihan model, melainkan hanya sebagai validator eksternal.
 
@@ -175,7 +175,7 @@ Seluruh langkah berada di [`sdg_energy_transition_analysis.R`](sdg_energy_transi
 ├── sdg_energy_transition_analysis.R   alur analisis R lengkap dari panel 2019 dan 2023 tersimpan
 ├── download_sdg_data.R                opsional: unduh ulang data dari API UNSD dan World Bank
 ├── data/
-│   ├── sdg_energy_climate_panel_2015_2023.csv   panel sumber untuk data lengkap 2023
+│   ├── sdg_energy_climate_panel_2023.csv        panel 2023 (215 ekonomi, 189 data lengkap)
 │   ├── sdg_energy_climate_panel_2019.csv        panel baseline 2019 lengkap (189 ekonomi)
 │   ├── iso3166_country_names.csv
 │   └── sdg_data_dictionary.csv
@@ -216,7 +216,7 @@ Lalu jalankan:
 Rscript sdg_energy_transition_analysis.R
 ```
 
-Skrip membaca `data/sdg_energy_climate_panel_2019.csv` dan irisan 2023 dari `data/sdg_energy_climate_panel_2015_2023.csv` secara luring dan menulis ulang `output/tables/`, `output/figures/`, serta `dashboard/data/`.
+Skrip membaca `data/sdg_energy_climate_panel_2019.csv` dan `data/sdg_energy_climate_panel_2023.csv` secara luring dan menulis ulang `output/tables/`, `output/figures/`, serta `dashboard/data/`.
 
 ### 2. Mengunduh ulang data terbaru (opsional)
 

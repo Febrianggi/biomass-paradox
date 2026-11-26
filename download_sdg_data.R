@@ -39,7 +39,7 @@ parse_un_value <- function(x) {
       ifelse(x == "<5", 2.5, suppressWarnings(as.numeric(x)))))
 }
 
-fetch_un_series <- function(series_code, years = c(2015, 2019, 2022, 2023)) {
+fetch_un_series <- function(series_code, years = c(2019, 2023)) {
   message(sprintf("[UN SDG API] Mengunduh seri %s ...", series_code))
   pages <- list()
   pg <- 1L
@@ -78,7 +78,7 @@ fetch_un_series <- function(series_code, years = c(2015, 2019, 2022, 2023)) {
   bind_rows(pages)
 }
 
-fetch_wb_indicator <- function(ind_code, years = "2015:2023") {
+fetch_wb_indicator <- function(ind_code, years = "2019:2023") {
   message(sprintf("[World Bank API] Mengunduh indikator %s ...", ind_code))
   Sys.sleep(1.2)
   url <- sprintf("https://api.worldbank.org/v2/en/country/all/indicator/%s", ind_code)
@@ -96,7 +96,7 @@ fetch_wb_indicator <- function(ind_code, years = "2015:2023") {
 }
 
 build_sdg_dataset <- function(cache_rds_dir = NULL) {
-  load_or_fetch_un <- function(code, yrs = c(2015, 2019, 2022, 2023)) {
+  load_or_fetch_un <- function(code, yrs = c(2019, 2023)) {
     f <- if (!is.null(cache_rds_dir)) file.path(cache_rds_dir, paste0("un_", code, ".rds")) else ""
     if (nzchar(f) && file.exists(f)) readRDS(f) else fetch_un_series(code, yrs)
   }
@@ -109,7 +109,7 @@ build_sdg_dataset <- function(cache_rds_dir = NULL) {
   un_clean  <- load_or_fetch_un("EG_EGY_CLEAN")
   un_rnewsh <- load_or_fetch_un("EG_FEC_RNEW")
   un_intens <- load_or_fetch_un("EG_EGY_PRIM")
-  un_rnewcp <- load_or_fetch_un("EG_EGY_RNEW", c(2015, 2019, 2022, 2023))
+  un_rnewcp <- load_or_fetch_un("EG_EGY_RNEW", c(2019, 2023))
   un_co2gdp <- load_or_fetch_un("EN_ATM_CO2GDP")
   un_co2tot <- load_or_fetch_un("EN_ATM_CO2")
 
@@ -171,7 +171,7 @@ build_sdg_dataset <- function(cache_rds_dir = NULL) {
       cap_marine_wpc     = MARINE
     )
 
-  panel_all <- expand_grid(iso3 = countries_base$iso3, year = c(2015L, 2019L, 2022L, 2023L)) |>
+  panel_all <- expand_grid(iso3 = countries_base$iso3, year = c(2019L, 2023L)) |>
     left_join(countries_base, by = "iso3") |>
     left_join(
       un_elec |> filter(dim_Location == "ALLAREA") |>
@@ -227,7 +227,7 @@ build_sdg_dataset <- function(cache_rds_dir = NULL) {
     ) |>
     arrange(year, iso3)
 
-  write_csv(panel_all |> filter(year %in% c(2015L, 2022L, 2023L)), file.path(data_dir, "sdg_energy_climate_panel_2015_2023.csv"))
+  write_csv(panel_all |> filter(year == 2023L), file.path(data_dir, "sdg_energy_climate_panel_2023.csv"))
   write_csv(panel_all |> filter(year == 2019L), file.path(data_dir, "sdg_energy_climate_panel_2019.csv"))
 
   kamus <- tribble(
