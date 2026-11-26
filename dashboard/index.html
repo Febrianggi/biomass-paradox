@@ -910,7 +910,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         <section class="card" style="margin-top:var(--s4)" aria-labelledby="h-eval-all">
           <div class="card-head">
             <div>
-              <h2 id="h-eval-all" data-i18n="evalTitle">Evaluasi 20 konfigurasi (4 metode x 5 nilai k)</h2>
+              <h2 id="h-eval-all" data-i18n="evalTitle">Evaluasi 20 konfigurasi</h2>
               <p data-i18n="evalSub">Baris bertanda adalah model terpilih: K-Means, k = 4.</p>
             </div>
           </div>
@@ -921,14 +921,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       </div>
     </div>
 
-    <!-- PANEL 4: 2019-2027 & ASEAN -->
+    <!-- PANEL 4: 2019-2027 -->
     <div role="tabpanel" id="panel-asean" aria-labelledby="tab-asean" hidden="until-found">
       <div class="panel-inner">
         <section class="card" aria-labelledby="h-mig-card">
           <div class="card-head">
             <div>
               <h2 id="h-mig-card" data-i18n="migTitle">Matriks perpindahan rezim, 2019 ke 2023</h2>
-              <p data-i18n="migSub">Arahkan atau fokus ke sel untuk melihat daftarnya; klik untuk menyematkan.</p>
             </div>
           </div>
           <div class="mig-split">
@@ -1113,7 +1112,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       dlCsv: "Unduh CSV (189 Negara)",
       title: "Paradoks Biomassa dalam Transisi Energi-Iklim Global",
       thesis: "Pangsa energi terbarukan yang tinggi tidak selalu berarti listrik bersih modern: 189 negara dikelompokkan dengan empat algoritma pada enam indikator SDG 7 dan SDG 13.",
-      tabs: ["Peta Rezim", "Paradoks Biomassa", "Evaluasi Model", "2019-2027 & ASEAN", "Data & Metodologi"],
+      tabs: ["Peta Rezim", "Paradoks Biomassa", "Evaluasi Model", "2019-2027", "Data & Metodologi"],
       tablistLabel: "Bagian analisis dashboard",
       kpis: [
         ["189", "negara, 8,02 miliar jiwa", "Enam indikator resmi UN SDG 7 dan 13 lengkap untuk 2019 dan 2023. Data PDB dan urbanisasi tidak dipakai untuk membentuk klaster."],
@@ -1201,11 +1200,11 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       outlierNote: "Negara ini tidak dihapus karena mewakili kondisi ekstrem nyata.",
       lblMetric: "Metrik validasi (k = 2 s/d 6)",
       metricOpts: [
-        "Stabilitas Jaccard bootstrap (B = 500, makin tinggi makin stabil)",
-        "Average Silhouette Width (makin tinggi makin kompak)",
-        "Davies-Bouldin (makin rendah makin terpisah)",
-        "Calinski-Harabasz (makin tinggi makin baik)",
-        "Dunn (makin tinggi makin baik)"
+        "Stabilitas Jaccard bootstrap (B = 500, semakin tinggi semakin stabil)",
+        "Average Silhouette Width (semakin tinggi semakin kompak)",
+        "Davies-Bouldin (semakin rendah semakin terpisah)",
+        "Calinski-Harabasz (semakin tinggi semakin baik)",
+        "Dunn (semakin tinggi semakin baik)"
       ],
       modelCurveTitle: "Kurva validasi empat algoritma",
       modelCurveSub: "Garis titik-titik k = 2 menandai optimum biner kasar; garis putus-putus k = 4 menandai model empat rezim yang dipilih.",
@@ -1252,7 +1251,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         },
         carbon: {
           title: "Cara membaca plot Intensitas Energi vs CO2 (SDG 7.3.1 vs SDG 13)",
-          lead: "Sumbu mendatar (X) adalah <strong>intensitas energi primer</strong> (MJ per USD PPP 2021): berapa banyak energi yang dibakar untuk menghasilkan 1 dolar output ekonomi (makin ke kiri makin efisien). Sumbu tegak (Y) adalah <strong>emisi CO2 per kapita</strong> (ton, skala log).",
+          lead: "Sumbu mendatar (X) adalah <strong>intensitas energi primer</strong> (MJ per USD PPP 2021): berapa banyak energi yang dibakar untuk menghasilkan 1 dolar output ekonomi (semakin ke kiri semakin efisien). Sumbu tegak (Y) adalah <strong>emisi CO2 per kapita</strong> (ton, skala log).",
           cells: [
             ["Kiri atas · Efisien per PDB, CO2 menengah-tinggi (R3)", "Ekonomi sudah efisien menghasilkan PDB (median R3 2,64 MJ/$), tetapi volume konsumsi energi per kapita tetap menghasilkan CO2 menengah (median 3,67 t)."],
             ["Kanan atas · Boros energi & karbon tinggi (R4)", "Intensitas energi tinggi (median R4 5,85 MJ/$; rata-rata 7,69) sekaligus CO2 per kapita tinggi (median 11,99 t) akibat industri berat dan dominasi bahan bakar fosil."],
@@ -1267,10 +1266,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       gmmSummary: "Sensitivitas GMM terhadap spesifikasi kovarians",
       gmmText: (sil, ari) => `Pada GMM elipsoidal pilihan BIC (VEV, k = 4), varians terstandardisasi <code>elec_access</code> pada dua komponen sangat kecil (0,0031 dan 0,0030), konsisten dengan konsentrasi pengamatan di batas atas akses listrik 100%. Dengan kovarians sferis isotropik untuk keenam variabel (<code>GMM EII</code>), Silhouette Euclidean berubah dari 0,198 menjadi <strong>${sil}</strong> dan ARI terhadap K-Means dari 0,367 menjadi <strong>${ari}</strong>. Perbedaan skor ini mencerminkan sensitivitas terhadap spesifikasi kovarians di keenam fitur.`,
       spec: "Spesifikasi", varElec: "Var. listrik", varCook: "Var. memasak",
-      evalTitle: "Evaluasi 20 konfigurasi (4 metode x 5 nilai k)",
+      evalTitle: "Evaluasi 20 konfigurasi",
       evalSub: "Baris bertanda adalah model terpilih: K-Means, k = 4.",
       migTitle: "Matriks perpindahan rezim, 2019 ke 2023",
-      migSub: "Arahkan atau fokus ke sel untuk melihat daftarnya; klik untuk menyematkan.",
       migNote: "Posisi 2019 diproyeksikan ke centroid 2023. Perpindahan adalah perbandingan observasional 4 tahun, bukan estimasi dampak kebijakan.",
       migUp: (n) => `Naik rezim (${n} negara)`,
       migDown: (n) => `Turun ke R4 (${n} negara)`,
@@ -1308,7 +1306,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         </ul>`,
       indicator: "Indikator", varCode: "Kode variabel", coverage: "Cakupan 2019 & 2023", globalMed: "Median global 2023", role: "Transformasi",
       leakText: (h) => `<p>(1) PDB per kapita PPP (uji Kruskal-Wallis eksternal H = ${h}, p &lt; 1e-24), tingkat urbanisasi, dan klasifikasi wilayah Bank Dunia tidak dipakai untuk membentuk klaster.</p><p style="margin-top:8px">(2) Data baseline 2019 maupun proyeksi 2027* ditransformasi dan distandardisasi dengan rata-rata serta simpangan baku 2023 sebelum dipetakan ke centroid terdekat, sehingga batas rezim tetap sama antarwaktu.</p>`,
-      footer: 'Sumber data: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) dan World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh angka diekspor dari <code>sdg_energy_transition_analysis.R</code> (seed = 2026).',
+      footer: 'Sumber data: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) dan World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>).',
       loadError: "Gagal memuat berkas data dashboard.",
       pathTitle: "Jalur perubahan 2019 ke 2023 (FANNY)",
       pathSub: "Klaster fuzzy atas perubahan 4 tahun keenam indikator, terpisah dari rezim 2023.",
@@ -1326,7 +1324,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       pcaQuadAria: "Sorot negara berdasarkan kuadran Biplot PCA",
       proj27Title: "Proyeksi 2027 dan potensi perpindahan rezim (horizon 4 tahun)",
       proj27Sub: "Dilatih dan divalidasi silang pada interval 2019 ke 2023, lalu diproyeksikan ke 2027 dari kondisi 2023.",
-      proj27Lead: (nShift, accEn, accPers) => `Data resmi UNSD/Bank Dunia tahun 2025-2026 belum tersedia (0 baris pada seri SDG 7), sedangkan 2019 lengkap pada seluruh 189 negara. Model Elastic Net 4-tahunan dilatih pada <strong>2019 ke 2023</strong> (akurasi rezim out-of-fold <strong class="num">${accEn}%</strong> vs persistensi <strong class="num">${accPers}%</strong>), lalu diisi fitur 2023 untuk memproyeksikan 2027. Sebanyak <strong>${nShift} negara</strong> diproyeksikan berpindah rezim (0 turun). <em>Catatan: proyeksi out-of-sample dengan asumsi pola 2019-2023 berlanjut; perhatikan margin centroid untuk membedakan perpindahan jelas vs tipis di perbatasan.</em>`,
+      proj27Lead: (nShift, accEn, accPers) => `Model Elastic Net 4-tahunan dilatih pada <strong>2019 ke 2023</strong> (akurasi rezim out-of-fold <strong class="num">${accEn}%</strong> vs persistensi <strong class="num">${accPers}%</strong>), lalu diisi fitur 2023 untuk memproyeksikan 2027. Sebanyak <strong>${nShift} negara</strong> diproyeksikan berpindah rezim (0 turun). <em>Catatan: proyeksi out-of-sample dengan asumsi pola 2019-2023 berlanjut; perhatikan margin centroid untuk membedakan perpindahan jelas vs tipis di perbatasan.</em>`,
       proj27TargetLbl: "Indikator target proyeksi 2027",
       proj27Targets: [
         ["clean_cooking", "Memasak bersih (SDG 7.1.2, %)"],
@@ -1367,7 +1365,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       dlCsv: "Download CSV (189 Countries)",
       title: "The Biomass Paradox in the Global Energy and Climate Transition",
       thesis: "A high renewable share does not always mean modern clean power: 189 countries clustered with four algorithms on six SDG 7 and SDG 13 indicators.",
-      tabs: ["Regime Map", "Biomass Paradox", "Model Evaluation", "2019-2027 & ASEAN", "Data & Methods"],
+      tabs: ["Regime Map", "Biomass Paradox", "Model Evaluation", "2019-2027", "Data & Methods"],
       tablistLabel: "Dashboard analysis sections",
       kpis: [
         ["189", "countries, 8.02 billion people", "Six official UN SDG 7 and 13 indicators complete for 2019 and 2023. GDP and urbanisation are kept out of cluster formation."],
@@ -1521,10 +1519,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       gmmSummary: "GMM sensitivity to the covariance specification",
       gmmText: (sil, ari) => `Under the BIC-selected ellipsoidal GMM (VEV, k = 4), two components have very small standardised <code>elec_access</code> variances (0.0031 and 0.0030), consistent with observations concentrated at the 100% electricity ceiling. With isotropic spherical covariance across all six variables (<code>GMM EII</code>), Euclidean Silhouette moves from 0.198 to <strong>${sil}</strong> and ARI with K-Means from 0.367 to <strong>${ari}</strong>. The score difference reflects sensitivity to the covariance specification across all six features.`,
       spec: "Specification", varElec: "Var. electricity", varCook: "Var. cooking",
-      evalTitle: "Evaluation of 20 configurations (4 methods x 5 values of k)",
+      evalTitle: "Evaluation of 20 configurations",
       evalSub: "The marked row is the chosen model: K-Means, k = 4.",
       migTitle: "Regime transition matrix, 2019 to 2023",
-      migSub: "Hover or focus a cell to list its countries; click to pin.",
       migNote: "2019 positions are projected onto the 2023 centroids. Transitions are an observational 4-year comparison, not estimates of policy effects.",
       migUp: (n) => `Moved up (${n} countries)`,
       migDown: (n) => `Moved into R4 (${n} countries)`,
@@ -1562,7 +1559,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         </ul>`,
       indicator: "Indicator", varCode: "Variable code", coverage: "2019 & 2023 coverage", globalMed: "2023 global median", role: "Transformation",
       leakText: (h) => `<p>(1) GDP per person PPP (external Kruskal-Wallis H = ${h}, p &lt; 1e-24), urbanisation and World Bank regions are excluded from cluster formation.</p><p style="margin-top:8px">(2) Both 2019 baseline values and 2027* projections are transformed and standardised with the 2023 means and standard deviations before nearest-centroid projection, so regime boundaries stay fixed over time.</p>`,
-      footer: 'Data: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) and World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). All figures are exported from <code>sdg_energy_transition_analysis.R</code> (seed = 2026).',
+      footer: 'Data: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) and World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>).',
       loadError: "Could not load the dashboard data file.",
       pathTitle: "Change pathways, 2019 to 2023 (FANNY)",
       pathSub: "Fuzzy clusters of 4-year changes across all six indicators, kept separate from 2023 regimes.",
@@ -1580,7 +1577,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       pcaQuadAria: "Highlight countries by PCA biplot quadrant",
       proj27Title: "2027 projections and potential regime shifts (4-year horizon)",
       proj27Sub: "Trained and cross-validated on 2019 to 2023, then projected to 2027 from 2023 features.",
-      proj27Lead: (nShift, accEn, accPers) => `Official 2025-2026 UNSD/World Bank SDG 7 series are not yet published (0 rows), whereas 2019 is complete across all 189 economies. A matched 4-year Elastic Net model is validated on <strong>2019 to 2023</strong> (out-of-fold regime accuracy <strong class="num">${accEn}%</strong> vs persistence <strong class="num">${accPers}%</strong>), then applied to 2023 features to project 2027. Overall, <strong>${nShift} economies</strong> are projected to shift regimes (0 regressing). <em>Note: out-of-sample projections assuming 2019-2023 dynamics persist; check centroid margins to distinguish clear shifts from borderline crossings.</em>`,
+      proj27Lead: (nShift, accEn, accPers) => `A matched 4-year Elastic Net model is validated on <strong>2019 to 2023</strong> (out-of-fold regime accuracy <strong class="num">${accEn}%</strong> vs persistence <strong class="num">${accPers}%</strong>), then applied to 2023 features to project 2027. Overall, <strong>${nShift} economies</strong> are projected to shift regimes (0 regressing). <em>Note: out-of-sample projections assuming 2019-2023 dynamics persist; check centroid margins to distinguish clear shifts from borderline crossings.</em>`,
       proj27TargetLbl: "2027 projection target indicator",
       proj27Targets: [
         ["clean_cooking", "Clean cooking (SDG 7.1.2, %)"],
