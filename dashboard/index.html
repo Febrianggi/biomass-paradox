@@ -571,7 +571,24 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   .pill { padding: 0 10px; }
 }
 
-.selection-ring { fill: none; stroke: white; stroke-width: 2; filter: drop-shadow(0 0 1px #17202a); pointer-events: none; }
+.selection-ring { fill: none; stroke: var(--text); stroke-width: 2; filter: drop-shadow(0 0 1.2px var(--surface)); pointer-events: none; }
+.selection-ring.is-multi { stroke-width: 1.75; }
+.legend-btn {
+  font: 500 12.5px/1 var(--sans); min-height: 34px; padding: 0 11px; border-radius: var(--pill);
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; touch-action: manipulation;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
+}
+.legend-btn:hover { border-color: var(--text); background: var(--surface-2); }
+.legend-btn .swatch { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.legend-btn .legend-n { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+.legend-btn[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--surface); font-weight: 600; }
+.legend-btn[aria-pressed="true"] .swatch { box-shadow: 0 0 0 1.5px var(--surface); }
+.legend-btn[aria-pressed="true"] .legend-n { color: var(--surface); opacity: 0.82; }
+#eda-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.legend-hint { font-size: 12px; color: var(--muted); margin-left: 4px; }
+@media (max-width: 640px) { .legend-btn { min-height: 40px; } }
+@media (prefers-reduced-motion: reduce) { .legend-btn { transition: none; } }
 .mig-grid, .table-wrapper { position: relative; }
 .selection-slide { position: absolute; z-index: 2; pointer-events: none; border-radius: 4px; border: 2px solid var(--text); background: var(--ink-soft); }
 </style>
@@ -1042,6 +1059,10 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       },
       selected: "Terpilih",
       openMap: "Lihat di peta",
+      edaLegendHint: "Klik R1-R4 untuk menyorot satu rezim",
+      edaLegendAria: "Sorot negara berdasarkan rezim",
+      edaRegimeLbl: "Rezim disorot",
+      edaBackSingle: "Fokus 1 negara",
       edaDiagTitle: "Kelayakan data & kemencengan",
       edaDiagSub: "Audit prapengolahan sebelum pemodelan.",
       feature: "Fitur", rawSkew: "Skew asli", modelSkew: "Skew model",
@@ -1256,6 +1277,10 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       },
       selected: "Selected",
       openMap: "View on map",
+      edaLegendHint: "Click R1-R4 to highlight a regime",
+      edaLegendAria: "Highlight countries by regime",
+      edaRegimeLbl: "Highlighted regime",
+      edaBackSingle: "Focus 1 country",
       edaDiagTitle: "Data adequacy & skewness",
       edaDiagSub: "Pre-modelling audit.",
       feature: "Feature", rawSkew: "Raw skew", modelSkew: "Model skew",
@@ -1457,6 +1482,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     mapZoom: "world",
     regimeFilter: "ALL",
     edaPreset: "paradox",
+    edaRegime: null,
     story: "none",
     evalMetric: "jaccard_mean",
     migCell: "R4_R3",
@@ -2043,13 +2069,219 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     ], { duration: 240, easing: "ease-out" });
     motion.onfinish = () => slide.remove();
   }
-  function renderEda() {
+  let edaAnimRaf = 0;
+  let edaLastMode = "single";
+  function shuffleArr(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function laminarPair(sources, targets) {
+    const n = sources.length;
+    if (!n) return [];
+    let msx = 0, msy = 0, mtx = 0, mty = 0;
+    for (let i = 0; i < n; i++) {
+      msx += sources[i].cx; msy += sources[i].cy;
+      mtx += targets[i].cx; mty += targets[i].cy;
+    }
+    const dx = (mtx - msx) / n, dy = (mty - msy) / n;
+    const len = Math.hypot(dx, dy);
+    const px = len > 1 ? -dy / len : 1;
+    const py = len > 1 ? dx / len : 0.7;
+    const sOrd = [...sources].sort((a, b) => (a.cx * px + a.cy * py) - (b.cx * px + b.cy * py));
+    const tOrd = [...targets].sort((a, b) => (a.cx * px + a.cy * py) - (b.cx * px + b.cy * py));
+    return sOrd.map((s, i) => [s, tOrd[i]]);
+  }
+  function captureEdaRings(wrap) {
+    if (edaAnimRaf) { cancelAnimationFrame(edaAnimRaf); edaAnimRaf = 0; }
+    const svg = wrap.querySelector("svg");
+    if (!svg || !svg.getBoundingClientRect().width) return null;
+    const rings = [...svg.querySelectorAll('.selection-ring[data-anim-keep="1"]')].map((el) => ({
+      iso: el.dataset.iso || "",
+      cx: Number(el.getAttribute("cx")),
+      cy: Number(el.getAttribute("cy")),
+      r: Number(el.getAttribute("rx"))
+    })).filter((p) => Number.isFinite(p.cx) && Number.isFinite(p.cy));
+    return rings.length ? { mode: edaLastMode, rings } : null;
+  }
+  function drawEdaRings(wrap, prev, targetIsos, nextMode, skipAnim = false) {
+    edaLastMode = nextMode;
+    const svg = wrap.querySelector("svg");
+    if (!svg) return;
+    const ns = svg.namespaceURI;
+    const targets = [];
+    for (const iso of targetIsos) {
+      const dot = wrap.querySelector('[data-iso="' + iso + '"] circle');
+      if (!dot) continue;
+      targets.push({
+        iso,
+        cx: Number(dot.getAttribute("cx")),
+        cy: Number(dot.getAttribute("cy")),
+        r: dot.r.baseVal.value + 2.2
+      });
+    }
+    if (!targets.length) return;
+    const isMulti = nextMode === "regime";
+    const mkRing = (cx, cy, r, iso, multi, role, keep, op = 1) => {
+      const el = document.createElementNS(ns, "ellipse");
+      el.setAttribute("class", multi ? "selection-ring is-multi" : "selection-ring");
+      el.setAttribute("aria-hidden", "true");
+      el.dataset.iso = iso;
+      el.dataset.animRole = role;
+      el.dataset.animKeep = keep ? "1" : "0";
+      el.setAttribute("cx", cx.toFixed(1));
+      el.setAttribute("cy", cy.toFixed(1));
+      el.setAttribute("rx", r.toFixed(1));
+      el.setAttribute("ry", r.toFixed(1));
+      if (op < 1) el.setAttribute("opacity", op.toFixed(3));
+      svg.append(el);
+      return el;
+    };
+
+    const sameSpot = prev && prev.mode === nextMode && prev.rings.length === targets.length &&
+      targets.every((t) => {
+        const p = prev.rings.find((x) => x.iso === t.iso);
+        return p && Math.hypot(p.cx - t.cx, p.cy - t.cy) < 0.5 && Math.abs(p.r - t.r) < 0.25;
+      });
+    if (!prev || !prev.rings.length || skipAnim || reduceMotion.matches || sameSpot) {
+      for (const t of targets) mkRing(t.cx, t.cy, t.r, t.iso, isMulti, "static", true, 1);
+      return;
+    }
+
+    const tracks = [];
+    const prevByIso = new Map(prev.rings.map((p) => [p.iso, p]));
+    const exactSameSet = prev.mode === "regime" && nextMode === "regime" &&
+      prev.rings.length === targets.length && targets.every((t) => prevByIso.has(t.iso));
+
+    if (exactSameSet) {
+      targets.forEach((t, i) => {
+        const s = prevByIso.get(t.iso);
+        const el = mkRing(s.cx, s.cy, s.r, t.iso, true, "move", true, 1);
+        tracks.push({ el, fx: s.cx, fy: s.cy, fr: s.r, tx: t.cx, ty: t.cy, tr: t.r, delay: (i % 8) * 6, dur: 460, mode: "move", removeOnEnd: false });
+      });
+    } else if (prev.mode === "single" && nextMode === "single") {
+      const s = prev.rings[0], t = targets[0];
+      const el = mkRing(s.cx, s.cy, s.r, t.iso, false, "move", true, 1);
+      tracks.push({ el, fx: s.cx, fy: s.cy, fr: s.r, tx: t.cx, ty: t.cy, tr: t.r, delay: 0, dur: 280, mode: "move", removeOnEnd: false });
+    } else if (prev.mode === "single" && nextMode === "regime") {
+      const s = prev.rings[0];
+      const denom = Math.max(1, targets.length - 1);
+      targets.forEach((t, i) => {
+        const el = mkRing(s.cx, s.cy, s.r, t.iso, true, "expand", true, 0.35);
+        tracks.push({ el, fx: s.cx, fy: s.cy, fr: s.r, tx: t.cx, ty: t.cy, tr: t.r, delay: (i / denom) * 55, dur: 440, mode: "expand", removeOnEnd: false });
+      });
+    } else if (prev.mode === "regime" && nextMode === "single") {
+      const dst = targets[0];
+      let keepIdx = prev.rings.findIndex((s) => s.iso === dst.iso);
+      if (keepIdx < 0) {
+        let bestD = Infinity;
+        prev.rings.forEach((s, i) => {
+          const d = Math.hypot(s.cx - dst.cx, s.cy - dst.cy);
+          if (d < bestD) { bestD = d; keepIdx = i; }
+        });
+      }
+      prev.rings.forEach((s, i) => {
+        if (i === keepIdx) return;
+        const el = mkRing(s.cx, s.cy, s.r, s.iso, true, "converge-merge", false, 0.85);
+        tracks.push({ el, fx: s.cx, fy: s.cy, fr: s.r, tx: dst.cx, ty: dst.cy, tr: dst.r, delay: Math.random() * 40, dur: 420, mode: "converge-merge", removeOnEnd: true });
+      });
+      const keepSrc = prev.rings[keepIdx];
+      const keepEl = mkRing(keepSrc.cx, keepSrc.cy, keepSrc.r, dst.iso, false, "converge-keep", true, 1);
+      tracks.push({ el: keepEl, fx: keepSrc.cx, fy: keepSrc.cy, fr: keepSrc.r, tx: dst.cx, ty: dst.cy, tr: dst.r, delay: 0, dur: 420, mode: "converge-keep", removeOnEnd: false });
+    } else if (targets.length > prev.rings.length) {
+      const chosen = prev.rings.map((s) => ({ ...s, isSplit: false }));
+      let rem = targets.length - prev.rings.length;
+      while (rem > 0) {
+        const pool = shuffleArr(prev.rings);
+        const take = Math.min(rem, pool.length);
+        for (let i = 0; i < take; i++) chosen.push({ ...pool[i], isSplit: true });
+        rem -= take;
+      }
+      for (const [s, t] of laminarPair(chosen, targets)) {
+        const role = s.isSplit ? "split" : "move";
+        const el = mkRing(s.cx, s.cy, s.r, t.iso, true, role, true, s.isSplit ? 0.55 : 1);
+        tracks.push({ el, fx: s.cx, fy: s.cy, fr: s.r, tx: t.cx, ty: t.cy, tr: t.r, delay: s.isSplit ? 25 + Math.random() * 45 : Math.random() * 35, dur: 460, mode: role, removeOnEnd: false });
+      }
+    } else {
+      const pool = shuffleArr(prev.rings);
+      const moving = pool.slice(0, targets.length);
+      const fading = pool.slice(targets.length);
+      for (const s of fading) {
+        const el = mkRing(s.cx, s.cy, s.r, s.iso, true, "fade-out", false, 1);
+        tracks.push({ el, fx: s.cx, fy: s.cy, fr: s.r, tx: s.cx, ty: s.cy, tr: Math.max(2, s.r * 0.8), delay: Math.random() * 35, dur: 320, mode: "fade-out", removeOnEnd: true });
+      }
+      for (const [s, t] of laminarPair(moving, targets)) {
+        const el = mkRing(s.cx, s.cy, s.r, t.iso, true, "move", true, 1);
+        tracks.push({ el, fx: s.cx, fy: s.cy, fr: s.r, tx: t.cx, ty: t.cy, tr: t.r, delay: Math.random() * 40, dur: 460, mode: "move", removeOnEnd: false });
+      }
+    }
+
+    const t0 = performance.now();
+    const step = (now) => {
+      let alive = false;
+      for (const tr of tracks) {
+        if (tr.done) continue;
+        const elapsed = now - t0 - tr.delay;
+        if (elapsed < 0) { alive = true; continue; }
+        const raw = Math.min(1, elapsed / tr.dur);
+        const u = 1 - Math.pow(1 - raw, 3);
+        const cx = tr.fx + (tr.tx - tr.fx) * u;
+        const cy = tr.fy + (tr.ty - tr.fy) * u;
+        const r = tr.fr + (tr.tr - tr.fr) * u;
+        tr.el.setAttribute("cx", cx.toFixed(1));
+        tr.el.setAttribute("cy", cy.toFixed(1));
+        tr.el.setAttribute("rx", r.toFixed(1));
+        tr.el.setAttribute("ry", r.toFixed(1));
+        if (tr.mode === "fade-out") {
+          tr.el.setAttribute("opacity", (1 - raw).toFixed(3));
+        } else if (tr.mode === "converge-merge") {
+          tr.el.setAttribute("opacity", (0.85 * (1 - Math.pow(raw, 1.8))).toFixed(3));
+        } else if (tr.mode === "expand") {
+          tr.el.setAttribute("opacity", (0.35 + 0.65 * Math.min(1, raw * 2.5)).toFixed(3));
+        } else if (tr.mode === "split") {
+          tr.el.setAttribute("opacity", (0.55 + 0.45 * Math.min(1, raw * 2.2)).toFixed(3));
+        }
+        if (raw >= 1) {
+          tr.done = true;
+          if (tr.removeOnEnd) {
+            tr.el.remove();
+          } else {
+            tr.el.removeAttribute("opacity");
+            tr.el.dataset.animRole = "static";
+          }
+        } else {
+          alive = true;
+        }
+      }
+      edaAnimRaf = alive ? requestAnimationFrame(step) : 0;
+    };
+    edaAnimRaf = requestAnimationFrame(step);
+  }
+  function regimeLabelSet(pts, regimeId) {
+    const grp = pts.filter((c) => c.regime_2023 === regimeId);
+    const keep = new Set();
+    for (const iso of ["IDN", "VNM", "NOR", "SWE", "ISL", "COD", "ETH", "PAK", "KHM", "PHL", "QAT", "RUS", "CHN", "USA", "DEU"]) {
+      if (grp.some((c) => c.iso3 === iso)) keep.add(iso);
+    }
+    for (const c of [...grp].sort((a, b) => (b.population_m || 0) - (a.population_m || 0)).slice(0, 6)) {
+      keep.add(c.iso3);
+    }
+    return keep;
+  }
+  function renderEda(opts = {}) {
     const t = T();
     const [title, sub] = t.edaPresets[state.edaPreset];
     $("eda-chart-title").textContent = title;
     $("eda-chart-sub").textContent = sub;
-    const hl = storySet();
-    renderStoryCallout(hl);
+    const regimeHl = state.edaRegime
+      ? new Set(DATA.countries.filter((c) => c.regime_2023 === state.edaRegime).map((c) => c.iso3))
+      : null;
+    const storyHl = regimeHl ? null : storySet();
+    const hl = regimeHl || storyHl;
+    renderStoryCallout(storyHl);
 
     const W = 680, H = 420, padL = 62, padR = 24, padT = 22, padB = 48;
     const pw = W - padL - padR, ph = H - padT - padB;
@@ -2087,9 +2319,11 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const xTicks = [0, 0.25, 0.5, 0.75, 1].map((q) => xmin + q * (xmax - xmin));
     const yTicks = [0, 0.25, 0.5, 0.75, 1].map((q) => ymin + q * (ymax - ymin));
 
-    const labelSet = hl
-      ? new Set([...hl, state.selectedIso])
-      : new Set(["IDN", "VNM", "NOR", "ISL", "COD", "ETH", "QAT", "CHN", "USA", state.selectedIso]);
+    const labelSet = regimeHl
+      ? regimeLabelSet(pts, state.edaRegime)
+      : hl
+        ? new Set([...hl, state.selectedIso])
+        : new Set(["IDN", "VNM", "NOR", "ISL", "COD", "ETH", "QAT", "CHN", "USA", state.selectedIso]);
 
     let extra = "";
     if (state.edaPreset === "pca") {
@@ -2102,29 +2336,33 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         extra += `<text class="iso" x="${vx + (ld.PC1 >= 0 ? 5 : -5)}" y="${vy - 4}" fill="var(--text)" font-size="10" text-anchor="${ld.PC1 >= 0 ? "start" : "end"}">${ld.feature}</text>`;
       }
     }
-    if (state.edaPreset === "paradox" && state.story === "r1") {
+    if (state.edaPreset === "paradox" && state.story === "r1" && !regimeHl) {
       const x70 = sx(70).toFixed(1);
       extra += `<line x1="${x70}" y1="${padT}" x2="${x70}" y2="${padT + ph}" stroke="var(--r1t)" stroke-width="1.2" stroke-dasharray="5 4"/>`;
       extra += `<text x="${(sx(70) - 5).toFixed(1)}" y="${padT + 12}" text-anchor="end" font-size="11" font-weight="600" fill="var(--r1t)">70%</text>`;
     }
 
     // Draw dimmed points first so highlighted ones stay on top.
-    const ordered = [...pts].sort((a, b) => (hl ? (hl.has(a.iso3) - hl.has(b.iso3)) : 0) || ((a.iso3 === state.selectedIso) - (b.iso3 === state.selectedIso)));
+    const ordered = [...pts].sort((a, b) =>
+      (hl ? (hl.has(a.iso3) - hl.has(b.iso3)) : 0) ||
+      ((!regimeHl && a.iso3 === state.selectedIso) - (!regimeHl && b.iso3 === state.selectedIso))
+    );
     const circles = ordered.map((c) => {
       const cx = sx(xGet(c)).toFixed(1), cy = sy(yGet(c)).toFixed(1);
-      const sel = c.iso3 === state.selectedIso;
-      const on = !hl || hl.has(c.iso3) || sel;
-      const r = sel ? 6.8 : Math.max(3.4, Math.min(8.5, Math.sqrt(c.population_m || 1) * 0.28 + 2.8));
+      const singleSel = !regimeHl && c.iso3 === state.selectedIso;
+      const inRegime = Boolean(regimeHl && regimeHl.has(c.iso3));
+      const on = !hl || hl.has(c.iso3) || singleSel;
+      const r = singleSel ? 6.8 : Math.max(3.4, Math.min(8.5, Math.sqrt(c.population_m || 1) * 0.28 + 2.8));
       const lbl = labelSet.has(c.iso3)
         ? `<text class="iso" x="${cx}" y="${(cy - r - 3).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text)">${c.iso3}</text>`
         : "";
       return `<g class="eda-pt" data-iso="${c.iso3}">
-        <circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${sel ? 1 : on ? 0.82 : 0.12}" stroke="${sel ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2.2 : 0.8}" stroke-opacity="${on ? 1 : 0.3}"/>
+        <circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${singleSel ? 1 : inRegime ? 0.94 : on ? 0.82 : 0.12}" stroke="${singleSel ? "var(--text)" : "var(--surface)"}" stroke-width="${singleSel ? 2.2 : 0.8}" stroke-opacity="${on ? 1 : 0.3}"/>
         ${lbl}
       </g>`;
     }).join("");
 
-    const previousRing = ringPosition($("eda-svg-wrap"));
+    const prevRings = captureEdaRings($("eda-svg-wrap"));
     $("eda-svg-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title}">
       ${yTicks.map((tv) => `<g>
         <line x1="${padL}" y1="${sy(tv).toFixed(1)}" x2="${W - padR}" y2="${sy(tv).toFixed(1)}" stroke="var(--line)" stroke-width="0.8"/>
@@ -2140,7 +2378,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       <text x="14" y="${padT + ph / 2}" transform="rotate(-90 14 ${padT + ph / 2})" text-anchor="middle" font-size="12" font-weight="600" fill="var(--text)">${yLbl}</text>
     </svg>`;
 
-    drawRing($("eda-svg-wrap"), previousRing);
+    const targetIsos = regimeHl ? [...regimeHl] : [state.selectedIso];
+    drawEdaRings($("eda-svg-wrap"), prevRings, targetIsos, regimeHl ? "regime" : "single", Boolean(opts.skipAnim));
+
     $("eda-svg-wrap").querySelectorAll(".eda-pt").forEach((g) => {
       const c = BY_ISO.get(g.dataset.iso);
       g.addEventListener("click", () => selectCountry(c.iso3));
@@ -2149,15 +2389,46 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       g.addEventListener("pointerleave", hideTip);
     });
 
-    $("eda-legend").innerHTML = DATA.regimes.map((rg) =>
-      `<span class="legend-item"><span class="swatch" style="background:${regimeColorVar(rg.regime_km)};border-radius:50%"></span>${rg.kode_rezim}</span>`
-    ).join("");
+    const leg = $("eda-legend");
+    leg.setAttribute("role", "group");
+    leg.setAttribute("aria-label", t.edaLegendAria);
+    leg.innerHTML = DATA.regimes.map((rg) => {
+      const active = state.edaRegime === rg.regime_km;
+      return `<button type="button" class="legend-btn" data-eda-regime="${rg.regime_km}" aria-pressed="${active}">
+        <span class="swatch" style="background:${regimeColorVar(rg.regime_km)}"></span>
+        <span>${rg.kode_rezim}</span>
+        <span class="legend-n">(${rg.n_negara})</span>
+      </button>`;
+    }).join("") + `<span class="legend-hint">${t.edaLegendHint}</span>`;
+    leg.querySelectorAll("[data-eda-regime]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const r = Number(btn.dataset.edaRegime);
+        state.edaRegime = state.edaRegime === r ? null : r;
+        if (state.edaRegime && state.story !== "none") {
+          state.story = "none";
+          document.querySelectorAll("#story-pills [data-story]").forEach((b) =>
+            b.setAttribute("aria-pressed", String(b.dataset.story === "none"))
+          );
+        }
+        renderEda();
+      });
+    });
 
-    const c = BY_ISO.get(state.selectedIso);
-    $("eda-selected").innerHTML = `<span>${t.selected}: <strong>${cName(c)}</strong> <span class="badge r${c.regime_2023}">${c.iso3} · ${c.kode_2023}</span></span>
-      <span class="num muted">7.2.1 ${fmt(c.renew_share_2023, 1)}% · 7.b.1 ${fmt(c.renew_cap_2023, 1)} ${t.perCap}</span>
-      <button type="button" class="btn small-btn" id="eda-open-map">${t.openMap}</button>`;
-    $("eda-open-map").addEventListener("click", goToAtlas);
+    if (regimeHl) {
+      const rg = DATA.regimes.find((r) => r.regime_km === state.edaRegime);
+      $("eda-selected").innerHTML = `<span>${t.edaRegimeLbl}: <span class="badge r${rg.regime_km}">${rg.kode_rezim} · ${rg.n_negara} ${t.countries}</span> <strong>${state.lang === "id" ? rg.nama_id : rg.nama_en}</strong></span>
+        <button type="button" class="btn small-btn" id="eda-back-single">${t.edaBackSingle}</button>`;
+      $("eda-back-single").addEventListener("click", () => {
+        state.edaRegime = null;
+        renderEda();
+      });
+    } else {
+      const c = BY_ISO.get(state.selectedIso);
+      $("eda-selected").innerHTML = `<span>${t.selected}: <strong>${cName(c)}</strong> <span class="badge r${c.regime_2023}">${c.iso3} · ${c.kode_2023}</span></span>
+        <span class="num muted">7.2.1 ${fmt(c.renew_share_2023, 1)}% · 7.b.1 ${fmt(c.renew_cap_2023, 1)} ${t.perCap}</span>
+        <button type="button" class="btn small-btn" id="eda-open-map">${t.openMap}</button>`;
+      $("eda-open-map").addEventListener("click", goToAtlas);
+    }
 
     const g = t.edaGuides[state.edaPreset];
     if (g) {
@@ -2632,8 +2903,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   /* Country selection shared by map, picker, scatter, chips, table and ASEAN bars */
   function pickerLabel(c) { return `${cName(c)} (${c.iso3})`; }
-  function selectCountry(iso3) {
+  function selectCountry(iso3, opts = {}) {
     if (!BY_ISO.has(iso3)) return;
+    if (!opts.keepEdaRegime) state.edaRegime = null;
     const body = $("country-tbody");
     slideSelection(body.closest(".table-wrapper"), body.querySelector(".is-active"), body.querySelector('[data-iso="' + iso3 + '"]'));
     state.selectedIso = iso3;
@@ -2642,7 +2914,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     picker.removeAttribute("aria-invalid");
     renderInspector();
     updateMapColorsAndZoom();
-    renderEda();
+    renderEda({ skipAnim: Boolean(opts.skipEdaAnim) });
     renderForecast();
     for (const tr of $("country-tbody").rows) tr.classList.toggle("is-active", tr.dataset.iso === iso3);
   }
@@ -2707,7 +2979,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     renderPathways();
     renderTableNumbers();
     renderMethodology();
-    selectCountry(state.selectedIso);
+    selectCountry(state.selectedIso, { keepEdaRegime: true, skipEdaAnim: true });
   }
 
   /* CSV export */
@@ -2766,6 +3038,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   document.querySelectorAll("#story-pills [data-story]").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.story = btn.dataset.story;
+      state.edaRegime = null;
       document.querySelectorAll("#story-pills [data-story]").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
       renderEda();
     });
