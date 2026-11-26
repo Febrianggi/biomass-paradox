@@ -36,6 +36,27 @@ Source: [`table_06`](output/tables/table_06_global_regime_profiles_2023.csv).
 
 `R1` shows the biomass paradox directly: it has the highest median renewable share of final energy (78.98%), yet median electricity access is only 40.5%, median clean cooking is 5%, and installed renewable power capacity is just 11.6 W per capita.
 
+### What a regime means and how each method assigns R1 to R4
+
+In this study, a **regime** is not a single-indicator ranking or a political bloc, but a recurring multivariate structural profile across all six SDG 7 and SDG 13 indicators jointly. Economies in the same regime face similar energy-transition constraints.
+
+None of the four algorithms uses manual country cut-offs. All four run unsupervised on the six features after `log(1 + x)` transformation (on renewable capacity, energy intensity, and CO2) and z-score standardisation:
+
+- **K-Means (chosen model):** Assigns each economy to the nearest cluster centroid (mean vector across the six standardised features) minimising squared Euclidean distance (`nstart = 100`, `iter.max = 200`).
+- **Hierarchical Ward D2:** Starts with each economy as its own cluster and iteratively merges the pair that causes the smallest increase in total within-cluster variance, then cuts the dendrogram at `k = 4`.
+- **PAM (K-Medoids):** Selects four actual economies as representative medoids (`TZA`, `PAK`, `JAM`, `SVN`) and assigns every economy to its nearest Euclidean medoid, making boundaries less sensitive to extreme values.
+- **GMM (`mclust`, BIC-selected `VEV`):** Fits four ellipsoidal multivariate Gaussian distributions via Expectation-Maximisation and assigns each economy to the component with the highest posterior probability.
+
+**Deterministic label alignment (identical for all four methods):** Because raw cluster numbers from unsupervised algorithms are arbitrary, `order_regime_labels()` in `sdg_energy_transition_analysis.R` maps the four clusters consistently: **R1** is the cluster with the lowest mean electricity access; among the remaining three, **R4** is the cluster with the highest mean CO2 per capita; between the remaining two, **R2** has the lower mean electricity access; and the remaining cluster becomes **R3** (high access, low energy intensity, and higher modern renewable capacity).
+
+### Why K-Means k = 4 was chosen over k = 2
+
+On purely global internal indices, K-Means at `k = 2` scores higher (Silhouette 0.4451, Davies-Bouldin 0.9291, Calinski-Harabasz 163.44, mean Jaccard 0.9758) than `k = 4` (Silhouette 0.3485, Davies-Bouldin 1.1096, Calinski-Harabasz 120.77, mean Jaccard 0.9533; [`table_04`](output/tables/table_04_model_comparison.csv)). K-Means `k = 4` was selected as the primary model for three reasons:
+
+1. **Why `k = 2` wins geometrically:** The widest single gap in the global data is a coarse binary split between basic-access deficit economies (`B1`, 60 economies) and electrified economies (`B2`, 129 economies).
+2. **Why `k = 2` hides the core policy questions:** `B2` merges clean-power leaders such as Norway and Sweden (`R3`) into the same cluster as fossil-intensive high emitters such as Qatar and Russia (`R4`), while `B1` merges acute traditional-biomass poverty (`R1`, 5% median clean cooking) with expanding transition economies (`R2`, 44%).
+3. **Why specifically `k = 4` (not `k = 3` or `k = 5`):** Among multi-regime models (`k >= 3`) that separate both the biomass paradox (`R1` vs `R2`) and fossil lock-in (`R3` vs `R4`), `k = 4` forms a sharp local stability peak: mean bootstrap Jaccard jumps from 0.7981 at `k = 3` (min 0.6951) to 0.9533 at `k = 4` (min 0.9114, 500/500 replicates, ARI 0.795 vs Ward D2), while `k = 5` drops sharply in compactness (Silhouette 0.2672, min Jaccard 0.8282). The `k = 2` alternative remains selectable directly on the dashboard map.
+
 ### Other core results
 
 - **Method choice and GMM sensitivity:** At `k = 4`, K-Means agrees closely with hierarchical Ward D2 (ARI 0.795) but poorly with BIC-selected ellipsoidal `VEV` GMM (ARI 0.3671, Silhouette 0.1975; [`table_05`](output/tables/table_05_ari_agreement_between_methods.csv)). In `VEV` GMM, two components collapse to tiny standardised `elec_access` variances (0.00308 and 0.00300), consistent with 59.3% of economies sitting at the 100% electricity ceiling ([`table_01`](output/tables/table_01_data_quality_audit_2023.csv)). Switching GMM to spherical `EII` covariance raises Silhouette to 0.3599 and ARI against K-Means to 0.8421 ([`table_11`](output/tables/table_11_gmm_covariance_sensitivity.csv)), showing that the GMM gap reflects sensitivity to covariance specification across all six features.
@@ -51,14 +72,33 @@ The landing page introduces the biomass paradox and links directly to the dashbo
 
 | Tab | What it shows | How to use it |
 |---|---|---|
-| **Regime Map** | Interactive world choropleth, synchronized country inspector panel, and KPI summary strip below the map | Switch **Map layer** across all 6 views (`2023 · K-Means k=4 (chosen model)`, `2023 · K-Means k=2 (binary alternative)`, `2015 · Baseline (projected k=4)`, `2023 · Ward's D2 k=4`, `2023 · PAM k=4`, `2023 · GMM k=4`). Switch **Extent** across **World**, **ASEAN**, **Asia**, **Africa**, **Europe**, **North America**, **South America**, and **Oceania** (per-regime country counts and profile cards update automatically for the chosen region), filter with **Highlight regime** (`All`, `R1` to `R4`), or search via **Find a country** using ISO 3166-1 names, Alpha-3 (`IDN`), or Alpha-2 (`ID`). |
-| **Biomass Paradox** | Interactive scatter plots and multivariate diagnostics (KMO, Bartlett, Hopkins, skewness before/after log transform) | Switch between three views: **Biomass paradox (7.2.1 vs 7.b.1)**, **PCA biplot**, and **Intensity vs CO2**. Use the spotlight pills (**All countries**, **Biomass trap (R1)**, **Indonesia vs ASEAN**, **Mahalanobis outliers**) to isolate groups, and click any point to inspect that economy. |
-| **Model Evaluation** | Full 20-model comparison grid (`k = 2` to `6` across four methods), cross-method ARI matrix, and GMM `VEV` vs `EII` sensitivity check | Compare internal validity (Silhouette, Davies-Bouldin, Calinski-Harabasz, Dunn) alongside `B = 500` bootstrap Jaccard stability to see why `k = 4` K-Means was chosen over `k = 2` and why unconstrained `VEV` GMM diverges. |
+| **Regime Map** | Interactive world choropleth, synchronized country inspector panel, KPI strip, and a built-in regime & method-criteria explainer | Switch **Map layer** across all 6 views (`2023 · K-Means k=4 (chosen model)`, `2023 · K-Means k=2 (binary alternative)`, `2015 · Baseline (projected k=4)`, `2023 · Ward's D2 k=4`, `2023 · PAM k=4`, `2023 · GMM k=4`). Switch **Extent** across **World**, **ASEAN**, **Asia**, **Africa**, **Europe**, **North America**, **South America**, and **Oceania** (per-regime country counts and profile cards update automatically for the chosen region), filter with **Highlight regime** (`All`, `R1` to `R4`), expand the criteria accordion to compare how all four methods form `R1` to `R4`, or search via **Find a country** using ISO 3166-1 names, Alpha-3 (`IDN`), or Alpha-2 (`ID`). |
+| **Biomass Paradox** | Interactive scatter plots with synchronized plot-reading guides, plus multivariate diagnostics (KMO, Bartlett, Hopkins, skewness before/after log transform) | Switch between three views: **Biomass paradox (7.2.1 vs 7.b.1)**, **PCA biplot**, and **Intensity vs CO2** (the guide box directly below the chart updates with quadrant meanings for each view). Use the spotlight pills (**All countries**, **Biomass trap (R1)**, **Indonesia vs ASEAN**, **Mahalanobis outliers**) to isolate groups, and click any point to inspect that economy. |
+| **Model Evaluation** | Full 20-model comparison grid (`k = 2` to `6` across four methods), explicit `k = 4` vs `k = 2` rationale, cross-method ARI matrix, and GMM `VEV` vs `EII` sensitivity check | Compare internal validity (Silhouette, Davies-Bouldin, Calinski-Harabasz, Dunn) alongside `B = 500` bootstrap Jaccard stability to see why `k = 4` K-Means was chosen over `k = 2` and why unconstrained `VEV` GMM diverges. |
 | **2015-2023 & ASEAN** | Interactive 4x4 migration matrix, 11-economy ASEAN benchmark with renewable mix breakdown, FANNY `P1`/`P2` change pathways, and 2023 clean cooking out-of-fold prediction scatter | Hover any matrix cell to preview which countries moved between 2015 and 2023, or click to pin the list. Click any point in the prediction scatter to inspect its actual vs predicted clean cooking values. |
 | **Data & Methods** | Searchable, sortable 189-country data table, indicator dictionary, and methodology accordions | Filter by regime or region (`ASEAN (11)`), search by English or Indonesian country name, Alpha-3, or Alpha-2, sort by any indicator column, and click a row to jump to that country. |
 
-Quick reading tips:
-- **Spotting the biomass paradox:** Look at the **Biomass paradox (7.2.1 vs 7.b.1)** scatter. Economies in the bottom-right corner have high renewable share (%) but very low renewable electricity capacity (W/capita) because their renewable energy comes mainly from household firewood and charcoal.
+### Reading the three Biomass Paradox plots
+
+Each chart preset in the **Biomass Paradox** tab examines a distinct angle of the six-indicator space:
+
+1. **Biomass paradox (`SDG 7.2.1 vs 7.b.1`):** Plots renewable share of final energy (%) on X against installed renewable electricity capacity per person (W, log scale) on Y.
+   - **Lower right (`R1` biomass trap):** High final renewable share (median 78.98%) paired with tiny modern renewable power capacity (median 11.6 W/cap) because household firewood and charcoal dominate energy use.
+   - **Upper right (`R3` modern renewable leaders):** High renewable share backed by thousands of Watts per capita of modern clean power (for example Norway 7,260 W, Sweden 3,817 W, Austria 2,892 W) and universal clean cooking.
+   - **Lower middle (`R2` expanding transition):** Moderate renewable share (median 40.35%) with modest modern generation capacity (median 53.2 W/cap).
+   - **Left (`R4` and fossil-heavy economies):** Very low renewable share (R4 median 1.31%) reflecting fossil-fuel-dominated grids and transport.
+2. **PCA biplot (`PC1` 59.4% vs `PC2` 17.6%, 77.1% total variance):** Compresses all six standardised indicators into two orthogonal axes. **PC1 (horizontal)** tracks energy-access modernisation: moving right increases clean cooking (`r = +0.945`), electricity access (`r = +0.900`), log CO2 (`r = +0.800`), and log renewable capacity (`r = +0.721`), while moving left reflects higher traditional biomass share (`r = -0.772`). **PC2 (vertical)** tracks energy intensity and carbon burden: moving up increases log primary energy intensity (`r = +0.888`) and log CO2 (`r = +0.384`), while moving down reflects higher energy efficiency and modern renewables (`r = -0.257` capacity, `-0.220` share).
+   - **Quadrant II, Upper Left (`PC1 < 0, PC2 > 0`):** Low modern access plus high energy intensity from thermally inefficient wood and charcoal stoves per dollar of GDP (**18/27 R1** and 10 R2).
+   - **Quadrant I, Upper Right (`PC1 > 0, PC2 > 0`):** Full basic access paired with high energy intensity and fossil emissions (**24/26 R4** such as Qatar, Russia, Iran, China, plus 23 higher-intensity R3).
+   - **Quadrant III, Lower Left (`PC1 < 0, PC2 < 0`):** Mid-transition economies expanding access at moderate energy intensity (**31/41 R2** such as Pakistan, Cambodia, Philippines, plus 9 R1).
+   - **Quadrant IV, Lower Right (`PC1 > 0, PC2 < 0`):** Universal access, lowest energy intensity (most efficient), and stronger modern renewable power (**72/95 R3** such as Norway, Sweden, Germany, Viet Nam).
+3. **Energy intensity vs CO2 (`SDG 7.3.1 vs SDG 13`):** Plots primary energy intensity (MJ consumed per 2021 PPP USD of GDP; farther left = more efficient) on X against CO2 per capita (tonnes, log scale) on Y.
+   - **Lower right (`R1`):** High energy intensity (median 5.10 MJ/USD) yet very low fossil CO2 (median 0.17 t/cap), because inefficient household biomass burns many MJ per dollar of output without counting as fossil emissions.
+   - **Lower left (`R2`):** Moderate energy intensity (median 3.47 MJ/USD) and low CO2 (median 0.74 t/cap) as per-capita energy consumption is still expanding.
+   - **Upper left (`R3`):** Most energy-efficient per dollar of GDP (median 2.64 MJ/USD), with moderate per-capita CO2 (median 3.67 t/cap) reflecting higher total consumption per person.
+   - **Upper right (`R4`):** Both high energy intensity (median 5.85 MJ/USD; mean 7.69) and high per-capita CO2 (median 11.99 t/cap) from fossil-heavy industry and power systems.
+
+Additional reading tips:
 - **Reading the country inspector:** Each country's six indicators are plotted against both its regime median and the global median, with 2015 vs 2023 regime labels and its `P1`/`P2` pathway tag.
 - **Comparing model layers:** Switching **Map layer** from `K-Means k=4` to `Ward's D2 k=4`, `PAM k=4`, or `GMM k=4` highlights where different clustering assumptions agree or diverge on individual countries.
 

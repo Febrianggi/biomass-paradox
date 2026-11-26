@@ -447,6 +447,23 @@ details.acc > summary::before { content: "+"; font: 600 16px/1 var(--mono); widt
 details.acc[open] > summary::before { content: "\2212"; }
 details.acc > .acc-body { padding: 0 var(--s4) var(--s4); font-size: 13.5px; }
 
+/* Analytical guide & quadrant breakdown boxes */
+.guide-box {
+  margin-top: var(--s4); padding-top: var(--s4); border-top: 1px solid var(--line); font-size: 13.5px;
+}
+.guide-box h3 { font-size: 14.5px; margin-bottom: 6px; }
+.quad-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); margin-top: var(--s3);
+}
+@media (max-width: 640px) { .quad-grid { grid-template-columns: minmax(0, 1fr); } }
+.quad-cell {
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2);
+  padding: var(--s3); font-size: 13px; line-height: 1.5;
+}
+.quad-cell strong.q-head { display: block; font-size: 13px; margin-bottom: 4px; color: var(--text); }
+.why-list { margin: 8px 0 14px 18px; display: grid; gap: 6px; font-size: 13.5px; line-height: 1.55; }
+.why-list li { padding-left: 2px; }
+
 /* Migration matrix */
 .mig-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
 .mig-grid { display: grid; grid-template-columns: auto repeat(4, minmax(56px, 1fr)); gap: 6px; }
@@ -691,6 +708,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         </div>
 
         <div class="kpi-strip" id="kpi-strip"></div>
+        <section class="card" id="regime-explainer" style="margin-top:var(--s4)" aria-labelledby="h-regime-exp"></section>
         <div class="regime-cards" id="regime-cards"></div>
       </div>
     </div>
@@ -730,6 +748,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
             <div class="svg-chart-wrap" id="eda-svg-wrap"></div>
             <div class="legend-row" id="eda-legend"></div>
             <div class="selected-line" id="eda-selected"></div>
+            <div class="guide-box" id="eda-guide"></div>
           </section>
 
           <section class="card" aria-labelledby="h-eda-diag">
@@ -1040,8 +1059,56 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       modelCurveSub: "Garis titik-titik k = 2 menandai optimum biner kasar; garis putus-putus k = 4 menandai model empat rezim yang dipilih.",
       binaryK2: "Biner k = 2",
       chosenK4: "Terpilih k = 4",
-      whyTitle: "Mengapa k = 4, dan alternatif k = 2",
-      why1: "Secara global k = 2 mencapai Jaccard tertinggi (0,976; Silhouette 0,445), tetapi menggabungkan pemimpin energi bersih dengan negara intensif fosil di B2. Di antara pembagian multi-rezim (k &ge; 3) yang diperlukan untuk memisahkan Paradoks Biomassa dari intensitas fosil, k = 4 adalah puncak stabilitas lokal: Jaccard 0,953, semua klaster &ge; 0,911, naik dari 0,798 di k = 3, sementara Silhouette turun ke 0,267 di k = 5. ARI terhadap Ward's D2 0,795.",
+      whyTitle: "Mengapa K-Means k = 4 dipilih meski skor k = 2 lebih tinggi",
+      why1: "Secara matematis murni, K-Means k = 2 memang mencatat skor validitas internal tertinggi (Silhouette 0,445; Davies-Bouldin 0,929; Calinski-Harabasz 163,4; Jaccard 0,976) dibandingkan k = 4 (Silhouette 0,349; Davies-Bouldin 1,110; Calinski-Harabasz 120,8; Jaccard 0,953). Namun keputusan memilih k = 4 didasarkan pada tiga alasan substantif dan stabilitas:",
+      whyBullets: [
+        "<strong>Mengapa k = 2 unggul secara geometri:</strong> celah terbesar di data global adalah pemisahan biner antara negara defisit akses dasar (B1, 60 negara) dan negara yang sudah terelektrifikasi (B2, 129 negara).",
+        "<strong>Mengapa k = 2 terlalu kasar untuk analisis kebijakan:</strong> B2 mencampurkan pemimpin energi bersih seperti Norwegia dan Swedia (R3) ke kelompok yang sama dengan negara intensif fosil seperti Qatar dan Rusia (R4), sedangkan B1 menggabungkan krisis biomassa akut (R1, memasak bersih median 5%) dengan transisi berkembang (R2, 44%).",
+        "<strong>Mengapa tepat k = 4 (bukan k = 3 atau k = 5):</strong> di antara solusi multi-rezim (k &ge; 3) yang memisahkan Paradoks Biomassa sekaligus ketergantungan fosil, stabilitas bootstrap melonjak di k = 4 (Jaccard naik dari 0,798 pada k = 3 menjadi puncak lokal 0,953 dengan min 0,911; ARI vs Ward's D2 0,795), sementara pada k = 5 Silhouette turun tajam ke 0,267. Solusi k = 2 tetap dipertahankan sebagai alternatif transparan di peta."
+      ],
+      regimeExpTitle: "Apa itu rezim energi-iklim, dan bagaimana negara masuk R1 sampai R4?",
+      regimeExpLead: "Dalam analisis ini, <strong>rezim</strong> bukan peringkat satu indikator atau kategori politik, melainkan pola struktural bersama yang muncul dari enam indikator SDG 7 dan SDG 13 sekaligus (akses listrik, memasak bersih, pangsa EBT final, kapasitas listrik EBT, intensitas energi primer, dan CO2 per kapita). Negara dalam rezim yang sama menghadapi tantangan transisi energi yang serupa.",
+      criteriaSummary: "Kriteria masuk klaster R1 sampai R4 pada keempat metode (tanpa ambang batas manual)",
+      criteriaIntro: "Keempat algoritma bekerja secara tak terawasi (<em>unsupervised</em>) pada 6 fitur yang telah ditransformasi <code>log(1 + x)</code> (untuk kapasitas EBT, intensitas, dan CO2) lalu distandardisasi z-score. Tidak ada aturan potong manual per negara; tiap metode mengelompokkan dengan kriteria matematisnya masing-masing:",
+      criteriaMethods: [
+        ["K-Means (model terpilih)", "Menempatkan tiap negara ke centroid (vektor rata-rata 6 fitur z-score) terdekat berdasarkan jarak Euklides kuadrat (<code>nstart = 100</code>)."],
+        ["Hierarki Ward's D2", "Menggabungkan pasangan klaster secara bertahap dengan kenaikan total varians dalam-klaster terkecil, lalu memotong dendrogram pada k = 4."],
+        ["PAM (K-Medoids)", "Memilih 4 negara nyata sebagai medoid pusat (<code>TZA</code>, <code>PAK</code>, <code>JAM</code>, <code>SVN</code>) lalu mengelompokkan tiap negara ke medoid terdekat (jarak Euklides); lebih tahan terhadap pencilan."],
+        ["GMM (mclust, VEV)", "Memodelkan 4 distribusi normal multivariat berbentuk elipsoidal (pilihan BIC) dan menempatkan tiap negara ke komponen dengan probabilitas posterior tertinggi."]
+      ],
+      criteriaAlign: "<strong>Penyelarasan label R1 sampai R4 (sama untuk semua metode):</strong> setelah 4 klaster terbentuk, label diselaraskan deterministik agar konsisten: <strong>R1</strong> = klaster dengan rata-rata akses listrik terendah; dari 3 klaster sisanya, <strong>R4</strong> = rata-rata CO2 per kapita tertinggi; dari 2 sisanya, <strong>R2</strong> = rata-rata akses listrik lebih rendah; sisanya menjadi <strong>R3</strong> (akses tinggi, efisien, dan EBT modern).",
+      edaGuides: {
+        paradox: {
+          title: "Cara membaca plot Paradoks Biomassa (SDG 7.2.1 vs SDG 7.b.1)",
+          lead: "Sumbu mendatar (X) menunjukkan pangsa energi terbarukan dalam konsumsi energi final (%), sedangkan sumbu tegak (Y) menunjukkan kapasitas pembangkit listrik terbarukan terpasang per kapita (W, skala log).",
+          cells: [
+            ["Kanan bawah · Perangkap biomassa (R1)", "Pangsa EBT sangat tinggi (median 78,98%), tetapi kapasitas listrik EBT sangat kecil (median 11,6 W/kapita) karena energinya didominasi kayu bakar dan arang rumah tangga."],
+            ["Kanan atas · EBT modern (pemimpin R3)", "Pangsa EBT tinggi sekaligus kapasitas pembangkit modern ribuan W/kapita (mis. Norwegia 7.260 W, Swedia 3.817 W, Austria 2.892 W) dengan akses memasak bersih penuh."],
+            ["Tengah bawah · Transisi berkembang (R2)", "Akses listrik mulai meluas, pangsa EBT menengah (40,35%), namun kapasitas listrik terbarukan modern masih terbatas (median 53,2 W/kapita)."],
+            ["Kiri · Dominasi fosil (R4 & sebagian R3)", "Pangsa EBT final rendah (median R4 hanya 1,31%), mencerminkan sistem energi yang bertumpu pada minyak, gas, atau batu bara."]
+          ]
+        },
+        pca: {
+          title: "Cara membaca Biplot PCA: makna sumbu PC1, PC2, dan keempat kuadran",
+          lead: "PCA meringkas 6 indikator menjadi 2 sumbu utama (77,1% varians). <strong>PC1 (59,4%)</strong> adalah sumbu modernisasi akses energi (ke kanan: listrik r = +0,900, memasak bersih r = +0,945, CO2 r = +0,800, kapasitas EBT r = +0,721; ke kiri: pangsa biomassa tradisional r = -0,772). <strong>PC2 (17,6%)</strong> adalah sumbu intensitas energi & beban karbon (ke atas: intensitas energi r = +0,888, CO2 r = +0,384; ke bawah: efisiensi energi & EBT).",
+          cells: [
+            ["Kuadran II · Kiri Atas (PC1 < 0, PC2 > 0)", "Defisit akses energi sekaligus intensitas energi primer tinggi karena tungku biomassa tradisional boros energi per dolar PDB. Dihuni <strong>18/27 negara R1</strong> dan 10 negara R2."],
+            ["Kuadran I · Kanan Atas (PC1 > 0, PC2 > 0)", "Akses listrik dan memasak penuh, tetapi boros energi dan intensif fosil. Dihuni <strong>24/26 negara R4</strong> (mis. Qatar, Rusia, Iran, Tiongkok) dan 23 negara R3 berintensitas tinggi."],
+            ["Kuadran III · Kiri Bawah (PC1 < 0, PC2 < 0)", "Tahap transisi akses energi berkembang dengan intensitas energi lebih moderat. Dihuni <strong>31/41 negara R2</strong> (mis. Pakistan, Kamboja, Filipina) dan 9 negara R1."],
+            ["Kuadran IV · Kanan Bawah (PC1 > 0, PC2 < 0)", "Akses penuh, intensitas energi paling rendah (efisien), dan kapasitas listrik EBT modern kuat. Dihuni <strong>72/95 negara R3</strong> (mis. Norwegia, Swedia, Jerman, Vietnam)."]
+          ]
+        },
+        carbon: {
+          title: "Cara membaca plot Intensitas Energi vs CO2 (SDG 7.3.1 vs SDG 13)",
+          lead: "Sumbu mendatar (X) adalah <strong>intensitas energi primer</strong> (MJ per USD PPP 2021): berapa banyak energi yang dibakar untuk menghasilkan 1 dolar output ekonomi (makin ke kiri makin efisien). Sumbu tegak (Y) adalah <strong>emisi CO2 per kapita</strong> (ton, skala log).",
+          cells: [
+            ["Kiri atas · Efisien per PDB, CO2 menengah-tinggi (R3)", "Ekonomi sudah efisien menghasilkan PDB (median R3 2,64 MJ/$), tetapi volume konsumsi energi per kapita tetap menghasilkan CO2 menengah (median 3,67 t)."],
+            ["Kanan atas · Boros energi & karbon tinggi (R4)", "Intensitas energi tinggi (median R4 5,85 MJ/$; rata-rata 7,69) sekaligus CO2 per kapita tinggi (median 11,99 t) akibat industri berat dan dominasi bahan bakar fosil."],
+            ["Kiri bawah · Intensitas sedang, CO2 rendah (R2)", "Intensitas energi menengah (median R2 3,47 MJ/$) dengan emisi CO2 masih rendah (median 0,74 t) karena konsumsi energi per kapita masih berkembang."],
+            ["Kanan bawah · Intensitas tinggi, CO2 rendah (R1)", "Intensitas energi tinggi (median R1 5,10 MJ/$) namun CO2 sangat rendah (median 0,17 t) karena pembakaran kayu bakar/arang tidak efisien secara termal tetapi bukan emisi fosil."]
+          ]
+        }
+      },
       k2Alt: "Alternatif k=2", k2Split: "Rincian di k=4",
       ariTitle: "Kesepakatan antarmetode (ARI, k = 4)",
       method: "Metode",
@@ -1206,8 +1273,56 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       modelCurveSub: "The dotted line at k = 2 marks the coarse binary peak; the dashed line at k = 4 marks the chosen four-regime model.",
       binaryK2: "Binary k = 2",
       chosenK4: "Chosen k = 4",
-      whyTitle: "Why k = 4, and the k = 2 alternative",
-      why1: "Globally, k = 2 reaches the highest Jaccard (0.976; Silhouette 0.445), but it lumps clean-power leaders together with fossil-intensive states in B2. Among multi-regime splits (k &ge; 3), which are needed to separate the biomass paradox from fossil intensity, k = 4 is the local stability peak: Jaccard 0.953, every cluster &ge; 0.911, up from 0.798 at k = 3, while Silhouette falls to 0.267 at k = 5. ARI with Ward's D2 is 0.795.",
+      whyTitle: "Why K-Means k = 4 was chosen even though k = 2 scores higher",
+      why1: "Strictly on global internal indices, K-Means k = 2 scores higher (Silhouette 0.445; Davies-Bouldin 0.929; Calinski-Harabasz 163.4; Jaccard 0.976) than k = 4 (Silhouette 0.349; Davies-Bouldin 1.110; Calinski-Harabasz 120.8; Jaccard 0.953). Choosing k = 4 rests on three substantive and stability reasons:",
+      whyBullets: [
+        "<strong>Why k = 2 wins geometrically:</strong> the single widest gap in global data is a coarse binary split between energy-deficit economies (B1, 60 countries) and electrified economies (B2, 129 countries).",
+        "<strong>Why k = 2 is too coarse for policy analysis:</strong> B2 lumps clean-power leaders such as Norway and Sweden (R3) together with fossil-intensive emitters such as Qatar and Russia (R4), while B1 merges acute biomass poverty (R1, 5% median clean cooking) with mid-transition economies (R2, 44%).",
+        "<strong>Why specifically k = 4 (not k = 3 or k = 5):</strong> among multi-regime splits (k &ge; 3) that separate both the biomass paradox and fossil lock-in, bootstrap stability jumps sharply at k = 4 (Jaccard rises from 0.798 at k = 3 to a local peak of 0.953 with min 0.911; ARI with Ward's D2 is 0.795), whereas at k = 5 Silhouette drops sharply to 0.267. The k = 2 solution remains available as a transparent alternative on the map."
+      ],
+      regimeExpTitle: "What is an energy-climate regime, and how are countries assigned to R1 to R4?",
+      regimeExpLead: "In this study, a <strong>regime</strong> is not a single-indicator ranking or a political label, but a recurring structural profile across all six SDG 7 and SDG 13 indicators jointly (electricity access, clean cooking, renewable energy share, renewable power capacity, primary energy intensity, and CO2 per person). Countries in the same regime share similar transition constraints.",
+      criteriaSummary: "Cluster assignment criteria for R1 to R4 across all four methods (no manual cut-offs)",
+      criteriaIntro: "All four algorithms run unsupervised on the six features after <code>log(1 + x)</code> transformation (capacity, intensity, CO2) and z-score standardisation. No manual country thresholds are set; each method groups countries by its own mathematical rule:",
+      criteriaMethods: [
+        ["K-Means (chosen model)", "Assigns each country to the nearest cluster centroid (mean vector across the 6 z-scored features) minimising squared Euclidean distance (<code>nstart = 100</code>)."],
+        ["Hierarchical Ward's D2", "Iteratively merges the pair of clusters producing the smallest increase in total within-cluster variance, then cuts the dendrogram at k = 4."],
+        ["PAM (K-Medoids)", "Selects 4 real countries as representative medoids (<code>TZA</code>, <code>PAK</code>, <code>JAM</code>, <code>SVN</code>) and assigns each country to its closest Euclidean medoid; more resistant to outliers."],
+        ["GMM (mclust, VEV)", "Fits 4 ellipsoidal multivariate Gaussian distributions (selected by BIC) via EM and assigns each country to the component with highest posterior probability."]
+      ],
+      criteriaAlign: "<strong>Label alignment for R1 to R4 (identical across all methods):</strong> after 4 clusters are formed, labels are aligned deterministically: <strong>R1</strong> = lowest mean electricity access; of the remaining 3, <strong>R4</strong> = highest mean CO2 per capita; of the remaining 2, <strong>R2</strong> = lower mean electricity access; the last becomes <strong>R3</strong> (high access, efficient, modern renewables).",
+      edaGuides: {
+        paradox: {
+          title: "How to read the Biomass Paradox plot (SDG 7.2.1 vs SDG 7.b.1)",
+          lead: "The horizontal axis (X) shows the renewable share of total final energy consumption (%), while the vertical axis (Y) shows installed renewable electricity capacity per person (W, log scale).",
+          cells: [
+            ["Lower right · Biomass trap (R1)", "Very high renewable share (median 78.98%) paired with minimal renewable power capacity (median 11.6 W/person), driven by household firewood and charcoal."],
+            ["Upper right · Modern renewables (R3 leaders)", "High renewable share backed by thousands of Watts per person in modern power plants (e.g. Norway 7,260 W, Sweden 3,817 W, Austria 2,892 W) and universal clean cooking."],
+            ["Lower middle · Expanding transition (R2)", "Electrification is rising with a moderate renewable share (40.35%), while modern renewable generation capacity remains modest (median 53.2 W/person)."],
+            ["Left · Fossil-dominated systems (R4 & some R3)", "Low final renewable share (R4 median just 1.31%), reflecting energy systems reliant on oil, gas, or coal."]
+          ]
+        },
+        pca: {
+          title: "How to read the PCA Biplot: PC1, PC2, and the four quadrants",
+          lead: "PCA compresses the 6 indicators into 2 axes (77.1% of variance). <strong>PC1 (59.4%)</strong> tracks energy-access modernisation (right: electricity r = +0.900, clean cooking r = +0.945, CO2 r = +0.800, renewable capacity r = +0.721; left: traditional biomass share r = -0.772). <strong>PC2 (17.6%)</strong> tracks energy intensity and carbon load (up: energy intensity r = +0.888, CO2 r = +0.384; down: efficiency and renewables).",
+          cells: [
+            ["Quadrant II · Upper Left (PC1 < 0, PC2 > 0)", "Low modern energy access combined with high primary energy intensity from thermally inefficient wood stoves per dollar of GDP. Holds <strong>18/27 R1</strong> and 10 R2 countries."],
+            ["Quadrant I · Upper Right (PC1 > 0, PC2 > 0)", "Full electricity and clean cooking access, but energy-intensive and fossil-heavy. Holds <strong>24/26 R4</strong> (e.g. Qatar, Russia, Iran, China) and 23 higher-intensity R3 countries."],
+            ["Quadrant III · Lower Left (PC1 < 0, PC2 < 0)", "Expanding access transition with more moderate energy intensity. Holds <strong>31/41 R2</strong> (e.g. Pakistan, Cambodia, Philippines) and 9 R1 countries."],
+            ["Quadrant IV · Lower Right (PC1 > 0, PC2 < 0)", "Universal access, lowest energy intensity (most efficient), and stronger modern renewable capacity. Holds <strong>72/95 R3</strong> (e.g. Norway, Sweden, Germany, Viet Nam)."]
+          ]
+        },
+        carbon: {
+          title: "How to read Energy Intensity vs CO2 (SDG 7.3.1 vs SDG 13)",
+          lead: "The horizontal axis (X) is <strong>primary energy intensity</strong> (MJ per 2021 PPP USD): how much energy is used per dollar of economic output (farther left = more efficient). The vertical axis (Y) is <strong>CO2 per person</strong> (tonnes, log scale).",
+          cells: [
+            ["Upper left · Efficient per GDP, mid-to-high CO2 (R3)", "Efficient economic energy use (R3 median 2.64 MJ/$), while higher overall per-capita consumption keeps CO2 moderate (median 3.67 t)."],
+            ["Upper right · Energy-intensive & high carbon (R4)", "High energy intensity (R4 median 5.85 MJ/$; mean 7.69) paired with high per-capita CO2 (median 11.99 t) from heavy industry and fossil-fuel reliance."],
+            ["Lower left · Moderate intensity, low CO2 (R2)", "Moderate energy intensity (R2 median 3.47 MJ/$) and low CO2 per person (median 0.74 t) as per-capita energy use is still growing."],
+            ["Lower right · High intensity, very low CO2 (R1)", "High energy intensity (R1 median 5.10 MJ/$) yet minimal fossil CO2 (median 0.17 t) because inefficient wood/charcoal stoves consume many MJ per dollar without counting as fossil CO2."]
+          ]
+        }
+      },
       k2Alt: "k=2 alternative", k2Split: "Split at k=4",
       ariTitle: "Agreement between methods (ARI, k = 4)",
       method: "Method",
@@ -1755,6 +1870,24 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     return clean.length ? clean.reduce((s, v) => s + v, 0) / clean.length : null;
   }
 
+  function renderRegimeExplainer() {
+    const t = T();
+    const open = $("acc-method-criteria") && $("acc-method-criteria").open ? " open" : "";
+    $("regime-explainer").innerHTML = `
+      <h2 id="h-regime-exp">${t.regimeExpTitle}</h2>
+      <p style="font-size:13.5px;margin-top:6px">${t.regimeExpLead}</p>
+      <details class="acc" id="acc-method-criteria"${open}>
+        <summary>${t.criteriaSummary}</summary>
+        <div class="acc-body">
+          <p>${t.criteriaIntro}</p>
+          <div class="quad-grid">
+            ${t.criteriaMethods.map(([name, desc]) => `<div class="quad-cell"><strong class="q-head">${name}</strong>${desc}</div>`).join("")}
+          </div>
+          <p style="margin-top:12px">${t.criteriaAlign}</p>
+        </div>
+      </details>`;
+  }
+
   function renderRegimeCards() {
     const t = T();
     const isScoped = state.mapZoom !== "world";
@@ -2025,6 +2158,16 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       <span class="num muted">7.2.1 ${fmt(c.renew_share_2023, 1)}% · 7.b.1 ${fmt(c.renew_cap_2023, 1)} ${t.perCap}</span>
       <button type="button" class="btn small-btn" id="eda-open-map">${t.openMap}</button>`;
     $("eda-open-map").addEventListener("click", goToAtlas);
+
+    const g = t.edaGuides[state.edaPreset];
+    if (g) {
+      $("eda-guide").innerHTML = `
+        <h3>${g.title}</h3>
+        <p class="muted" style="margin-top:4px">${g.lead}</p>
+        <div class="quad-grid">
+          ${g.cells.map(([head, body]) => `<div class="quad-cell"><strong class="q-head">${head}</strong>${body}</div>`).join("")}
+        </div>`;
+    }
   }
 
   function renderEdaDiagnostics() {
@@ -2107,7 +2250,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     ).join("");
 
     $("model-insight-box").innerHTML = `
-      <p style="font-size:13.5px;margin-bottom:10px">${t.why1}</p>
+      <p style="font-size:13.5px;margin-bottom:8px">${t.why1}</p>
+      <ul class="why-list">${t.whyBullets.map((b) => `<li>${b}</li>`).join("")}</ul>
       <div style="overflow-x:auto"><table class="compact-table" style="margin-bottom:14px">
         <thead><tr><th>${t.k2Alt}</th><th class="num">Jaccard</th><th class="num">SDG 7.1.1 / 7.1.2</th><th>${t.k2Split}</th></tr></thead>
         <tbody>${k2Html}</tbody>
@@ -2554,6 +2698,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     document.querySelectorAll(".th-lbl").forEach((el) => { el.textContent = t.thLabels[el.dataset.k]; });
 
     renderKpis();
+    renderRegimeExplainer();
     renderRegimePills();
     renderRegimeCards();
     renderEdaDiagnostics();
