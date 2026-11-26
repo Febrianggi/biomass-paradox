@@ -479,7 +479,15 @@ button.quad-btn[aria-pressed="true"] {
   padding: 3px 7px; border-radius: var(--pill); border: 1px solid var(--line-strong); background: var(--surface);
 }
 button.quad-btn[aria-pressed="true"] .q-count { background: var(--text); color: var(--surface); border-color: var(--text); }
-@media (prefers-reduced-motion: reduce) { button.quad-btn { transition: none; } }
+.pca-quad-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: var(--s3); }
+.pca-quad-bar[hidden] { display: none; }
+.pca-quad-lbl { font-size: 12px; font-weight: 600; color: var(--muted); margin-right: 4px; }
+.pca-quad-hit { fill: transparent; cursor: pointer; transition: fill 140ms ease-out; }
+.pca-quad-hit:hover { fill: var(--ink-soft); }
+.pca-quad-hit.is-active { fill: var(--ink-soft); stroke: var(--line-strong); stroke-width: 1; }
+.pca-quad-wm { pointer-events: none; font: 700 12px/1 var(--mono); fill: var(--muted); opacity: 0.72; }
+.pca-quad-wm.is-active { fill: var(--text); opacity: 1; }
+@media (prefers-reduced-motion: reduce) { button.quad-btn, .pca-quad-hit { transition: none; } }
 .why-list { margin: 8px 0 14px 18px; display: grid; gap: 6px; font-size: 13.5px; line-height: 1.55; }
 .why-list li { padding-left: 2px; }
 
@@ -660,7 +668,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       <button type="button" role="tab" id="tab-atlas" aria-controls="panel-atlas" aria-selected="true">Peta Rezim</button>
       <button type="button" role="tab" id="tab-eda" aria-controls="panel-eda" aria-selected="false" tabindex="-1">Paradoks Biomassa</button>
       <button type="button" role="tab" id="tab-models" aria-controls="panel-models" aria-selected="false" tabindex="-1">Evaluasi Model</button>
-      <button type="button" role="tab" id="tab-asean" aria-controls="panel-asean" aria-selected="false" tabindex="-1">2015-2023 &amp; ASEAN</button>
+      <button type="button" role="tab" id="tab-asean" aria-controls="panel-asean" aria-selected="false" tabindex="-1">2019-2027 &amp; ASEAN</button>
       <button type="button" role="tab" id="tab-data" aria-controls="panel-data" aria-selected="false" tabindex="-1">Data &amp; Metodologi</button>
     </div>
   </div>
@@ -681,7 +689,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
             <select id="map-layer-select">
               <option value="km2023"></option>
               <option value="km2_2023"></option>
-              <option value="km2015"></option>
+              <option value="km2019"></option>
               <option value="proj2027"></option>
               <option value="ward2023"></option>
               <option value="pam2023"></option>
@@ -782,6 +790,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
               </div>
             </div>
             <div class="callout" id="story-callout" role="status" hidden></div>
+            <div class="pca-quad-bar" id="pca-quad-bar" hidden></div>
             <div class="svg-chart-wrap" id="eda-svg-wrap"></div>
             <div class="legend-row" id="eda-legend"></div>
             <div class="selected-line" id="eda-selected"></div>
@@ -852,14 +861,14 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       </div>
     </div>
 
-    <!-- PANEL 4: 2015-2023 & ASEAN -->
+    <!-- PANEL 4: 2019-2027 & ASEAN -->
     <div role="tabpanel" id="panel-asean" aria-labelledby="tab-asean" hidden="until-found">
       <div class="panel-inner">
         <div class="two-col">
           <section class="card" aria-labelledby="h-mig-card">
             <div class="card-head">
               <div>
-                <h2 id="h-mig-card" data-i18n="migTitle">Matriks perpindahan rezim, 2015 ke 2023</h2>
+                <h2 id="h-mig-card" data-i18n="migTitle">Matriks perpindahan rezim, 2019 ke 2023</h2>
                 <p data-i18n="migSub">Arahkan atau fokus ke sel untuk melihat daftarnya; klik untuk menyematkan.</p>
               </div>
             </div>
@@ -867,7 +876,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
               <div id="mig-matrix-box"></div>
               <div class="legend-row small" id="mig-legend"></div>
               <div class="roster" id="mig-list-box" aria-live="polite"></div>
-              <p class="muted small" data-i18n="migNote">Posisi 2015 diproyeksikan ke centroid 2023. Perpindahan adalah perbandingan observasional, bukan estimasi dampak kebijakan.</p>
+              <p class="muted small" data-i18n="migNote">Posisi 2019 diproyeksikan ke centroid 2023. Perpindahan adalah perbandingan observasional, bukan estimasi dampak kebijakan.</p>
             </div>
           </section>
 
@@ -885,24 +894,11 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         <section class="card" style="margin-top:var(--s4)" aria-labelledby="h-path">
           <div class="card-head">
             <div>
-              <h2 id="h-path" data-i18n="pathTitle">Jalur perubahan 2015 ke 2023 (FANNY)</h2>
+              <h2 id="h-path" data-i18n="pathTitle">Jalur perubahan 2019 ke 2023 (FANNY)</h2>
               <p data-i18n="pathSub">Klaster fuzzy atas perubahan keenam indikator, terpisah dari rezim 2023.</p>
             </div>
           </div>
           <div id="path-content"></div>
-        </section>
-
-        <section class="card" style="margin-top:var(--s4)" aria-labelledby="h-fc">
-          <div class="card-head">
-            <div>
-              <h2 id="h-fc" data-i18n="fcTitle">Memprediksi memasak bersih 2023 dari kondisi 2015</h2>
-              <p data-i18n="fcSub">Validasi silang antarnegara atas satu interval historis.</p>
-            </div>
-          </div>
-          <div class="two-col">
-            <div id="fc-content"></div>
-            <div class="svg-chart-wrap" id="fc-scatter-wrap"></div>
-          </div>
         </section>
 
         <section class="card" id="proj27-card" style="margin-top:var(--s4)" aria-labelledby="h-proj27">
@@ -942,7 +938,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           <div class="card-head">
             <div>
               <h2 id="h-idn-policy" data-i18n="idnTitle">Indonesia: akses dasar tercapai, kapasitas listrik terbarukan tertinggal</h2>
-              <p data-i18n="idnSub">Sintesis dari perbandingan 2015 ke 2023 dan pembanding ASEAN.</p>
+              <p data-i18n="idnSub">Sintesis dari perbandingan 2019 ke 2023, proyeksi 2027, dan pembanding ASEAN.</p>
             </div>
           </div>
           <div id="idn-policy-content"></div>
@@ -954,6 +950,14 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     <div role="tabpanel" id="panel-data" aria-labelledby="tab-data" hidden="until-found">
       <div class="panel-inner">
         <div class="control-bar">
+          <div class="field">
+            <span class="field-lbl" id="lbl-table-year" data-i18n="lblTYear">Tahun indikator</span>
+            <div class="seg" role="group" aria-labelledby="lbl-table-year" id="table-year-seg">
+              <button type="button" data-tyear="2019" aria-pressed="false">2019</button>
+              <button type="button" data-tyear="2023" aria-pressed="true">2023</button>
+              <button type="button" data-tyear="2027" aria-pressed="false">2027*</button>
+            </div>
+          </div>
           <div class="field">
             <label for="table-search" data-i18n="lblTSearch">Cari negara / kode ISO3</label>
             <input type="search" id="table-search">
@@ -985,12 +989,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
         <div tabindex="0" role="region" aria-labelledby="country-table-caption" class="table-wrapper" id="country-table-wrap">
           <table class="data-table" id="country-table">
-            <caption id="country-table-caption" data-i18n="tableCaption">189 negara: indikator SDG 7 dan SDG 13 serta hasil klaster (2023)</caption>
+            <caption id="country-table-caption">189 negara: indikator SDG 7 dan SDG 13 (2019, 2023, proyeksi 2027)</caption>
             <thead>
               <tr>
                 <th scope="col" data-type="text"><button type="button"><span class="th-lbl" data-k="country"></span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="text"><button type="button"><span class="th-lbl" data-k="r2019"></span><span class="sort-icon" aria-hidden="true"></span></button></th>
                 <th scope="col" data-type="text"><button type="button"><span class="th-lbl" data-k="regime"></span><span class="sort-icon" aria-hidden="true"></span></button></th>
-                <th scope="col" data-type="text"><button type="button"><span class="th-lbl" data-k="r2015"></span><span class="sort-icon" aria-hidden="true"></span></button></th>
+                <th scope="col" data-type="text"><button type="button"><span class="th-lbl" data-k="r2027"></span><span class="sort-icon" aria-hidden="true"></span></button></th>
                 <th scope="col" data-type="number"><button type="button"><span class="th-lbl" data-k="elec"></span><span class="sort-icon" aria-hidden="true"></span></button></th>
                 <th scope="col" data-type="number"><button type="button"><span class="th-lbl" data-k="cook"></span><span class="sort-icon" aria-hidden="true"></span></button></th>
                 <th scope="col" data-type="number"><button type="button"><span class="th-lbl" data-k="rsh"></span><span class="sort-icon" aria-hidden="true"></span></button></th>
@@ -1035,19 +1040,19 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       dlCsv: "Unduh CSV (189 Negara)",
       title: "Paradoks Biomassa dalam Transisi Energi-Iklim Global",
       thesis: "Pangsa energi terbarukan yang tinggi tidak selalu berarti listrik bersih modern: 189 negara dikelompokkan dengan empat algoritma pada enam indikator SDG 7 dan SDG 13.",
-      tabs: ["Peta Rezim", "Paradoks Biomassa", "Evaluasi Model", "2015-2023 & ASEAN", "Data & Metodologi"],
+      tabs: ["Peta Rezim", "Paradoks Biomassa", "Evaluasi Model", "2019-2027 & ASEAN", "Data & Metodologi"],
       tablistLabel: "Bagian analisis dashboard",
       kpis: [
-        ["189", "negara, 8,02 miliar jiwa", "Enam indikator resmi UN SDG 7 dan 13 lengkap untuk 2015 dan 2023. Data PDB dan urbanisasi tidak dipakai untuk membentuk klaster."],
+        ["189", "negara, 8,02 miliar jiwa", "Enam indikator resmi UN SDG 7 dan 13 lengkap untuk 2019 dan 2023. Data PDB dan urbanisasi tidak dipakai untuk membentuk klaster."],
         ["k = 4", "K-Means, Jaccard 0,953", "Model empat rezim yang dipilih: rata-rata Jaccard bootstrap 0,953 (B = 500), semua klaster di atas 0,91. Alternatif biner k = 2 mencapai 0,976. ARI 0,795 terhadap Ward's D2."],
-        ["22", "negara naik rezim", "7 dari R1 ke R2, 8 dari R2 ke R3, 7 dari R4 ke R3, antara 2015 dan 2023. Perbandingan observasional."],
+        ["6 → 7*", "pindah rezim (2019-2023 & 2027*)", "Antara 2019 dan 2023, 6 negara naik/dekarbonisasi (2 R1→R2, 1 R2→R3, 3 R4→R3, 0 turun). Model 4-tahunan memproyeksikan 7 negara lagi naik pada 2027."],
         ["47,4 W", "listrik EBT per kapita Indonesia", "Akses listrik Indonesia 99,4%, tetapi kapasitas listrik terbarukan per kapita sekitar sepersepuluh Vietnam (476,3 W)."]
       ],
       kpiTip: "Rincian",
       mapLayers: [
         ["km2023", "2023 · K-Means k=4 (model terpilih)"],
         ["km2_2023", "2023 · K-Means k=2 (alternatif biner)"],
-        ["km2015", "2015 · Baseline (proyeksi k=4)"],
+        ["km2019", "2019 · Baseline (proyeksi k=4)"],
         ["proj2027", "2027 · Proyeksi Elastic Net (k=4)"],
         ["ward2023", "2023 · Ward's D2 k=4"],
         ["pam2023", "2023 · PAM k=4"],
@@ -1078,7 +1083,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       ofGlobal: (scope, n, total) => `${scope} · ${n}/${total} global`,
       noDataMap: "Tidak dianalisis (data tidak lengkap)",
       thLabels: {
-        country: "Negara", regime: "Rezim 2023", r2015: "2015",
+        country: "Negara", r2019: "2019", regime: "2023", r2027: "2027*",
         elec: "Listrik (%)", cook: "Memasak bersih (%)", rsh: "Pangsa EBT (%)",
         rcap: "Kapasitas EBT (W/kap)", eint: "Intensitas (MJ/$)", co2: "CO2 (t/kap)", sil: "Silhouette"
       },
@@ -1091,7 +1096,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       subMed: (r, rv, gv) => `Median ${r} ${rv} · global ${gv}`,
       consensus: (n) => `${n}/4 metode sepakat`,
       consensusNote: "Label Ward's D2, PAM, dan GMM diselaraskan dengan K-Means.",
-      migLine: (c, k2) => `2015 <strong>${c.kode_2015}</strong> ke 2023 <strong>${c.kode_2023}</strong>${c.kode_2027 ? ` · proyeksi 2027 <strong>${c.kode_2027}</strong>` : ""} · k=2: <strong>${k2}</strong> · Populasi <strong class="num">${fmt(c.population_m, 1)} juta</strong> · Silhouette <strong class="num">${fmt(c.sil_width, 3)}</strong>`,
+      migLine: (c, k2) => `2019 <strong>${c.kode_2019}</strong> ke 2023 <strong>${c.kode_2023}</strong>${c.kode_2027 ? ` · proyeksi 2027 <strong>${c.kode_2027}</strong>` : ""} · k=2: <strong>${k2}</strong> · Populasi <strong class="num">${fmt(c.population_m, 1)} juta</strong> · Silhouette <strong class="num">${fmt(c.sil_width, 3)}</strong>`,
       countries: "negara",
       popLbl: "Populasi 2023",
       gdpExtLbl: "Median PDB PPP (eksternal)",
@@ -1191,9 +1196,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       spec: "Spesifikasi", varElec: "Var. listrik", varCook: "Var. memasak",
       evalTitle: "Evaluasi 20 konfigurasi (4 metode x 5 nilai k)",
       evalSub: "Baris bertanda adalah model terpilih: K-Means, k = 4.",
-      migTitle: "Matriks perpindahan rezim, 2015 ke 2023",
+      migTitle: "Matriks perpindahan rezim, 2019 ke 2023",
       migSub: "Arahkan atau fokus ke sel untuk melihat daftarnya; klik untuk menyematkan.",
-      migNote: "Posisi 2015 diproyeksikan ke centroid 2023. Perpindahan adalah perbandingan observasional, bukan estimasi dampak kebijakan.",
+      migNote: "Posisi 2019 diproyeksikan ke centroid 2023. Perpindahan adalah perbandingan observasional 4 tahun, bukan estimasi dampak kebijakan.",
       migUp: (n) => `Naik rezim (${n} negara)`,
       migDown: (n) => `Turun ke R4 (${n} negara)`,
       migStay: "Bertahan",
@@ -1203,7 +1208,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       aseanSub: "Kapasitas terpasang, Watt per kapita, menurut teknologi (2023).",
       techs: ["Air", "Surya", "Angin", "Panas bumi", "Bioenergi"],
       idnTitle: "Indonesia: akses dasar tercapai, kapasitas listrik terbarukan tertinggal",
-      idnSub: "Sintesis dari perbandingan 2015 ke 2023 dan pembanding ASEAN.",
+      idnSub: "Sintesis dari perbandingan 2019 ke 2023, proyeksi 2027, dan pembanding ASEAN.",
+      lblTYear: "Tahun indikator",
       lblTSearch: "Cari negara / kode ISO3",
       tSearchPh: "Indonesia, IDN, VNM...",
       lblTRegime: "Rezim 2023",
@@ -1212,38 +1218,39 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       tRegionOpts: ["Semua wilayah", "ASEAN (11)"],
       resetBtn: "Reset filter",
       emptyMsg: "Tidak ada negara yang cocok dengan filter saat ini.",
-      tableCaption: "189 negara: indikator SDG 7 dan SDG 13 serta hasil klaster (2023)",
-      barNote: "Batang tipis di belakang angka: kapasitas EBT dan CO2 memakai skala log(1 + x) terhadap nilai maksimum; Silhouette memakai skala linear 0 sampai maksimum (nilai negatif ditampilkan tanpa batang).",
+      tableCaptionFn: (yr) => yr === "2027"
+        ? "189 negara: indikator proyeksi 2027* (Elastic Net 4-tahunan) serta rezim 2019, 2023, dan 2027*"
+        : `189 negara: indikator SDG 7 dan SDG 13 tahun ${yr} serta rezim 2019, 2023, dan 2027*`,
+      barNote: "Batang tipis di belakang angka: kapasitas EBT dan CO2 memakai skala log(1 + x) terhadap nilai maksimum; Silhouette memakai skala linear 0 sampai maksimum (nilai negatif ditampilkan tanpa batang). Tahun 2027* adalah proyeksi Elastic Net 4-tahunan.",
       sortStatus: (lbl, dir, n) => `Diurutkan menurut ${lbl}, ${dir === "ascending" ? "naik" : "turun"}, ${n} baris`,
-      dictTitle: "Kamus indikator resmi",
+      dictTitle: "Kamus indikator resmi (2019, 2023, dan proyeksi 2027*)",
       leakTitle: "Protokol pencegahan kebocoran data",
-      indicator: "Indikator", varCode: "Kode variabel", coverage: "Cakupan 2023", globalMed: "Median global", role: "Transformasi",
-      leakText: (h) => `<p>(1) PDB per kapita PPP (uji Kruskal-Wallis eksternal H = ${h}, p &lt; 1e-24), tingkat urbanisasi, dan klasifikasi wilayah Bank Dunia tidak dipakai untuk membentuk klaster.</p><p style="margin-top:8px">(2) Data baseline 2015 ditransformasi dan distandardisasi dengan rata-rata serta simpangan baku 2023 sebelum dipetakan ke centroid terdekat, sehingga batas rezim tetap sama antarwaktu.</p>`,
+      litTitle: "Landasan jurnal ilmiah 10 tahun terakhir (2017-2025): mengapa Paradoks Biomassa?",
+      litHtml: `<p style="margin-bottom:8px">Pemilihan pertanyaan riset tentang <strong>Paradoks Biomassa</strong>, keenam indikator SDG 7 &amp; 13, metode <em>clustering</em> rezim, dan sorotan Indonesia-ASEAN berlandaskan jurnal peer-reviewed 2017-2025:</p>
+        <ul class="why-list">
+          <li><strong>Distorsi biomassa tradisional &amp; memasak bersih (SDG 7.2.1 vs 7.1.2):</strong> <a href="https://doi.org/10.1038/s41467-021-26036-x" target="_blank" rel="noopener">Stoner dkk. (2021, <em>Nature Communications</em> 12:5793)</a> memodelkan 6 bahan bakar memasak global dan menunjukkan dominasi persisten kayu bakar/arang di negara berpendapatan rendah; <a href="https://doi.org/10.1016/j.esd.2017.11.003" target="_blank" rel="noopener">Rosenthal dkk. (2017/2018, <em>Energy for Sustainable Development</em> 42:152-159)</a> menekankan evaluasi terpadu lintas indikator agar target memasak bersih tidak bias oleh angka agregat.</li>
+          <li><strong>Sinergi &amp; trade-off multivariat SDG 7 dan SDG 13:</strong> <a href="https://doi.org/10.1038/s41560-017-0036-5" target="_blank" rel="noopener">Fuso Nerini dkk. (2017/2018, <em>Nature Energy</em> 3:10-15)</a> memetakan sinergi dan konflik antara target energi dan iklim; <a href="https://doi.org/10.1016/j.esr.2019.01.006" target="_blank" rel="noopener">Gielen dkk. (2019, <em>Energy Strategy Reviews</em> 24:38-50)</a> menegaskan pemisahan antara biomassa tradisional vs ekspansi kapasitas pembangkit listrik EBT modern (<code>7.b.1</code>) dan efisiensi intensitas energi (<code>7.3.1</code>).</li>
+          <li><strong>Tipologi rezim negara berbasis clustering:</strong> <a href="https://doi.org/10.1016/j.apenergy.2022.119167" target="_blank" rel="noopener">He dkk. (2022, <em>Applied Energy</em> 317:119167)</a> menilai jejak EBT lintas negara menuju 2030, sementara <a href="https://doi.org/10.3390/app15031575" target="_blank" rel="noopener">Eşiyok &amp; Antmen (2025, <em>Applied Sciences</em> 15(3):1575)</a> memakai <em>K-Means clustering</em> multivariat untuk memetakan klaster pertumbuhan EBT antarnegara.</li>
+          <li><strong>Sorotan transisi energi Indonesia:</strong> <a href="https://doi.org/10.1080/00074918.2023.2238336" target="_blank" rel="noopener">Resosudarmo, Rezki, &amp; Effendi (2023, <em>Bulletin of Indonesian Economic Studies</em> 59(2):149-177)</a> membedah hambatan struktural Indonesia yang sudah mencapai elektrifikasi tinggi namun masih tertinggal pada kapasitas listrik terbarukan modern.</li>
+        </ul>`,
+      indicator: "Indikator", varCode: "Kode variabel", coverage: "Cakupan 2019 & 2023", globalMed: "Median global 2023", role: "Transformasi",
+      leakText: (h) => `<p>(1) PDB per kapita PPP (uji Kruskal-Wallis eksternal H = ${h}, p &lt; 1e-24), tingkat urbanisasi, dan klasifikasi wilayah Bank Dunia tidak dipakai untuk membentuk klaster.</p><p style="margin-top:8px">(2) Data baseline 2019 maupun proyeksi 2027* ditransformasi dan distandardisasi dengan rata-rata serta simpangan baku 2023 sebelum dipetakan ke centroid terdekat, sehingga batas rezim tetap sama antarwaktu.</p>`,
       footer: 'Sumber data: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) dan World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). Seluruh angka diekspor dari <code>sdg_energy_transition_analysis.R</code> (seed = 2026).',
       loadError: "Gagal memuat berkas data dashboard.",
-      pathTitle: "Jalur perubahan 2015 ke 2023 (FANNY)",
-      pathSub: "Klaster fuzzy atas perubahan keenam indikator, terpisah dari rezim 2023.",
-      pathLead: (k, r, sil, jac, aPam, aRaw, aReg, weak) => `FANNY (eksponen keanggotaan ${r}) atas perubahan terstandardisasi: selisih poin persen untuk akses listrik, memasak bersih, dan pangsa EBT; selisih log(1 + x) untuk kapasitas EBT, intensitas energi, dan CO2. Aturan pemilihan memberi k = ${k} (Jaccard sub-sampel ${jac}, Silhouette ${sil}). ${weak ? `<strong>Strukturnya lemah:</strong> Silhouette di bawah 0,25, kesesuaian dengan PAM pada fitur yang sama hanya ARI ${aPam}, dan dengan selisih mentah ARI ${aRaw}. Baca jalur sebagai ringkasan arah perubahan, bukan kelompok yang tegas.` : `Kesesuaian dengan PAM ARI ${aPam}, dengan selisih mentah ARI ${aRaw}.`} Kesesuaian dengan rezim 2023 hanya ARI ${aReg}, jadi jalur ini menggambarkan hal yang berbeda dari posisi tahun 2023.`,
+      pathTitle: "Jalur perubahan 2019 ke 2023 (FANNY)",
+      pathSub: "Klaster fuzzy atas perubahan 4 tahun keenam indikator, terpisah dari rezim 2023.",
+      pathLead: (k, r, sil, jac, aPam, aRaw, aReg, weak) => `FANNY (eksponen keanggotaan ${r}) atas perubahan terstandardisasi 2019 ke 2023: selisih poin persen untuk akses listrik, memasak bersih, dan pangsa EBT; selisih log(1 + x) untuk kapasitas EBT, intensitas energi, dan CO2. Aturan pemilihan memberi k = ${k} (Jaccard sub-sampel ${jac}, Silhouette ${sil}). ${weak ? `<strong>Strukturnya lemah:</strong> Silhouette di bawah 0,25 meski kesesuaian dengan PAM mencapai ARI ${aPam} dan dengan selisih mentah ARI ${aRaw}. Baca jalur sebagai ringkasan arah perubahan 4 tahun, bukan kelompok yang tegas.` : `Kesesuaian dengan PAM ARI ${aPam}, dengan selisih mentah ARI ${aRaw}.`} Kesesuaian dengan rezim 2023 hanya ARI ${aReg}, jadi jalur ini menggambarkan arah perubahan, bukan posisi statis 2023.`,
       pathCols: ["Jalur", "n", "Keanggotaan rerata", "Listrik (pp)", "Memasak bersih (pp)", "Pangsa EBT (pp)", "Kapasitas EBT (W/kap)", "Intensitas (MJ/$)", "CO2 (t/kap)", "Rezim 2023"],
-      pathMedNote: "Median perubahan 2015 ke 2023 dalam satuan asli. Perubahan bersifat deskriptif, bukan dampak kebijakan.",
+      pathMedNote: "Median perubahan 2019 ke 2023 dalam satuan asli. Perubahan bersifat deskriptif, bukan dampak kebijakan.",
       pathKSummary: "Perbandingan k = 2 sampai 6 (FANNY, PAM, dan selisih mentah)",
       pathKCols: ["Metode", "Fitur", "k", "Ukuran", "Silhouette", "Dunn ternormalisasi", "Keanggotaan maks.", "% ambigu", "Jaccard rerata", "Jaccard min.", "ARI rerata"],
-      pathKNote: (b) => `Stabilitas: ${b} sub-sampel 80% tanpa pengembalian, label disejajarkan ke solusi penuh dengan permutasi terbaik. Ambigu: selisih dua keanggotaan tertinggi di bawah 0,2. Grid eksponen keanggotaan {2; 1,7; 1,5; 1,3; 1,2} dan ambang struktur lemah (Silhouette 0,25, Jaccard 0,75) adalah pilihan eksploratif yang ditetapkan setelah fit awal, ketika eksponen bawaan 2 menghasilkan keanggotaan seragam.`,
+      pathKNote: (b) => `Stabilitas: ${b} sub-sampel 80% tanpa pengembalian, label disejajarkan ke solusi penuh dengan permutasi terbaik. Ambigu: selisih dua keanggotaan tertinggi di bawah 0,2. Grid eksponen keanggotaan {2; 1,7; 1,5; 1,3; 1,2} dan ambang struktur lemah (Silhouette 0,25, Jaccard 0,75) adalah pilihan eksploratif yang ditetapkan setelah fit awal.`,
       featLbl: { log_diff_std: "selisih log, z", raw_diff_std: "selisih mentah, z" },
-      pathLine: (pw, fc, c) => `Jalur perubahan <strong>${pw.pathway}</strong> (keanggotaan <strong class="num">${fmt(pw.memb_max, 2)}</strong>) · Memasak bersih 2023 <strong class="num">${fmt(c.cooking_2023, 0)}%</strong>, prediksi elastic net <strong class="num">${fmt(fc.elastic_net, 1)}%</strong>, persistensi <strong class="num">${fmt(fc.persistence, 0)}%</strong>`,
-      fcTitle: "Memprediksi memasak bersih 2023 dari kondisi 2015",
-      fcSub: "Validasi silang antarnegara atas satu interval historis.",
-      fcLead: (k) => `Target: akses memasak bersih 2023 (SDG 7.1.2). Prediktor hanya data 2015. ${k} lipatan luar yang sama untuk ketiga model; alpha dan lambda elastic net dipilih di lipatan dalam, dan standardisasi dipelajari dari data latih saja. Prediksi di luar 0 sampai 100 dipotong ke rentang itu, aturan yang ditetapkan sebelum fit. Hasil ini adalah validasi antarnegara untuk satu interval (2015 ke 2023), bukan peramalan tahun mendatang.`,
-      fcModels: { persistence: "Persistensi (nilai 2015)", ols_cook2015: "Regresi linear, memasak 2015", elastic_net: "Elastic net, enam indikator 2015" },
-      fcCols: ["Model", "MAE (pp)", "RMSE (pp)", "Prediksi mentah di luar 0-100"],
-      fcCmpCols: ["Perbandingan", "Selisih MAE (pp)", "IK 95% (sampel ulang berpasangan galat out-of-fold)"],
-      fcVerdict: (dP, loP, hiP, dO, loO, hiO) => `Pada interval ini, MAE elastic net lebih rendah daripada persistensi (selisih ${dP} pp, IK 95% ${loP} sampai ${hiP}) dan daripada regresi memasak 2015 (selisih ${dO} pp, IK 95% ${loO} sampai ${hiO}). Interval berasal dari pengambilan sampel ulang berpasangan atas galat out-of-fold yang sudah ada. Perbandingan dengan regresi mengubah prediktor sekaligus metode estimasi, jadi selisihnya mengukur kinerja model secara keseluruhan dan tidak memisahkan sumbangan lima indikator tambahan.`,
-      fcScatterNote: "Warna titik = rezim 2023. Garis putus-putus = prediksi sama dengan nilai aktual. Klik titik untuk memilih negara.",
-      fcTip: (c, f) => `<strong>${cName(c)} (${c.iso3})</strong> · ${c.kode_2023}<br>Aktual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistensi: ${fmt(f.persistence, 0)}%`,
-      fcAxisX: "Aktual 2023 (%)", fcAxisY: "Prediksi out-of-fold elastic net (%)",
-      fcScatterAria: "Memasak bersih 2023 aktual terhadap prediksi out-of-fold elastic net, 189 negara",
+      pathLine: (pw, c) => `Jalur perubahan 2019-2023 <strong>${pw.pathway}</strong> (keanggotaan <strong class="num">${fmt(pw.memb_max, 2)}</strong>) · Proyeksi memasak bersih 2027 <strong class="num">${fmt(c.cooking_2027, 1)}%</strong> (2023: ${fmt(c.cooking_2023, 0)}%) · margin centroid 2027 <strong class="num">${fmt(c.margin_centroid_2027, 3)}</strong>`,
       edaQuadLbl: "Kuadran PCA disorot",
-      edaQuadClickHint: "Klik kartu kuadran di bawah untuk menyorot negara di kuadran tersebut.",
+      pcaQuadBarLbl: "Sorot kuadran:",
+      pcaQuadShort: { Q1: "K-1", Q2: "K-2", Q3: "K-3", Q4: "K-4" },
+      pcaQuadAria: "Sorot negara berdasarkan kuadran Biplot PCA",
       proj27Title: "Proyeksi 2027 dan potensi perpindahan rezim (horizon 4 tahun)",
       proj27Sub: "Dilatih dan divalidasi silang pada interval 2019 ke 2023, lalu diproyeksikan ke 2027 dari kondisi 2023.",
       proj27Lead: (nShift, accEn, accPers) => `Data resmi UNSD/Bank Dunia tahun 2025-2026 belum tersedia (0 baris pada seri SDG 7), sedangkan 2019 lengkap pada seluruh 189 negara. Model Elastic Net 4-tahunan dilatih pada <strong>2019 ke 2023</strong> (akurasi rezim out-of-fold <strong class="num">${accEn}%</strong> vs persistensi <strong class="num">${accPers}%</strong>), lalu diisi fitur 2023 untuk memproyeksikan 2027. Sebanyak <strong>${nShift} negara</strong> diproyeksikan berpindah rezim (0 turun). <em>Catatan: proyeksi out-of-sample dengan asumsi pola 2019-2023 berlanjut; perhatikan margin centroid untuk membedakan perpindahan jelas vs tipis di perbatasan.</em>`,
@@ -1282,19 +1289,19 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       dlCsv: "Download CSV (189 Countries)",
       title: "The Biomass Paradox in the Global Energy and Climate Transition",
       thesis: "A high renewable share does not always mean modern clean power: 189 countries clustered with four algorithms on six SDG 7 and SDG 13 indicators.",
-      tabs: ["Regime Map", "Biomass Paradox", "Model Evaluation", "2015-2023 & ASEAN", "Data & Methods"],
+      tabs: ["Regime Map", "Biomass Paradox", "Model Evaluation", "2019-2027 & ASEAN", "Data & Methods"],
       tablistLabel: "Dashboard analysis sections",
       kpis: [
-        ["189", "countries, 8.02 billion people", "Six official UN SDG 7 and 13 indicators complete for 2015 and 2023. GDP and urbanisation are kept out of cluster formation."],
+        ["189", "countries, 8.02 billion people", "Six official UN SDG 7 and 13 indicators complete for 2019 and 2023. GDP and urbanisation are kept out of cluster formation."],
         ["k = 4", "K-Means, Jaccard 0.953", "The chosen four-regime model: mean bootstrap Jaccard 0.953 (B = 500), every cluster above 0.91. The binary k = 2 alternative reaches 0.976. ARI 0.795 with Ward's D2."],
-        ["22", "countries moved up", "7 from R1 to R2, 8 from R2 to R3, 7 from R4 to R3, between 2015 and 2023. An observational comparison."],
+        ["6 → 7*", "regime shifts (2019-2023 & 2027*)", "Between 2019 and 2023, 6 economies moved up/lower-carbon (2 R1→R2, 1 R2→R3, 3 R4→R3, 0 down). The 4-year model projects 7 more shifts by 2027."],
         ["47.4 W", "renewable power per person, Indonesia", "Indonesia has 99.4% electricity access, yet its renewable capacity per person is about a tenth of Viet Nam's (476.3 W)."]
       ],
       kpiTip: "Details",
       mapLayers: [
         ["km2023", "2023 · K-Means k=4 (chosen model)"],
         ["km2_2023", "2023 · K-Means k=2 (binary alternative)"],
-        ["km2015", "2015 · Baseline (projected k=4)"],
+        ["km2019", "2019 · Baseline (projected k=4)"],
         ["proj2027", "2027 · Elastic Net projection (k=4)"],
         ["ward2023", "2023 · Ward's D2 k=4"],
         ["pam2023", "2023 · PAM k=4"],
@@ -1325,7 +1332,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       ofGlobal: (scope, n, total) => `${scope} · ${n}/${total} global`,
       noDataMap: "Not modelled (incomplete data)",
       thLabels: {
-        country: "Country", regime: "2023 regime", r2015: "2015",
+        country: "Country", r2019: "2019", regime: "2023", r2027: "2027*",
         elec: "Electricity (%)", cook: "Clean cooking (%)", rsh: "Renew. share (%)",
         rcap: "Renew. cap. (W/cap)", eint: "Intensity (MJ/$)", co2: "CO2 (t/cap)", sil: "Silhouette"
       },
@@ -1338,7 +1345,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       subMed: (r, rv, gv) => `${r} median ${rv} · global ${gv}`,
       consensus: (n) => `${n}/4 methods agree`,
       consensusNote: "Ward's D2, PAM and GMM labels are aligned to K-Means.",
-      migLine: (c, k2) => `2015 <strong>${c.kode_2015}</strong> to 2023 <strong>${c.kode_2023}</strong>${c.kode_2027 ? ` · 2027 proj. <strong>${c.kode_2027}</strong>` : ""} · k=2: <strong>${k2}</strong> · Population <strong class="num">${fmt(c.population_m, 1)}M</strong> · Silhouette <strong class="num">${fmt(c.sil_width, 3)}</strong>`,
+      migLine: (c, k2) => `2019 <strong>${c.kode_2019}</strong> to 2023 <strong>${c.kode_2023}</strong>${c.kode_2027 ? ` · 2027 proj. <strong>${c.kode_2027}</strong>` : ""} · k=2: <strong>${k2}</strong> · Population <strong class="num">${fmt(c.population_m, 1)}M</strong> · Silhouette <strong class="num">${fmt(c.sil_width, 3)}</strong>`,
       countries: "countries",
       popLbl: "2023 population",
       gdpExtLbl: "Median GDP PPP (external)",
@@ -1438,9 +1445,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       spec: "Specification", varElec: "Var. electricity", varCook: "Var. cooking",
       evalTitle: "Evaluation of 20 configurations (4 methods x 5 values of k)",
       evalSub: "The marked row is the chosen model: K-Means, k = 4.",
-      migTitle: "Regime transition matrix, 2015 to 2023",
+      migTitle: "Regime transition matrix, 2019 to 2023",
       migSub: "Hover or focus a cell to list its countries; click to pin.",
-      migNote: "2015 positions are projected onto the 2023 centroids. Transitions are an observational comparison, not estimates of policy effects.",
+      migNote: "2019 positions are projected onto the 2023 centroids. Transitions are an observational 4-year comparison, not estimates of policy effects.",
       migUp: (n) => `Moved up (${n} countries)`,
       migDown: (n) => `Moved into R4 (${n} countries)`,
       migStay: "Stayed",
@@ -1450,7 +1457,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       aseanSub: "Installed capacity, Watts per person, by technology (2023).",
       techs: ["Hydro", "Solar", "Wind", "Geothermal", "Bioenergy"],
       idnTitle: "Indonesia: basic access reached, renewable power capacity lagging",
-      idnSub: "Synthesis of the 2015 to 2023 comparison and the ASEAN benchmark.",
+      idnSub: "Synthesis of the 2019 to 2023 comparison, 2027 projection, and ASEAN benchmark.",
+      lblTYear: "Indicator year",
       lblTSearch: "Search country / ISO3 code",
       tSearchPh: "Indonesia, IDN, VNM...",
       lblTRegime: "2023 regime",
@@ -1459,38 +1467,39 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       tRegionOpts: ["All regions", "ASEAN (11)"],
       resetBtn: "Reset filters",
       emptyMsg: "No countries match the current filters.",
-      tableCaption: "189 countries: SDG 7 and SDG 13 indicators and cluster results (2023)",
-      barNote: "Thin bars behind the numbers: renewable capacity and CO2 use a log(1 + x) scale against the maximum; Silhouette uses a linear scale from 0 to the maximum (negative values show no bar).",
+      tableCaptionFn: (yr) => yr === "2027"
+        ? "189 countries: projected 2027* indicators (4-year Elastic Net) and 2019, 2023, 2027* regimes"
+        : `189 countries: ${yr} SDG 7 and SDG 13 indicators and 2019, 2023, 2027* regimes`,
+      barNote: "Thin bars behind the numbers: renewable capacity and CO2 use a log(1 + x) scale against the maximum; Silhouette uses a linear scale from 0 to the maximum (negative values show no bar). 2027* values are 4-year Elastic Net projections.",
       sortStatus: (lbl, dir, n) => `Sorted by ${lbl}, ${dir}, ${n} rows`,
-      dictTitle: "Official indicator dictionary",
+      dictTitle: "Official indicator dictionary (2019, 2023, and 2027* projections)",
       leakTitle: "Data leakage prevention protocol",
-      indicator: "Indicator", varCode: "Variable code", coverage: "2023 coverage", globalMed: "Global median", role: "Transformation",
-      leakText: (h) => `<p>(1) GDP per person PPP (external Kruskal-Wallis H = ${h}, p &lt; 1e-24), urbanisation and World Bank regions are excluded from cluster formation.</p><p style="margin-top:8px">(2) 2015 baseline values are transformed and standardised with the 2023 means and standard deviations before nearest-centroid projection, so regime boundaries stay fixed over time.</p>`,
+      litTitle: "Peer-reviewed journal foundation (2017-2025): why the Biomass Paradox?",
+      litHtml: `<p style="margin-bottom:8px">The focus on the <strong>Biomass Paradox</strong>, joint six-indicator SDG 7 &amp; 13 modelling, country regime clustering, and the Indonesia-ASEAN spotlight is grounded in peer-reviewed journals from the last decade (2017-2025):</p>
+        <ul class="why-list">
+          <li><strong>Traditional biomass distortion &amp; clean cooking (SDG 7.2.1 vs 7.1.2):</strong> <a href="https://doi.org/10.1038/s41467-021-26036-x" target="_blank" rel="noopener">Stoner et al. (2021, <em>Nature Communications</em> 12:5793)</a> model six household cooking fuels globally and show persistent firewood/charcoal reliance in low-income nations; <a href="https://doi.org/10.1016/j.esd.2017.11.003" target="_blank" rel="noopener">Rosenthal et al. (2017/2018, <em>Energy for Sustainable Development</em> 42:152-159)</a> call for integrated multi-indicator evaluation so clean cooking needs are not masked by aggregate metrics.</li>
+          <li><strong>Multivariate SDG 7 &amp; SDG 13 synergies and trade-offs:</strong> <a href="https://doi.org/10.1038/s41560-017-0036-5" target="_blank" rel="noopener">Fuso Nerini et al. (2017/2018, <em>Nature Energy</em> 3:10-15)</a> map synergies and trade-offs between energy and climate goals; <a href="https://doi.org/10.1016/j.esr.2019.01.006" target="_blank" rel="noopener">Gielen et al. (2019, <em>Energy Strategy Reviews</em> 24:38-50)</a> highlight the structural distinction between traditional biomass, modern renewable power capacity (<code>7.b.1</code>), and energy intensity reduction (<code>7.3.1</code>).</li>
+          <li><strong>Country-level regime clustering:</strong> <a href="https://doi.org/10.1016/j.apenergy.2022.119167" target="_blank" rel="noopener">He et al. (2022, <em>Applied Energy</em> 317:119167)</a> assess national renewable footprints under SDG 7 toward 2030, while <a href="https://doi.org/10.3390/app15031575" target="_blank" rel="noopener">Eşiyok &amp; Antmen (2025, <em>Applied Sciences</em> 15(3):1575)</a> apply multivariate K-Means clustering to classify countries by renewable growth and transition performance.</li>
+          <li><strong>Indonesia transition spotlight:</strong> <a href="https://doi.org/10.1080/00074918.2023.2238336" target="_blank" rel="noopener">Resosudarmo, Rezki, &amp; Effendi (2023, <em>Bulletin of Indonesian Economic Studies</em> 59(2):149-177)</a> examine Indonesia's structural bottlenecks where near-universal electrification coexists with lagging modern renewable generation.</li>
+        </ul>`,
+      indicator: "Indicator", varCode: "Variable code", coverage: "2019 & 2023 coverage", globalMed: "2023 global median", role: "Transformation",
+      leakText: (h) => `<p>(1) GDP per person PPP (external Kruskal-Wallis H = ${h}, p &lt; 1e-24), urbanisation and World Bank regions are excluded from cluster formation.</p><p style="margin-top:8px">(2) Both 2019 baseline values and 2027* projections are transformed and standardised with the 2023 means and standard deviations before nearest-centroid projection, so regime boundaries stay fixed over time.</p>`,
       footer: 'Data: UN Statistics Division SDG Indicators Database (<a href="https://unstats.un.org/sdgs/dataportal/database" target="_blank" rel="noopener">unstats.un.org/sdgs</a>) and World Bank Open Data (<a href="https://data.worldbank.org" target="_blank" rel="noopener">data.worldbank.org</a>). All figures are exported from <code>sdg_energy_transition_analysis.R</code> (seed = 2026).',
       loadError: "Could not load the dashboard data file.",
-      pathTitle: "Change pathways, 2015 to 2023 (FANNY)",
-      pathSub: "Fuzzy clusters of the change in all six indicators, kept separate from the 2023 regimes.",
-      pathLead: (k, r, sil, jac, aPam, aRaw, aReg, weak) => `FANNY (membership exponent ${r}) on standardised changes: percentage-point differences for electricity access, clean cooking and renewable share; differences of log(1 + x) for renewable capacity, energy intensity and CO2. The selection rule gives k = ${k} (subsample Jaccard ${jac}, Silhouette ${sil}). ${weak ? `<strong>The structure is weak:</strong> Silhouette is below 0.25, agreement with PAM on the same features is only ARI ${aPam}, and with raw differences ARI ${aRaw}. Read the pathways as a summary of the direction of change, not as sharply separated groups.` : `Agreement with PAM is ARI ${aPam}, with raw differences ARI ${aRaw}.`} Agreement with the 2023 regimes is only ARI ${aReg}, so the pathways describe something different from the 2023 position.`,
+      pathTitle: "Change pathways, 2019 to 2023 (FANNY)",
+      pathSub: "Fuzzy clusters of 4-year changes across all six indicators, kept separate from 2023 regimes.",
+      pathLead: (k, r, sil, jac, aPam, aRaw, aReg, weak) => `FANNY (membership exponent ${r}) on standardised 2019-to-2023 changes: percentage-point differences for electricity access, clean cooking and renewable share; differences of log(1 + x) for renewable capacity, energy intensity and CO2. The selection rule gives k = ${k} (subsample Jaccard ${jac}, Silhouette ${sil}). ${weak ? `<strong>The structure is weak:</strong> Silhouette is below 0.25 even though agreement with PAM reaches ARI ${aPam} and with raw differences ARI ${aRaw}. Read the pathways as a summary of 4-year direction of change, not as sharply separated groups.` : `Agreement with PAM is ARI ${aPam}, with raw differences ARI ${aRaw}.`} Agreement with the 2023 regimes is only ARI ${aReg}, so the pathways describe direction of change rather than static 2023 position.`,
       pathCols: ["Pathway", "n", "Mean membership", "Electricity (pp)", "Clean cooking (pp)", "Renewable share (pp)", "Renewable capacity (W/cap)", "Intensity (MJ/$)", "CO2 (t/cap)", "2023 regimes"],
-      pathMedNote: "Median change from 2015 to 2023 in original units. Changes are descriptive, not policy effects.",
+      pathMedNote: "Median change from 2019 to 2023 in original units. Changes are descriptive, not policy effects.",
       pathKSummary: "Comparison of k = 2 to 6 (FANNY, PAM and raw differences)",
       pathKCols: ["Method", "Features", "k", "Sizes", "Silhouette", "Normalised Dunn", "Max. membership", "% ambiguous", "Mean Jaccard", "Min. Jaccard", "Mean ARI"],
-      pathKNote: (b) => `Stability: ${b} subsamples of 80% without replacement, labels aligned to the full solution by the best permutation. Ambiguous: gap between the two highest memberships below 0.2. The membership exponent grid {2, 1.7, 1.5, 1.3, 1.2} and the weak-structure thresholds (Silhouette 0.25, Jaccard 0.75) are exploratory choices made after initial fits, when the default exponent of 2 gave equal memberships.`,
+      pathKNote: (b) => `Stability: ${b} subsamples of 80% without replacement, labels aligned to the full solution by the best permutation. Ambiguous: gap between the two highest memberships below 0.2. The membership exponent grid {2, 1.7, 1.5, 1.3, 1.2} and the weak-structure thresholds (Silhouette 0.25, Jaccard 0.75) are exploratory choices made after initial fits.`,
       featLbl: { log_diff_std: "log differences, z", raw_diff_std: "raw differences, z" },
-      pathLine: (pw, fc, c) => `Change pathway <strong>${pw.pathway}</strong> (membership <strong class="num">${fmt(pw.memb_max, 2)}</strong>) · Clean cooking 2023 <strong class="num">${fmt(c.cooking_2023, 0)}%</strong>, elastic net prediction <strong class="num">${fmt(fc.elastic_net, 1)}%</strong>, persistence <strong class="num">${fmt(fc.persistence, 0)}%</strong>`,
-      fcTitle: "Predicting 2023 clean cooking from 2015 conditions",
-      fcSub: "Cross-country validation over one historical interval.",
-      fcLead: (k) => `Target: clean cooking access in 2023 (SDG 7.1.2). Predictors use 2015 data only. The same ${k} outer folds serve all three models; elastic net alpha and lambda are tuned in inner folds, and standardisation is learned from training data only. Predictions outside 0 to 100 are clipped to that range, a rule fixed before fitting. This is cross-country validation over one interval (2015 to 2023), not a forecast of future years.`,
-      fcModels: { persistence: "Persistence (2015 value)", ols_cook2015: "Linear regression, 2015 cooking", elastic_net: "Elastic net, six 2015 indicators" },
-      fcCols: ["Model", "MAE (pp)", "RMSE (pp)", "Raw predictions outside 0-100"],
-      fcCmpCols: ["Comparison", "MAE difference (pp)", "95% CI (paired resampling of out-of-fold errors)"],
-      fcVerdict: (dP, loP, hiP, dO, loO, hiO) => `Over this interval, the elastic net has lower MAE than persistence (difference ${dP} pp, 95% CI ${loP} to ${hiP}) and than the 2015 cooking-only regression (difference ${dO} pp, 95% CI ${loO} to ${hiO}). The intervals come from paired resampling of the existing out-of-fold errors. The comparison with the regression changes both the predictors and the estimation method, so the difference measures overall model performance and does not isolate the contribution of the five extra indicators.`,
-      fcScatterNote: "Point colour = 2023 regime. Dashed line = prediction equals the actual value. Click a point to select a country.",
-      fcTip: (c, f) => `<strong>${cName(c)} (${c.iso3})</strong> · ${c.kode_2023}<br>Actual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistence: ${fmt(f.persistence, 0)}%`,
-      fcAxisX: "Actual 2023 (%)", fcAxisY: "Elastic net out-of-fold prediction (%)",
-      fcScatterAria: "Actual 2023 clean cooking against elastic net out-of-fold predictions, 189 countries",
+      pathLine: (pw, c) => `2019-2023 change pathway <strong>${pw.pathway}</strong> (membership <strong class="num">${fmt(pw.memb_max, 2)}</strong>) · 2027 clean cooking proj. <strong class="num">${fmt(c.cooking_2027, 1)}%</strong> (2023: ${fmt(c.cooking_2023, 0)}%) · 2027 centroid margin <strong class="num">${fmt(c.margin_centroid_2027, 3)}</strong>`,
       edaQuadLbl: "Highlighted PCA quadrant",
-      edaQuadClickHint: "Click any quadrant card below to highlight countries in that quadrant.",
+      pcaQuadBarLbl: "Highlight quadrant:",
+      pcaQuadShort: { Q1: "Q-1", Q2: "Q-2", Q3: "Q-3", Q4: "Q-4" },
+      pcaQuadAria: "Highlight countries by PCA biplot quadrant",
       proj27Title: "2027 projections and potential regime shifts (4-year horizon)",
       proj27Sub: "Trained and cross-validated on 2019 to 2023, then projected to 2027 from 2023 features.",
       proj27Lead: (nShift, accEn, accPers) => `Official 2025-2026 UNSD/World Bank SDG 7 series are not yet published (0 rows), whereas 2019 is complete across all 189 economies. A matched 4-year Elastic Net model is validated on <strong>2019 to 2023</strong> (out-of-fold regime accuracy <strong class="num">${accEn}%</strong> vs persistence <strong class="num">${accPers}%</strong>), then applied to 2023 features to project 2027. Overall, <strong>${nShift} economies</strong> are projected to shift regimes (0 regressing). <em>Note: out-of-sample projections assuming 2019-2023 dynamics persist; check centroid margins to distinguish clear shifts from borderline crossings.</em>`,
@@ -1579,7 +1588,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   let DATA = null;
   let BY_ISO = new Map();
-  let PATH_BY_ISO = new Map(), FC_BY_ISO = new Map();
+  let PATH_BY_ISO = new Map();
   let GLOBAL = { med: {}, max: {} };
   const initialLang = (() => {
     let l = new URLSearchParams(location.search).get("lang");
@@ -1601,7 +1610,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     migPreview: null,
     mig27Cell: "R4_R3",
     mig27Preview: null,
-    proj27Target: "clean_cooking"
+    proj27Target: "clean_cooking",
+    tableYear: "2023"
   };
 
   const $ = (id) => document.getElementById(id);
@@ -1820,7 +1830,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   function getCountryRegime(c, layer) {
     if (!c) return null;
     if (layer === "km2_2023") return c.regime_k2;
-    if (layer === "km2015") return c.regime_2015;
+    if (layer === "km2019") return c.regime_2019;
     if (layer === "proj2027") return c.regime_2027 || c.regime_2023;
     if (layer === "ward2023") return c.regime_ward;
     if (layer === "pam2023") return c.regime_pam;
@@ -1975,7 +1985,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     b.textContent = c.kode_2023;
     b.className = `badge r${c.regime_2023}`;
     $("insp-migration-line").innerHTML = `<span>${t.migLine(c, c.kode_k2)}</span>`;
-    $("insp-path-line").innerHTML = `<span>${t.pathLine(PATH_BY_ISO.get(c.iso3), FC_BY_ISO.get(c.iso3), c)}</span>`;
+    $("insp-path-line").innerHTML = `<span>${t.pathLine(PATH_BY_ISO.get(c.iso3), c)}</span>`;
 
     const methods = [["K-Means", c.regime_2023], ["Ward D2", c.regime_ward], ["PAM", c.regime_pam], ["GMM", c.regime_gmm]];
     const agree = methods.filter(([, r]) => r === c.regime_2023).length;
@@ -2036,7 +2046,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const scoped = scopeCountries();
     const sLbl = scopeLabel();
     const layer = state.mapLayer === "km2_2023" ? "km2023" : state.mapLayer;
-    const use2015 = layer === "km2015";
+    const use2019 = layer === "km2019";
     $("regime-cards").innerHTML = DATA.regimes.map((rg) => {
       if (!isScoped && layer === "km2023") {
         return `<article class="regime-card" data-r="${rg.regime_km}">
@@ -2074,12 +2084,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       const popSumM = grp.reduce((s, c) => s + (Number(c.population_m) || 0), 0);
       const popTxt = popSumM >= 1000 ? `${fmt(popSumM / 1000, 2)} ${t.bn}` : `${fmt(popSumM, 1)} ${t.mPop}`;
       const use2027 = layer === "proj2027";
-      const kE = use2015 ? "elec_2015" : use2027 ? "elec_2027" : "elec_2023";
-      const kC = use2015 ? "cooking_2015" : use2027 ? "cooking_2027" : "cooking_2023";
-      const kS = use2015 ? "renew_share_2015" : use2027 ? "renew_share_2027" : "renew_share_2023";
-      const kP = use2015 ? "renew_cap_2015" : use2027 ? "renew_cap_2027" : "renew_cap_2023";
-      const kI = use2015 ? "energy_int_2015" : use2027 ? "energy_int_2027" : "energy_int_2023";
-      const kO = use2015 ? "co2_pc_2015" : use2027 ? "co2_pc_2027" : "co2_pc_2023";
+      const kE = use2019 ? "elec_2019" : use2027 ? "elec_2027" : "elec_2023";
+      const kC = use2019 ? "cooking_2019" : use2027 ? "cooking_2027" : "cooking_2023";
+      const kS = use2019 ? "renew_share_2019" : use2027 ? "renew_share_2027" : "renew_share_2023";
+      const kP = use2019 ? "renew_cap_2019" : use2027 ? "renew_cap_2027" : "renew_cap_2023";
+      const kI = use2019 ? "energy_int_2019" : use2027 ? "energy_int_2027" : "energy_int_2023";
+      const kO = use2019 ? "co2_pc_2019" : use2027 ? "co2_pc_2027" : "co2_pc_2023";
       const gdps = grp.map((c) => c.gdp_pc_ppp).filter((v) => v !== null && v !== undefined && !Number.isNaN(Number(v)));
       const gdpTxt = gdps.length ? `$${fmt(median(gdps), 0)}` : "-";
       return `<article class="regime-card" data-r="${rg.regime_km}">
@@ -2457,23 +2467,23 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     let extra = "";
     if (state.edaPreset === "pca") {
       const zx = sx(0), zy = sy(0);
-      if (state.edaQuad) {
-        const qRect = {
-          Q2: [padL, padT, zx - padL, zy - padT],
-          Q1: [zx, padT, padL + pw - zx, zy - padT],
-          Q3: [padL, zy, zx - padL, padT + ph - zy],
-          Q4: [zx, zy, padL + pw - zx, padT + ph - zy]
-        }[state.edaQuad];
-        if (qRect) {
-          extra += `<rect x="${qRect[0].toFixed(1)}" y="${qRect[1].toFixed(1)}" width="${Math.max(0, qRect[2]).toFixed(1)}" height="${Math.max(0, qRect[3]).toFixed(1)}" fill="var(--ink-soft)" rx="4"/>`;
-        }
+      const qRects = [
+        ["Q2", padL, padT, zx - padL, zy - padT, padL + 8, padT + 15, "start"],
+        ["Q1", zx, padT, padL + pw - zx, zy - padT, padL + pw - 8, padT + 15, "end"],
+        ["Q3", padL, zy, zx - padL, padT + ph - zy, padL + 8, padT + ph - 8, "start"],
+        ["Q4", zx, zy, padL + pw - zx, padT + ph - zy, padL + pw - 8, padT + ph - 8, "end"]
+      ];
+      for (const [qid, rx, ry, rw, rh, wx, wy, anchor] of qRects) {
+        const act = state.edaQuad === qid;
+        extra += `<rect class="pca-quad-hit${act ? " is-active" : ""}" data-eda-quad="${qid}" x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${Math.max(0, rw).toFixed(1)}" height="${Math.max(0, rh).toFixed(1)}" rx="3"/>`;
+        extra += `<text class="pca-quad-wm${act ? " is-active" : ""}" x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" text-anchor="${anchor}">${t.pcaQuadShort[qid]}</text>`;
       }
-      extra += `<line x1="${zx}" y1="${padT}" x2="${zx}" y2="${padT + ph}" stroke="var(--line-strong)" stroke-dasharray="3 3"/>`;
-      extra += `<line x1="${padL}" y1="${zy}" x2="${padL + pw}" y2="${zy}" stroke="var(--line-strong)" stroke-dasharray="3 3"/>`;
+      extra += `<line x1="${zx}" y1="${padT}" x2="${zx}" y2="${padT + ph}" stroke="var(--line-strong)" stroke-dasharray="3 3" pointer-events="none"/>`;
+      extra += `<line x1="${padL}" y1="${zy}" x2="${padL + pw}" y2="${zy}" stroke="var(--line-strong)" stroke-dasharray="3 3" pointer-events="none"/>`;
       for (const ld of DATA.meta.pca_loadings) {
         const vx = sx(ld.PC1 * 3.4), vy = sy(ld.PC2 * 3.4);
-        extra += `<line x1="${zx}" y1="${zy}" x2="${vx}" y2="${vy}" stroke="var(--text)" stroke-width="1.3"/>`;
-        extra += `<text class="iso" x="${vx + (ld.PC1 >= 0 ? 5 : -5)}" y="${vy - 4}" fill="var(--text)" font-size="10" text-anchor="${ld.PC1 >= 0 ? "start" : "end"}">${ld.feature}</text>`;
+        extra += `<line x1="${zx}" y1="${zy}" x2="${vx}" y2="${vy}" stroke="var(--text)" stroke-width="1.3" pointer-events="none"/>`;
+        extra += `<text class="iso" x="${vx + (ld.PC1 >= 0 ? 5 : -5)}" y="${vy - 4}" fill="var(--text)" font-size="10" text-anchor="${ld.PC1 >= 0 ? "start" : "end"}" pointer-events="none">${ld.feature}</text>`;
       }
     }
     if (state.edaPreset === "paradox" && state.story === "r1" && !groupHl) {
@@ -2521,9 +2531,44 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const targetIsos = groupHl ? [...groupHl] : [state.selectedIso];
     drawEdaRings($("eda-svg-wrap"), prevRings, targetIsos, groupHl ? "regime" : "single", Boolean(opts.skipAnim));
 
+    const togglePcaQuad = (q) => {
+      state.edaQuad = state.edaQuad === q ? null : q;
+      state.edaRegime = null;
+      if (state.edaQuad && state.story !== "none") {
+        state.story = "none";
+        document.querySelectorAll("#story-pills [data-story]").forEach((b) =>
+          b.setAttribute("aria-pressed", String(b.dataset.story === "none"))
+        );
+      }
+      renderEda();
+    };
+
+    const qBar = $("pca-quad-bar");
+    if (state.edaPreset === "pca") {
+      qBar.hidden = false;
+      qBar.setAttribute("role", "group");
+      qBar.setAttribute("aria-label", t.pcaQuadAria);
+      qBar.innerHTML = `<span class="pca-quad-lbl">${t.pcaQuadBarLbl}</span>` +
+        ["Q1", "Q2", "Q3", "Q4"].map((qId) => {
+          const cnt = pts.filter((c) => inPcaQuad(c, qId)).length;
+          return `<button type="button" class="legend-btn" data-eda-quad="${qId}" aria-pressed="${state.edaQuad === qId}">
+            <span>${t.pcaQuadShort[qId]}</span><span class="legend-n">(${cnt})</span>
+          </button>`;
+        }).join("");
+      qBar.querySelectorAll("[data-eda-quad]").forEach((btn) =>
+        btn.addEventListener("click", () => togglePcaQuad(btn.dataset.edaQuad))
+      );
+    } else {
+      qBar.hidden = true;
+      qBar.innerHTML = "";
+    }
+
+    $("eda-svg-wrap").querySelectorAll(".pca-quad-hit").forEach((rect) => {
+      rect.addEventListener("click", () => togglePcaQuad(rect.dataset.edaQuad));
+    });
     $("eda-svg-wrap").querySelectorAll(".eda-pt").forEach((g) => {
       const c = BY_ISO.get(g.dataset.iso);
-      g.addEventListener("click", () => selectCountry(c.iso3));
+      g.addEventListener("click", (ev) => { ev.stopPropagation(); selectCountry(c.iso3); });
       g.addEventListener("pointerenter", (ev) => showTip(ev, countryTip(c)));
       g.addEventListener("pointermove", moveTip);
       g.addEventListener("pointerleave", hideTip);
@@ -2588,39 +2633,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
     const g = t.edaGuides[state.edaPreset];
     if (g) {
-      const isPca = state.edaPreset === "pca";
-      const cellsHtml = g.cells.map(([head, body], i) => {
-        if (!isPca) {
-          return `<div class="quad-cell"><strong class="q-head">${head}</strong>${body}</div>`;
-        }
-        const qId = PCA_QUAD_ORDER[i];
-        const cnt = pts.filter((c) => inPcaQuad(c, qId)).length;
-        const pressed = state.edaQuad === qId;
-        return `<button type="button" class="quad-cell quad-btn" data-eda-quad="${qId}" aria-pressed="${pressed}">
-          <span class="q-top"><strong class="q-head">${head}</strong><span class="q-count">${cnt} ${t.countries}</span></span>
-          <span>${body}</span>
-        </button>`;
-      }).join("");
       $("eda-guide").innerHTML = `
         <h3>${g.title}</h3>
-        <p class="muted" style="margin-top:4px">${g.lead}${isPca ? ` <strong>${t.edaQuadClickHint}</strong>` : ""}</p>
-        <div class="quad-grid">${cellsHtml}</div>`;
-      if (isPca) {
-        $("eda-guide").querySelectorAll("[data-eda-quad]").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const q = btn.dataset.edaQuad;
-            state.edaQuad = state.edaQuad === q ? null : q;
-            state.edaRegime = null;
-            if (state.edaQuad && state.story !== "none") {
-              state.story = "none";
-              document.querySelectorAll("#story-pills [data-story]").forEach((b) =>
-                b.setAttribute("aria-pressed", String(b.dataset.story === "none"))
-              );
-            }
-            renderEda();
-          });
-        });
-      }
+        <p class="muted" style="margin-top:4px">${g.lead}</p>
+        <div class="quad-grid">
+          ${g.cells.map(([head, body]) => `<div class="quad-cell"><strong class="q-head">${head}</strong>${body}</div>`).join("")}
+        </div>`;
     }
   }
 
@@ -2749,12 +2767,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   function renderRoster() {
     const t = T();
     const key = state.migPreview || state.migCell;
-    const [f15, t23] = key.split("_");
-    const matched = DATA.countries.filter((c) => c.kode_2015 === f15 && c.kode_2023 === t23)
+    const [f19, t23] = key.split("_");
+    const matched = DATA.countries.filter((c) => c.kode_2019 === f19 && c.kode_2023 === t23)
       .sort((a, b) => cName(a).localeCompare(cName(b)));
     $("mig-list-box").innerHTML = matched.length === 0
-      ? `<p class="muted">${t.migEmpty(f15, t23)}</p>`
-      : `<p><strong>${t.migRoster(f15, t23, matched.length)}</strong></p>
+      ? `<p class="muted">${t.migEmpty(f19, t23)}</p>`
+      : `<p><strong>${t.migRoster(f19, t23, matched.length)}</strong></p>
          <div class="chip-row">${matched.map((c) => `<button type="button" class="chip" data-pick="${c.iso3}" title="${cName(c)}">${cName(c)} <span class="muted">${c.iso3}</span></button>`).join("")}</div>`;
     $("mig-list-box").querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
       selectCountry(b.dataset.pick);
@@ -2790,56 +2808,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           </table></div>
         </div>
       </details>`;
-  }
-
-  function renderForecast() {
-    const t = T(), F = DATA.cooking_forecast;
-    const mRows = F.metrics.map((m) => `<tr><td>${t.fcModels[m.model]}</td><td class="num">${fmt(m.mae_pp, 2)}</td><td class="num">${fmt(m.rmse_pp, 2)}</td><td class="num">${m.n_prediksi_di_luar_0_100}</td></tr>`).join("");
-    const cmpLbl = (s) => s.split(" - ").map((k) => t.fcModels[k]).join(" vs ");
-    const cRows = F.comparisons.map((c) => `<tr><td>${cmpLbl(c.perbandingan)}</td><td class="num">${fmt(c.selisih_mae_pp, 2)}</td><td class="num">[${fmt(c.ci95_bawah, 2)}; ${fmt(c.ci95_atas, 2)}]</td></tr>`).join("");
-    const en = F.comparisons.find((c) => c.perbandingan === "elastic_net - persistence");
-    const enOls = F.comparisons.find((c) => c.perbandingan === "elastic_net - ols_cook2015");
-    $("fc-content").innerHTML = `<p style="font-size:13.5px;margin-bottom:10px">${t.fcLead(F.k_outer)}</p>
-      <div style="overflow-x:auto"><table class="compact-table" style="margin-bottom:14px">
-        <thead><tr>${t.fcCols.map((h, i) => `<th${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${mRows}</tbody>
-      </table></div>
-      <div style="overflow-x:auto"><table class="compact-table">
-        <thead><tr>${t.fcCmpCols.map((h, i) => `<th${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${cRows}</tbody>
-      </table></div>
-      <p style="font-size:13.5px;margin-top:10px">${t.fcVerdict(fmt(en.selisih_mae_pp, 2), fmt(en.ci95_bawah, 2), fmt(en.ci95_atas, 2), fmt(enOls.selisih_mae_pp, 2), fmt(enOls.ci95_bawah, 2), fmt(enOls.ci95_atas, 2))}</p>`;
-
-    const W = 380, H = 340, padL = 44, padR = 12, padT = 12, padB = 40, pw = W - padL - padR, ph = H - padT - padB;
-    const sx = (v) => padL + (v / 100) * pw, sy = (v) => padT + ph - (v / 100) * ph;
-    const ticks = [0, 25, 50, 75, 100];
-    const pts = DATA.countries.map((c) => ({ c, f: FC_BY_ISO.get(c.iso3) }))
-      .sort((a, b) => (a.c.iso3 === state.selectedIso) - (b.c.iso3 === state.selectedIso));
-    const dots = pts.map(({ c, f }) => {
-      const sel = c.iso3 === state.selectedIso;
-      const cx = sx(c.cooking_2023), cy = sy(f.elastic_net);
-      const lx = c.cooking_2023 > 84 ? (cx - 9).toFixed(1) : (cx + 8).toFixed(1);
-      const anchor = c.cooking_2023 > 84 ? "end" : "start";
-      const ly = f.elastic_net > 92 ? (cy + 14).toFixed(1) : (cy - 8).toFixed(1);
-      return `<circle class="eda-pt" data-iso="${c.iso3}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${sel ? 6 : 3.2}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${sel ? 1 : 0.7}" stroke="${sel ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2 : 0.6}"><title>${cName(c)} (${c.iso3}): ${fmt(c.cooking_2023, 0)}% / ${fmt(f.elastic_net, 1)}%</title></circle>` +
-        (sel ? `<text class="iso" x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="11" font-weight="600" fill="var(--text)">${c.iso3}</text>` : "");
-    }).join("");
-    const previousRing = ringPosition($("fc-scatter-wrap"));
-    $("fc-scatter-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.fcScatterAria}">
-      ${ticks.map((v) => `<line x1="${padL}" y1="${sy(v)}" x2="${W - padR}" y2="${sy(v)}" stroke="var(--line)" stroke-width="0.8"/>
-        <text x="${padL - 6}" y="${sy(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>
-        <text x="${sx(v)}" y="${padT + ph + 16}" text-anchor="middle" font-size="11" fill="var(--muted)">${v}</text>`).join("")}
-      <line x1="${sx(0)}" y1="${sy(0)}" x2="${sx(100)}" y2="${sy(100)}" stroke="var(--line-strong)" stroke-dasharray="4 4"/>
-      ${dots}
-      <text x="${padL + pw / 2}" y="${H - 6}" text-anchor="middle" font-size="11.5" fill="var(--text)">${t.fcAxisX}</text>
-      <text transform="translate(12 ${padT + ph / 2}) rotate(-90)" text-anchor="middle" font-size="11.5" fill="var(--text)">${t.fcAxisY}</text>
-    </svg><p class="muted small" style="margin-top:6px">${t.fcScatterNote}</p>`;
-    drawRing($("fc-scatter-wrap"), previousRing);
-    $("fc-scatter-wrap").querySelectorAll(".eda-pt").forEach((dot) => {
-      const c = BY_ISO.get(dot.dataset.iso), f = FC_BY_ISO.get(dot.dataset.iso);
-      dot.addEventListener("click", () => selectCountry(c.iso3));
-      dot.addEventListener("pointerenter", (ev) => showTip(ev, t.fcTip(c, f)));
-      dot.addEventListener("pointermove", moveTip);
-      dot.addEventListener("pointerleave", hideTip);
-    });
   }
 
   const PROJ27_SPECS = {
@@ -3004,22 +2972,22 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   function renderAseanAndTransition() {
     const t = T();
-    const migMap = new Map(DATA.migration.map((m) => [`${m.kode_2015}_${m.kode_2023}`, m.n]));
+    const migMap = new Map(DATA.migration.map((m) => [`${m.kode_2019}_${m.kode_2023}`, m.n]));
     const codes = ["R1", "R2", "R3", "R4"];
     let up = 0, down = 0;
-    let html = `<div class="mig-grid" role="group" aria-label="${t.migTitle}"><div class="mig-hdr">2015 \\ 2023</div>` +
+    let html = `<div class="mig-grid" role="group" aria-label="${t.migTitle}"><div class="mig-hdr">2019 \\ 2023</div>` +
       codes.map((c) => `<div class="mig-hdr">${c}</div>`).join("");
-    for (const r15 of codes) {
-      html += `<div class="mig-hdr">${r15}</div>`;
+    for (const r19 of codes) {
+      html += `<div class="mig-hdr">${r19}</div>`;
       for (const r23 of codes) {
-        const key = `${r15}_${r23}`;
+        const key = `${r19}_${r23}`;
         const n = migMap.get(key) || 0;
         if (POSITIVE_CELLS.has(key)) up += n;
         if (NEGATIVE_CELLS.has(key)) down += n;
-        const cls = ["mig-cell", n === 0 ? "is-zero" : "", r15 === r23 ? "is-diag" : "",
+        const cls = ["mig-cell", n === 0 ? "is-zero" : "", r19 === r23 ? "is-diag" : "",
           POSITIVE_CELLS.has(key) && n ? "is-up" : "", NEGATIVE_CELLS.has(key) && n ? "is-down" : ""].join(" ");
-        html += `<button type="button" class="${cls}" data-cell="${key}" aria-pressed="${state.migCell === key}" aria-label="${t.migRoster(r15, r23, n)}">
-          <strong>${n}</strong><span>${r15}&#8594;${r23}</span></button>`;
+        html += `<button type="button" class="${cls}" data-cell="${key}" aria-pressed="${state.migCell === key}" aria-label="${t.migRoster(r19, r23, n)}">
+          <strong>${n}</strong><span>${r19}&#8594;${r23}</span></button>`;
       }
     }
     $("mig-matrix-box").innerHTML = html + `</div>`;
@@ -3088,22 +3056,22 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     });
 
     /* Indonesia synthesis */
-    const idn = BY_ISO.get("IDN"), vnm = BY_ISO.get("VNM"), mys = BY_ISO.get("MYS");
+    const idn = BY_ISO.get("IDN"), vnm = BY_ISO.get("VNM"), mys = BY_ISO.get("MYS"), phl = BY_ISO.get("PHL");
     const r3 = DATA.regimes.find((r) => r.regime_km === 3);
     $("idn-policy-content").innerHTML = state.lang === "id"
       ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;font-size:13.5px">
-          <div><h3>1. Capaian dasar 2015 ke 2023</h3>
-            <p class="muted" style="margin-top:4px">Indonesia berada di <strong>R3</strong> pada 2015 dan 2023. Akses memasak bersih naik dari <strong class="num">${fmt(idn.cooking_2015, 0)}%</strong> menjadi <strong class="num">${fmt(idn.cooking_2023, 0)}%</strong>, akses listrik <strong class="num">${fmt(idn.elec_2023, 1)}%</strong>, dan intensitas energi <strong class="num">${fmt(idn.energy_int_2023, 2)} MJ/$</strong>.</p></div>
+          <div><h3>1. Capaian 2019 ke 2023 &amp; proyeksi 2027</h3>
+            <p class="muted" style="margin-top:4px">Indonesia stabil di <strong>R3</strong> pada 2019, 2023, dan proyeksi 2027. Akses memasak bersih naik dari <strong class="num">${fmt(idn.cooking_2019, 0)}%</strong> (2019) ke <strong class="num">${fmt(idn.cooking_2023, 0)}%</strong> (2023) dan diproyeksikan <strong class="num">${fmt(idn.cooking_2027, 1)}%</strong> (2027), dengan listrik <strong class="num">${fmt(idn.elec_2023, 1)}%</strong> dan intensitas <strong class="num">${fmt(idn.energy_int_2023, 2)} MJ/$</strong>.</p></div>
           <div><h3>2. Celah kapasitas listrik terbarukan (SDG 7.b.1)</h3>
-            <p class="muted" style="margin-top:4px">Median R3 adalah <strong class="num">${fmt(r3.renew_cap_median, 1)} W</strong> per kapita, sedangkan Indonesia <strong class="num">${fmt(idn.renew_cap_2023, 1)} W</strong> (air ${fmt(idn.cap_hydro_wpc, 1)}, bioenergi ${fmt(idn.cap_bioenergy_wpc, 1)}, panas bumi ${fmt(idn.cap_geothermal_wpc, 1)}, surya <strong>${fmt(idn.cap_solar_wpc, 1)}</strong>). Vietnam <strong class="num">${fmt(vnm.renew_cap_2023, 1)} W</strong>; Malaysia <strong class="num">${fmt(mys.renew_cap_2023, 1)} W</strong>, yang berpindah dari ${mys.kode_2015} ke ${mys.kode_2023}.</p></div>
+            <p class="muted" style="margin-top:4px">Median R3 adalah <strong class="num">${fmt(r3.renew_cap_median, 1)} W</strong> per kapita, sedangkan Indonesia <strong class="num">${fmt(idn.renew_cap_2023, 1)} W</strong> (proyeksi 2027: <strong class="num">${fmt(idn.renew_cap_2027, 1)} W</strong>; air ${fmt(idn.cap_hydro_wpc, 1)}, bioenergi ${fmt(idn.cap_bioenergy_wpc, 1)}, panas bumi ${fmt(idn.cap_geothermal_wpc, 1)}, surya <strong>${fmt(idn.cap_solar_wpc, 1)}</strong>). Vietnam <strong class="num">${fmt(vnm.renew_cap_2023, 1)} W</strong>; Malaysia <strong class="num">${fmt(mys.renew_cap_2023, 1)} W</strong>; Filipina diproyeksikan naik dari ${phl.kode_2023} ke ${phl.kode_2027} pada 2027.</p></div>
           <div><h3>3. Implikasi kebijakan</h3>
             <p class="muted" style="margin-top:4px">Pendanaan JETP dan RUPTL dapat difokuskan pada percepatan PLTS atap dan skala utilitas dengan pengadaan yang transparan, interkoneksi antarpulau untuk menyerap potensi panas bumi dan air, serta elektrifikasi wilayah kepulauan agar sisa populasi tanpa listrik terjangkau tanpa generator diesel.</p></div>
         </div>`
       : `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;font-size:13.5px">
-          <div><h3>1. Baseline gains, 2015 to 2023</h3>
-            <p class="muted" style="margin-top:4px">Indonesia sits in <strong>R3</strong> in both 2015 and 2023. Clean cooking access rose from <strong class="num">${fmt(idn.cooking_2015, 0)}%</strong> to <strong class="num">${fmt(idn.cooking_2023, 0)}%</strong>, electricity access is <strong class="num">${fmt(idn.elec_2023, 1)}%</strong> and energy intensity <strong class="num">${fmt(idn.energy_int_2023, 2)} MJ/$</strong>.</p></div>
+          <div><h3>1. Progress 2019 to 2023 &amp; 2027 projection</h3>
+            <p class="muted" style="margin-top:4px">Indonesia remains in <strong>R3</strong> across 2019, 2023, and the 2027 projection. Clean cooking rose from <strong class="num">${fmt(idn.cooking_2019, 0)}%</strong> (2019) to <strong class="num">${fmt(idn.cooking_2023, 0)}%</strong> (2023) and is projected at <strong class="num">${fmt(idn.cooking_2027, 1)}%</strong> (2027), with <strong class="num">${fmt(idn.elec_2023, 1)}%</strong> electricity access and <strong class="num">${fmt(idn.energy_int_2023, 2)} MJ/$</strong> energy intensity.</p></div>
           <div><h3>2. The renewable power gap (SDG 7.b.1)</h3>
-            <p class="muted" style="margin-top:4px">The R3 median is <strong class="num">${fmt(r3.renew_cap_median, 1)} W</strong> per person; Indonesia has <strong class="num">${fmt(idn.renew_cap_2023, 1)} W</strong> (hydro ${fmt(idn.cap_hydro_wpc, 1)}, bioenergy ${fmt(idn.cap_bioenergy_wpc, 1)}, geothermal ${fmt(idn.cap_geothermal_wpc, 1)}, solar <strong>${fmt(idn.cap_solar_wpc, 1)}</strong>). Viet Nam has <strong class="num">${fmt(vnm.renew_cap_2023, 1)} W</strong>; Malaysia <strong class="num">${fmt(mys.renew_cap_2023, 1)} W</strong>, having moved from ${mys.kode_2015} to ${mys.kode_2023}.</p></div>
+            <p class="muted" style="margin-top:4px">The R3 median is <strong class="num">${fmt(r3.renew_cap_median, 1)} W</strong> per person; Indonesia has <strong class="num">${fmt(idn.renew_cap_2023, 1)} W</strong> (2027 proj.: <strong class="num">${fmt(idn.renew_cap_2027, 1)} W</strong>; hydro ${fmt(idn.cap_hydro_wpc, 1)}, bioenergy ${fmt(idn.cap_bioenergy_wpc, 1)}, geothermal ${fmt(idn.cap_geothermal_wpc, 1)}, solar <strong>${fmt(idn.cap_solar_wpc, 1)}</strong>). Viet Nam has <strong class="num">${fmt(vnm.renew_cap_2023, 1)} W</strong>; Malaysia <strong class="num">${fmt(mys.renew_cap_2023, 1)} W</strong>; the Philippines is projected to move from ${phl.kode_2023} to ${phl.kode_2027} by 2027.</p></div>
           <div><h3>3. Policy implications</h3>
             <p class="muted" style="margin-top:4px">JETP and RUPTL finance could prioritise rooftop and utility solar with transparent procurement, inter-island transmission to use geothermal and hydro potential, and island electrification that reaches the remaining unconnected population without diesel lock-in.</p></div>
         </div>`;
@@ -3135,8 +3103,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       tr.dataset.search = `${c.country_id || ""} ${c.country_en} ${c.iso3} ${c.iso2 || ""} ${c.region}`.toLowerCase();
       tr.innerHTML = `
         <th scope="row" data-value="${cName(c)}"><button type="button" class="row-pick"><span class="cname">${cName(c)}</span> <span class="muted mono">${c.iso3}</span></button></th>
+        <td data-value="${c.kode_2019}" class="mono">${c.kode_2019}</td>
         <td data-value="${c.kode_2023}"><span class="badge r${c.regime_2023}">${c.kode_2023}</span></td>
-        <td data-value="${c.kode_2015}" class="mono">${c.kode_2015}</td>
+        <td data-value="${c.kode_2027}" class="mono">${c.kode_2027}</td>
         <td class="num" data-value="${c.elec_2023}"></td>
         <td class="num" data-value="${c.cooking_2023}"></td>
         <td class="num" data-value="${c.renew_share_2023}"></td>
@@ -3193,7 +3162,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   }
 
   function renderTableNumbers() {
-    const digits = [null, null, null, 1, 1, 1, 1, 2, 2, 3];
+    const yr = state.tableYear || "2023";
+    const keys = [null, null, null, null, `elec_${yr}`, `cooking_${yr}`, `renew_share_${yr}`, `renew_cap_${yr}`, `energy_int_${yr}`, `co2_pc_${yr}`, "sil_width"];
+    const digits = [null, null, null, null, 1, 1, 1, 1, 2, 2, 3];
+    $("country-table-caption").textContent = T().tableCaptionFn(yr);
+    document.querySelectorAll("#table-year-seg [data-tyear]").forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.tyear === yr))
+    );
     for (const tr of $("country-tbody").rows) {
       const c = BY_ISO.get(tr.dataset.iso);
       if (c) {
@@ -3201,10 +3176,15 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         tr.cells[0].dataset.value = nm;
         const cnEl = tr.cells[0].querySelector(".cname");
         if (cnEl) cnEl.textContent = nm;
+        for (let i = 4; i <= 10; i++) {
+          const val = c[keys[i]];
+          tr.cells[i].dataset.value = val;
+          tr.cells[i].textContent = fmt(val, digits[i]);
+          if (i === 7) tr.cells[i].style.setProperty("--w", `${Math.min(100, barPct.cap(val)).toFixed(1)}%`);
+          if (i === 9) tr.cells[i].style.setProperty("--w", `${Math.min(100, barPct.co2(val)).toFixed(1)}%`);
+          if (i === 10) tr.cells[i].style.setProperty("--w", `${Math.min(100, barPct.sil(val)).toFixed(1)}%`);
+        }
       }
-      [...tr.cells].forEach((cell, i) => {
-        if (digits[i] !== null) cell.textContent = fmt(cell.dataset.value, digits[i]);
-      });
       tr.classList.toggle("is-active", tr.dataset.iso === state.selectedIso);
     }
   }
@@ -3221,6 +3201,10 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     ];
     const open = (id) => ($(id) && $(id).open ? " open" : "");
     $("methodology-notes").innerHTML = `
+      <details class="acc" id="acc-lit"${open("acc-lit")}>
+        <summary>${t.litTitle}</summary>
+        <div class="acc-body">${t.litHtml}</div>
+      </details>
       <details class="acc" id="acc-dict"${open("acc-dict")}>
         <summary>${t.dictTitle}</summary>
         <div class="acc-body" style="overflow-x:auto">
@@ -3258,7 +3242,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     renderInspector();
     updateMapColorsAndZoom();
     renderEda({ skipAnim: Boolean(opts.skipEdaAnim) });
-    renderForecast();
     renderProjection2027();
     for (const tr of $("country-tbody").rows) tr.classList.toggle("is-active", tr.dataset.iso === iso3);
   }
@@ -3332,9 +3315,11 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   /* CSV export */
   $("download-csv-btn").addEventListener("click", () => {
     if (!DATA) return;
-    const cols = ["iso3", "country_en", "region", "income_group", "kode_2015", "kode_2023",
-      "elec_2023", "cooking_2023", "renew_share_2023", "renew_cap_2023",
-      "energy_int_2023", "co2_pc_2023", "gdp_pc_ppp", "sil_width"];
+    const cols = ["iso3", "country_en", "region", "income_group", "kode_2019", "kode_2023", "kode_2027",
+      "elec_2019", "cooking_2019", "renew_share_2019", "renew_cap_2019", "energy_int_2019", "co2_pc_2019",
+      "elec_2023", "cooking_2023", "renew_share_2023", "renew_cap_2023", "energy_int_2023", "co2_pc_2023",
+      "elec_2027", "cooking_2027", "renew_share_2027", "renew_cap_2027", "energy_int_2027", "co2_pc_2027",
+      "margin_centroid_2027", "gdp_pc_ppp", "sil_width"];
     const lines = [cols.join(",")];
     for (const c of DATA.countries) {
       lines.push(cols.map((k) => {
@@ -3347,7 +3332,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "sdg7_sdg13_189_countries_cluster_results.csv";
+    a.download = "sdg7_sdg13_189_countries_2019_2023_2027.csv";
     a.click();
     URL.revokeObjectURL(a.href);
   });
@@ -3407,13 +3392,18 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     state.proj27Target = e.target.value;
     renderProjection2027();
   });
+  document.querySelectorAll("#table-year-seg [data-tyear]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.tableYear = btn.dataset.tyear;
+      renderTableNumbers();
+    });
+  });
 
   /* Boot */
   loadData().then((payload) => {
     DATA = payload;
     BY_ISO = new Map(DATA.countries.map((c) => [c.iso3, c]));
     PATH_BY_ISO = new Map(DATA.pathways.countries.map((r) => [r.iso3, r]));
-    FC_BY_ISO = new Map(DATA.cooking_forecast.countries.map((r) => [r.iso3, r]));
     for (const m of INDICATORS) {
       const vals = DATA.countries.map((c) => c[m.key]);
       GLOBAL.med[m.key] = median(vals);
@@ -3435,6 +3425,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   });
 })();
 </script>
-<script type="module" src="./bot.js?v=2"></script>
+<script type="module" src="./bot.js?v=3"></script>
 </body>
 </html>

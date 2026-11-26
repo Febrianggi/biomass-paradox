@@ -1,7 +1,7 @@
 # ==============================================================================
 # Judul Analisis : Membongkar Paradoks Biomassa dan Trilema Transisi Energi-Iklim
-#                  Global (SDG 7 & SDG 13): Perbandingan Empat Metode Clustering
-#                  dan Dinamika Rezim Pasca-Kesepakatan Paris (2015-2023)
+#                  Global (SDG 7 & SDG 13): Perbandingan Empat Metode Clustering,
+#                  Dinamika Rezim 2019-2023, dan Proyeksi 2027
 # Sumber Data    : UN SDG Indicators Database (https://unstats.un.org/sdgs/dataportal)
 #                  & World Bank Open Data (https://data.worldbank.org)
 # Seed           : 2026 (reprodusibilitas penuh seluruh analisis & bootstrap B=500)
@@ -79,7 +79,9 @@ n_dup <- sum(duplicated(panel[, c("iso3", "year")]))
 stopifnot("Ditemukan duplikasi iso3 x year!" = n_dup == 0L)
 
 d2023_all <- panel |> filter(year == 2023L)
-d2015_all <- panel |> filter(year == 2015L)
+panel_2019_path <- file.path(data_dir, "sdg_energy_climate_panel_2019.csv")
+stopifnot("Berkas data/sdg_energy_climate_panel_2019.csv tidak ditemukan!" = file.exists(panel_2019_path))
+d2019_all <- read_csv(panel_2019_path, show_col_types = FALSE) |> filter(year == 2019L)
 
 audit_missing <- tibble(
   variabel = core_vars,
@@ -550,29 +552,31 @@ cat(sprintf("[Validasi Eksternal Bebas Bocor] Kruskal-Wallis PDB PPP per kapita 
 cat(sprintf("[Validasi Eksternal Bebas Bocor] Kruskal-Wallis Urbanisasi antar-rezim       : H = %.2f, p = %.3e\n\n",
             kw_urb$statistic, kw_urb$p.value))
 
-d15 <- d2015_all |>
-  filter(iso3 %in% d23_res$iso3, complete.cases(across(all_of(core_vars))))
+d19 <- d2019_all |>
+  filter(iso3 %in% d23_res$iso3, complete.cases(across(all_of(core_vars)))) |>
+  arrange(match(iso3, d23_res$iso3))
+stopifnot("Kohort 2019 harus lengkap pada seluruh 189 negara 2023!" = identical(d19$iso3, d23_res$iso3))
 
-X15_scaled <- scale(transform_features(d15), center = mu_2023, scale = sd_2023)
+X19_scaled <- scale(transform_features(d19), center = mu_2023, scale = sd_2023)
 assign_nearest_centroid <- function(Xmat, Cmat) {
   apply(Xmat, 1, function(r) which.min(rowSums(sweep(Cmat, 2, r)^2)))
 }
-cl15_proj <- assign_nearest_centroid(X15_scaled, centers_km4)
-pc15_proj <- X15_scaled %*% pca_fit$rotation
+cl19_proj <- assign_nearest_centroid(X19_scaled, centers_km4)
+pc19_proj <- X19_scaled %*% pca_fit$rotation
 
-migration_df <- d15 |>
+migration_df <- d19 |>
   transmute(
     iso3,
-    regime_2015      = cl15_proj,
-    kode_2015        = paste0("R", cl15_proj),
-    elec_2015        = elec_access,
-    cooking_2015     = clean_cooking,
-    renew_share_2015 = renew_share_tfec,
-    renew_cap_2015   = renew_cap_wpc,
-    energy_int_2015  = energy_intensity,
-    co2_pc_2015      = co2_per_capita,
-    pc1_2015         = round(pc15_proj[, 1], 4),
-    pc2_2015         = round(pc15_proj[, 2], 4)
+    regime_2019      = cl19_proj,
+    kode_2019        = paste0("R", cl19_proj),
+    elec_2019        = elec_access,
+    cooking_2019     = clean_cooking,
+    renew_share_2019 = renew_share_tfec,
+    renew_cap_2019   = renew_cap_wpc,
+    energy_int_2019  = energy_intensity,
+    co2_pc_2019      = co2_per_capita,
+    pc1_2019         = round(pc19_proj[, 1], 4),
+    pc2_2019         = round(pc19_proj[, 2], 4)
   ) |>
   inner_join(
     d23_res |> select(
@@ -590,29 +594,29 @@ migration_df <- d15 |>
   ) |>
   mutate(
     status_migrasi = case_when(
-      regime_2015 == 1 & regime_2023 %in% c(2, 3) ~ "Naik Kelas Akses (R1 -> R2/R3)",
-      regime_2015 == 2 & regime_2023 == 3         ~ "Lulus Elektrifikasi & Memasak Bersih (R2 -> R3)",
-      regime_2015 == 4 & regime_2023 == 3         ~ "Dekarbonisasi & Efisiensi (R4 -> R3)",
-      regime_2015 == 3 & regime_2023 == 4         ~ "Terkunci Intensitas Fosil (R3 -> R4)",
+      regime_2019 == 1 & regime_2023 %in% c(2, 3) ~ "Naik Kelas Akses (R1 -> R2/R3)",
+      regime_2019 == 2 & regime_2023 == 3         ~ "Lulus Elektrifikasi & Memasak Bersih (R2 -> R3)",
+      regime_2019 == 4 & regime_2023 == 3         ~ "Dekarbonisasi & Efisiensi (R4 -> R3)",
+      regime_2019 == 3 & regime_2023 == 4         ~ "Terkunci Intensitas Fosil (R3 -> R4)",
       TRUE                                        ~ "Bertahan di Rezim yang Sama"
     ),
-    delta_cooking    = round(cooking_2023 - cooking_2015, 2),
-    delta_renew_cap  = round(renew_cap_2023 - renew_cap_2015, 2),
-    delta_energy_int = round(energy_int_2023 - energy_int_2015, 2),
-    delta_co2_pc     = round(co2_pc_2023 - co2_pc_2015, 2)
+    delta_cooking    = round(cooking_2023 - cooking_2019, 2),
+    delta_renew_cap  = round(renew_cap_2023 - renew_cap_2019, 2),
+    delta_energy_int = round(energy_int_2023 - energy_int_2019, 2),
+    delta_co2_pc     = round(co2_pc_2023 - co2_pc_2019, 2)
   )
 
-write_csv(migration_df, file.path(tab_dir, "table_07_full_results_189_countries_2015_2023.csv"))
+write_csv(migration_df, file.path(tab_dir, "table_07_full_results_189_countries_2019_2023.csv"))
 
 mig_matrix <- migration_df |>
-  count(kode_2015, kode_2023) |>
+  count(kode_2019, kode_2023) |>
   pivot_wider(names_from = kode_2023, values_from = n, values_fill = 0L)
-write_csv(mig_matrix, file.path(tab_dir, "table_08_migration_matrix_2015_2023.csv"))
+write_csv(mig_matrix, file.path(tab_dir, "table_08_migration_matrix_2019_2023.csv"))
 
 asean_bench <- migration_df |>
   filter(is_asean) |>
   arrange(regime_2023, desc(renew_cap_2023)) |>
-  select(iso3, country_en, kode_k2, kode_2015, kode_2023, elec_2023, cooking_2023,
+  select(iso3, country_en, kode_k2, kode_2019, kode_2023, elec_2023, cooking_2023,
          renew_share_2023, renew_cap_2023, delta_renew_cap,
          energy_int_2023, co2_pc_2023, cap_hydro_wpc, cap_solar_wpc,
          cap_geothermal_wpc, cap_wind_wpc, cap_bioenergy_wpc)
@@ -620,7 +624,7 @@ write_csv(asean_bench, file.path(tab_dir, "table_09_indonesia_asean_benchmark.cs
 
 cat("[Tahap 4] Profil Alternatif Biner Dua Rezim (k = 2):\n")
 print(k2_profiles |> select(kode_k2, jaccard_km_k2, n_negara, populasi_miliar, elec_mean, cooking_mean, co2_pc_median, komposisi_rezim_k4))
-cat("\n[Tahap 4] Matriks Migrasi Rezim Pasca-Kesepakatan Paris (2015 -> 2023):\n")
+cat("\n[Tahap 4] Matriks Migrasi Rezim Energi-Iklim Global (2019 -> 2023):\n")
 print(mig_matrix)
 
 # ==============================================================================
@@ -781,42 +785,42 @@ p5 <- ggplot(asean_tech, aes(x = reorder(paste0(country_en, " (", kode_2023, ")"
 ggsave(file.path(fig_dir, "fig05_renewable_mix_indonesia_asean.png"), p5, width = 10.5, height = 6, dpi = 300)
 
 mig_long <- migration_df |>
-  count(kode_2015, kode_2023) |>
-  complete(kode_2015 = paste0("R", 1:4), kode_2023 = paste0("R", 1:4), fill = list(n = 0L))
+  count(kode_2019, kode_2023) |>
+  complete(kode_2019 = paste0("R", 1:4), kode_2023 = paste0("R", 1:4), fill = list(n = 0L))
 
-p6 <- ggplot(mig_long, aes(x = kode_2023, y = factor(kode_2015, levels = paste0("R", 4:1)), fill = n)) +
+p6 <- ggplot(mig_long, aes(x = kode_2023, y = factor(kode_2019, levels = paste0("R", 4:1)), fill = n)) +
   geom_tile(color = "#FFFFFF", linewidth = 1.2) +
   geom_text(aes(label = n, color = n > 40), size = 5, fontface = "bold", show.legend = FALSE) +
   scale_fill_gradient(low = "#F1F5F9", high = "#0F766E") +
   scale_color_manual(values = c("FALSE" = "#0F172A", "TRUE" = "#FFFFFF")) +
   labs(
-    title = "Matriks Perpindahan Rezim Energi-Iklim Global Pasca-Kesepakatan Paris (2015 -> 2023)",
-    subtitle = "Sebanyak 22 negara berhasil naik kelas/dekarbonisasi (termasuk Malaysia R4 -> R3), tanpa satu pun negara mundur ke R1",
-    x = "Rezim Tahun 2023 (Pasca-Global Stocktake)",
-    y = "Rezim Tahun 2015 (Baseline Kesepakatan Paris)",
+    title = "Matriks Perpindahan Rezim Energi-Iklim Global (2019 -> 2023)",
+    subtitle = "Sebanyak 6 negara berpindah rezim dalam rentang 4 tahun (2019 ke 2023), tanpa satu pun mundur ke R1",
+    x = "Rezim Tahun 2023",
+    y = "Rezim Tahun 2019 (Baseline 4 Tahun)",
     fill = "Jumlah Negara",
-    caption = "Proyeksi 2015 menggunakan parameter penskalaan & centroid 2023 agar bebas kebocoran temporal (n = 189 negara)"
+    caption = "Proyeksi 2019 menggunakan parameter penskalaan & centroid 2023 agar bebas kebocoran temporal (n = 189 negara)"
   ) +
   theme_sdg
-ggsave(file.path(fig_dir, "fig06_migration_matrix_2015_2023.png"), p6, width = 8.5, height = 6, dpi = 300)
+ggsave(file.path(fig_dir, "fig06_migration_matrix_2019_2023.png"), p6, width = 8.5, height = 6, dpi = 300)
 
 # ==============================================================================
-# TAHAP 5B: JALUR PERUBAHAN 2015-2023 (FANNY) & PREDIKSI MEMASAK BERSIH 2023 (ELASTIC NET)
+# TAHAP 5B: JALUR PERUBAHAN 2019-2023 (FANNY)
 # ==============================================================================
-# Kohort: 189 negara yang sama (lengkap 2015 & 2023), nilai mentah tanpa pembulatan dari migration_df.
+# Kohort: 189 negara yang sama (lengkap 2019 & 2023), nilai mentah tanpa pembulatan dari migration_df.
 chg_raw <- with(migration_df, data.frame(
-  d_elec   = elec_2023 - elec_2015,
-  d_cook   = cooking_2023 - cooking_2015,
-  d_rshare = renew_share_2023 - renew_share_2015,
-  d_cap    = renew_cap_2023 - renew_cap_2015,
-  d_int    = energy_int_2023 - energy_int_2015,
-  d_co2    = co2_pc_2023 - co2_pc_2015
+  d_elec   = elec_2023 - elec_2019,
+  d_cook   = cooking_2023 - cooking_2019,
+  d_rshare = renew_share_2023 - renew_share_2019,
+  d_cap    = renew_cap_2023 - renew_cap_2019,
+  d_int    = energy_int_2023 - energy_int_2019,
+  d_co2    = co2_pc_2023 - co2_pc_2019
 ))
 # Fitur utama: selisih poin persen untuk tiga pangsa, selisih log1p untuk tiga fitur miring
 chg_feat <- transform(chg_raw,
-  d_cap = log1p(migration_df$renew_cap_2023) - log1p(migration_df$renew_cap_2015),
-  d_int = log1p(migration_df$energy_int_2023) - log1p(migration_df$energy_int_2015),
-  d_co2 = log1p(migration_df$co2_pc_2023) - log1p(migration_df$co2_pc_2015))
+  d_cap = log1p(migration_df$renew_cap_2023) - log1p(migration_df$renew_cap_2019),
+  d_int = log1p(migration_df$energy_int_2023) - log1p(migration_df$energy_int_2019),
+  d_co2 = log1p(migration_df$co2_pc_2023) - log1p(migration_df$co2_pc_2019))
 stopifnot("Selisih tidak cocok dengan kolom delta yang diekspor!" =
   max(abs(round(chg_raw$d_cook, 2) - migration_df$delta_cooking)) < 1e-9 &&
   max(abs(round(chg_raw$d_cap, 2) - migration_df$delta_renew_cap)) < 1e-9 &&
@@ -913,7 +917,7 @@ ari_path_raw <- round(mclust::adjustedRandIndex(path_id, raw_k), 4)
 ari_path_regime <- round(mclust::adjustedRandIndex(path_id, migration_df$regime_2023), 4)
 
 path_df <- tibble(iso3 = migration_df$iso3, country_en = migration_df$country_en,
-                  kode_2015 = migration_df$kode_2015, kode_2023 = migration_df$kode_2023,
+                  kode_2019 = migration_df$kode_2019, kode_2023 = migration_df$kode_2023,
                   pathway = paste0("P", path_id), memb_max = round(apply(U_path, 1, max), 4)) |>
   bind_cols(as_tibble(round(U_path, 4)), as_tibble(chg_raw))
 write_csv(path_df, file.path(tab_dir, "table_14_change_pathway_memberships.csv"))
@@ -939,101 +943,31 @@ cat(sprintf("  ARI jalur vs PAM = %.4f, vs FANNY selisih mentah = %.4f, vs rezim
             ari_path_pam, ari_path_raw, ari_path_regime))
 print(path_profiles |> select(pathway, n_negara, keanggotaan_rerata, starts_with("med_")))
 
-# Prediksi memasak bersih 2023 dari kondisi 2015 saja. Lipatan luar yang sama untuk ketiga model;
-# alpha dan lambda dipilih di lipatan dalam; standardisasi glmnet hanya memakai data latih.
-# Prediksi di luar 0-100 dipotong ke [0, 100] untuk semua model (ditetapkan sebelum fit).
-X15 <- with(migration_df, cbind(
-  elec = elec_2015, cook = cooking_2015, rshare = renew_share_2015,
-  log_cap = log1p(renew_cap_2015), log_int = log1p(energy_int_2015), log_co2 = log1p(co2_pc_2015)))
-y23 <- migration_df$cooking_2023
-K_OUTER <- 10L
-alpha_grid <- seq(0.1, 1, by = 0.1)
-set.seed(2026)
-fold_out <- sample(rep(seq_len(K_OUTER), length.out = nrow(X15)))
-tune_enet <- function(X, y, foldid) {
-  cvs <- lapply(alpha_grid, function(a) cv.glmnet(X, y, alpha = a, foldid = foldid, standardize = TRUE))
-  best <- which.min(vapply(cvs, function(cv) min(cv$cvm), numeric(1)))
-  list(cv = cvs[[best]], alpha = alpha_grid[best])
-}
-pred_raw <- matrix(NA_real_, nrow(X15), 3, dimnames = list(NULL, c("persistence", "ols_cook2015", "elastic_net")))
-tune_rows <- list()
-for (f in seq_len(K_OUTER)) {
-  tr <- fold_out != f; te <- !tr
-  pred_raw[te, "persistence"] <- X15[te, "cook"]
-  ols <- lm(y ~ cook, data = data.frame(y = y23[tr], cook = X15[tr, "cook"]))
-  pred_raw[te, "ols_cook2015"] <- predict(ols, newdata = data.frame(cook = X15[te, "cook"]))
-  set.seed(2026 + f)
-  tn <- tune_enet(X15[tr, ], y23[tr], sample(rep(1:10, length.out = sum(tr))))
-  pred_raw[te, "elastic_net"] <- as.numeric(predict(tn$cv, X15[te, , drop = FALSE], s = "lambda.min"))
-  cf <- as.numeric(coef(tn$cv, s = "lambda.min"))
-  tune_rows[[f]] <- tibble(lipatan = as.character(f), n_latih = sum(tr), n_uji = sum(te), alpha = tn$alpha,
-                           lambda = signif(tn$cv$lambda.min, 4), cv_mse = round(min(tn$cv$cvm), 3),
-                           n_koef_nonnol = sum(cf[-1] != 0), !!!setNames(as.list(round(cf, 5)), c("intercept", colnames(X15))))
-}
-# Model seluruh data (deskriptif, bukan untuk skor): koefisien pada skala asli
-set.seed(2026)
-tn_all <- tune_enet(X15, y23, sample(rep(1:10, length.out = nrow(X15))))
-cf_all <- as.numeric(coef(tn_all$cv, s = "lambda.min"))
-tune_tbl <- bind_rows(tune_rows, tibble(lipatan = "semua_data", n_latih = nrow(X15), n_uji = 0L, alpha = tn_all$alpha,
-  lambda = signif(tn_all$cv$lambda.min, 4), cv_mse = round(min(tn_all$cv$cvm), 3), n_koef_nonnol = sum(cf_all[-1] != 0),
-  !!!setNames(as.list(round(cf_all, 5)), c("intercept", colnames(X15)))))
-write_csv(tune_tbl, file.path(tab_dir, "table_17_clean_cooking_forecast_tuning.csv"))
-
-pred_clip <- pmin(pmax(pred_raw, 0), 100)
-abs_err <- abs(pred_clip - y23)
-set.seed(2026)
-boot_idx <- replicate(2000, sample(nrow(abs_err), replace = TRUE))
-# IK selisih MAE: sampel ulang berpasangan atas galat out-of-fold yang sudah ada (model tidak di-fit ulang)
-paired_ci <- function(a, b) {
-  d <- abs_err[, a] - abs_err[, b]
-  ci <- quantile(apply(boot_idx, 2, function(i) mean(d[i])), c(0.025, 0.975))
-  c(mean(d), ci)
-}
-fc_metrics <- tibble(
-  model = colnames(pred_clip),
-  mae_pp = round(colMeans(abs_err), 3),
-  rmse_pp = round(sqrt(colMeans((pred_clip - y23)^2)), 3),
-  n_prediksi_di_luar_0_100 = colSums(pred_raw < 0 | pred_raw > 100),
-  mae_pp_tanpa_potong = round(colMeans(abs(pred_raw - y23)), 3)
-)
-cmp <- rbind(paired_ci("elastic_net", "persistence"), paired_ci("elastic_net", "ols_cook2015"), paired_ci("ols_cook2015", "persistence"))
-fc_compare <- tibble(
-  perbandingan = c("elastic_net - persistence", "elastic_net - ols_cook2015", "ols_cook2015 - persistence"),
-  selisih_mae_pp = round(cmp[, 1], 3), ci95_bawah = round(cmp[, 2], 3), ci95_atas = round(cmp[, 3], 3)
-)
-write_csv(bind_rows(fc_metrics, fc_compare), file.path(tab_dir, "table_15_clean_cooking_forecast_metrics.csv"))
-fc_oof <- tibble(iso3 = migration_df$iso3, country_en = migration_df$country_en, lipatan = fold_out,
-                 cooking_2015 = X15[, "cook"], cooking_2023_aktual = y23) |>
-  bind_cols(as_tibble(round(pred_clip, 2)), as_tibble(round(pred_raw, 2), .name_repair = ~ paste0(.x, "_tanpa_potong")))
-write_csv(fc_oof, file.path(tab_dir, "table_16_clean_cooking_forecast_oof.csv"))
-
-cat(sprintf("\n[Tahap 5B] Prediksi memasak bersih 2023 (validasi silang %d lipatan antarnegara, satu interval 2015-2023):\n", K_OUTER))
-print(fc_metrics); print(fc_compare)
-
 # ==============================================================================
 # TAHAP 5C: PROYEKSI 2027 HORIZON 4 TAHUN (2019 -> 2023 -> 2027) & PERPINDAHAN REZIM
 # ==============================================================================
 # Data resmi UNSD & World Bank tahun 2025-2026 belum tersedia (0 baris pada seri SDG 7),
 # sementara 2024 kehilangan separuh negara pada 7.2.1 & 7.3.1. Tahun 2019 lengkap 189/189,
-# sehingga horizon 4 tahun (2019 -> 2023) dipakai untuk memvalidasi model dan memproyeksikan
-# 2027 (2023 + 4) pada keenam indikator serta posisi rezim proyeksi terhadap centroid 2023.
-panel_2019_path <- file.path(data_dir, "sdg_energy_climate_panel_2019.csv")
-stopifnot("Berkas data/sdg_energy_climate_panel_2019.csv tidak ditemukan!" = file.exists(panel_2019_path))
-d19 <- read_csv(panel_2019_path, show_col_types = FALSE) |>
-  filter(year == 2019, iso3 %in% migration_df$iso3) |>
-  arrange(match(iso3, migration_df$iso3))
-stopifnot(
-  "Kohort 2019 harus cocok persis 189 negara dengan migration_df!" = identical(d19$iso3, migration_df$iso3),
-  "Data 2019 harus lengkap pada keenam indikator inti!" = all(complete.cases(d19[, core_vars]))
-)
+# sehingga horizon 4 tahun (2019 -> 2023) dipakai untuk validasi silang 10 lipatan dan
+# memproyeksikan 2027 (2023 + 4) pada keenam indikator serta posisi rezim pada centroid 2023.
+K_OUTER <- 10L
+alpha_grid <- seq(0.1, 1, by = 0.1)
+set.seed(2026)
+fold_out <- sample(rep(seq_len(K_OUTER), length.out = nrow(migration_df)))
+boot_idx <- replicate(2000, sample(nrow(migration_df), replace = TRUE))
+tune_enet <- function(X, y, foldid) {
+  cvs <- lapply(alpha_grid, function(a) cv.glmnet(X, y, alpha = a, foldid = foldid, standardize = TRUE))
+  best <- which.min(vapply(cvs, function(cv) min(cv$cvm), numeric(1)))
+  list(cv = cvs[[best]], alpha = alpha_grid[best])
+}
 
-X19 <- with(d19, cbind(
-  elec    = elec_access,
-  cook    = clean_cooking,
-  rshare  = renew_share_tfec,
-  log_cap = log1p(renew_cap_wpc),
-  log_int = log1p(energy_intensity),
-  log_co2 = log1p(co2_per_capita)
+X19 <- with(migration_df, cbind(
+  elec    = elec_2019,
+  cook    = cooking_2019,
+  rshare  = renew_share_2019,
+  log_cap = log1p(renew_cap_2019),
+  log_int = log1p(energy_int_2019),
+  log_co2 = log1p(co2_pc_2019)
 ))
 X23_fc <- with(migration_df, cbind(
   elec    = elec_2023,
@@ -1129,7 +1063,7 @@ for (ti in seq_along(target_specs_2027)) {
 }
 
 fc27_cv_tbl <- bind_rows(fc27_cv_rows)
-write_csv(fc27_cv_tbl, file.path(tab_dir, "table_18_forecast_2027_cv_metrics.csv"))
+write_csv(fc27_cv_tbl, file.path(tab_dir, "table_15_forecast_2027_cv_metrics.csv"))
 
 # Validasi out-of-fold perpindahan rezim (2019 -> 2023) & proyeksi rezim 2027 pada centroid 2023
 project_to_2023_regimes <- function(df6) {
@@ -1195,12 +1129,12 @@ proj27_df <- tibble(
   d_int_23_27 = round(proj_en_27[, "energy_intensity"] - migration_df$energy_int_2023, 2),
   d_co2_23_27 = round(proj_en_27[, "co2_per_capita"] - migration_df$co2_pc_2023, 2)
 )
-write_csv(proj27_df, file.path(tab_dir, "table_20_forecast_2027_country_projections.csv"))
+write_csv(proj27_df, file.path(tab_dir, "table_17_forecast_2027_country_projections.csv"))
 
 mig_2027 <- proj27_df |>
   count(kode_2023, kode_2027) |>
   complete(kode_2023 = paste0("R", 1:4), kode_2027 = paste0("R", 1:4), fill = list(n = 0L))
-write_csv(bind_rows(mig_2027, regime_cv_summary), file.path(tab_dir, "table_19_forecast_2027_regime_migration.csv"))
+write_csv(bind_rows(mig_2027, regime_cv_summary), file.path(tab_dir, "table_16_forecast_2027_regime_migration.csv"))
 
 cat("\n[Tahap 5C] Validasi silang 4-tahunan (2019 -> 2023) 6 indikator (Elastic Net):\n")
 print(fc27_cv_tbl |> filter(model == "elastic_net") |> select(target, satuan, mae_oof, rmse_oof, r2_oof, selisih_mae_vs_pers, ci95_bawah_vs_pers, ci95_atas_vs_pers))
@@ -1328,7 +1262,7 @@ outliers_export <- outliers_maha |>
   select(-any_of("country_en_iso"))
 
 countries_export <- migration_df |>
-  left_join(proj27_df |> select(iso3, kode_2019, regime_2027, kode_2027, berubah_2027, margin_centroid_2027,
+  left_join(proj27_df |> select(iso3, regime_2027, kode_2027, berubah_2027, margin_centroid_2027,
                                 elec_2027, cooking_2027, renew_share_2027, renew_cap_2027, energy_int_2027, co2_pc_2027),
             by = "iso3") |>
   left_join(iso_names_df, by = "iso3") |>
@@ -1338,7 +1272,7 @@ countries_export <- migration_df |>
     gdp_pc_ppp   = round(gdp_pc_ppp, 0),
     urban_pct    = round(urban_pct, 1),
     across(c(elec_2023, cooking_2023, renew_share_2023, renew_cap_2023, energy_int_2023, co2_pc_2023,
-             elec_2015, cooking_2015, renew_share_2015, renew_cap_2015, energy_int_2015, co2_pc_2015,
+             elec_2019, cooking_2019, renew_share_2019, renew_cap_2019, energy_int_2019, co2_pc_2019,
              cap_solar_wpc, cap_wind_wpc, cap_hydro_wpc, cap_geothermal_wpc, cap_bioenergy_wpc),
            ~ round(.x, 2))
   ) |>
@@ -1379,11 +1313,6 @@ dashboard_payload <- list(
     k_comparison = path_eval, profiles = path_profiles,
     countries = path_df |> select(iso3, pathway, memb_max, starts_with("memb_P"))
   ),
-  cooking_forecast = list(
-    k_outer = K_OUTER, alpha_grid = alpha_grid,
-    metrics = fc_metrics, comparisons = fc_compare, tuning = tune_tbl,
-    countries = fc_oof |> select(iso3, lipatan, persistence, ols_cook2015, elastic_net)
-  ),
   forecast_2027 = list(
     train_from = 2019L, train_to = 2023L, horizon_years = 4L, target_year = 2027L,
     k_outer = K_OUTER,
@@ -1409,6 +1338,6 @@ writeLines(paste0("window.__SDG_DASHBOARD_DATA__ = ", json_txt, ";"),
            file.path(dash_dir, "dashboard_data.js"), useBytes = TRUE)
 
 cat("\n======================================================================\n")
-cat("SELESAI! Seluruh 20 tabel CSV, 6 grafik PNG (300 DPI), dan data JSON\n")
+cat("SELESAI! Seluruh 17 tabel CSV, 6 grafik PNG (300 DPI), dan data JSON\n")
 cat("dashboard berhasil dibangun ulang secara konsisten.\n")
 cat("======================================================================\n")

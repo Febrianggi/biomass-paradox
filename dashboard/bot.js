@@ -23,22 +23,33 @@ const UI = {
     footLocal: "Mode lokal: Tidak ada AI yang terlibat.",
     footAi: (prov) => `Dijawab AI (${prov === "groq" ? "Groq" : "Gemini"}) berdasarkan isi dashboard.`,
     footFallback: "Mode lokal: Tidak ada AI yang terlibat.",
-    help: "Saya belum menangkap pertanyaannya. Coba sebut negara atau kodenya (misalnya \"Indo gimana?\", \"MY\", \"Spanyol\", \"ESP\"), bandingkan dua negara, ASEAN, R1 sampai R4, \"memasak bersih terendah\", atau tanya metode (K-Means, GMM, jalur P1/P2, prediksi).",
+    help: "Saya belum menangkap pertanyaannya. Coba sebut negara atau kodenya (misalnya \"Indo gimana?\", \"MY\", \"Spanyol\", \"ESP\"), bandingkan dua negara, ASEAN, R1 sampai R4, \"memasak bersih terendah\", atau tanya metode (K-Means, GMM, jalur P1/P2/P3, proyeksi 2027).",
     nf: (v, d = 1) => Number(v).toLocaleString("id-ID", { minimumFractionDigits: d, maximumFractionDigits: d }),
-    country: (c, r, n, pw, nm) => `${nm(c)} (${c.iso3}) masuk ${r.kode_rezim}, ${r.nama_id}${c.kode_2015 !== c.kode_2023 ? `; pada 2015 masih di ${c.kode_2015}` : ""}${pw ? ` (jalur perubahan ${pw.pathway})` : ""}. ` +
-      `Pada 2023: akses listrik ${n(c.elec_2023)}%, memasak bersih ${n(c.cooking_2023, 0)}% (2015: ${n(c.cooking_2015, 0)}%), pangsa energi terbarukan ${n(c.renew_share_2023)}%, ` +
-      `kapasitas listrik terbarukan ${n(c.renew_cap_2023)} W per orang, intensitas energi ${n(c.energy_int_2023, 2)} MJ per USD PPP, dan CO2 ${n(c.co2_pc_2023, 2)} ton per orang.`,
-    compare: (cs, n, nm) => "Perbandingan 2023:\n" + cs.map((c) => `${nm(c)} (${c.iso3}): ${c.kode_2023}, listrik ${n(c.elec_2023)}%, memasak bersih ${n(c.cooking_2023, 0)}%, terbarukan ${n(c.renew_share_2023)}%, kapasitas ${n(c.renew_cap_2023)} W per orang, CO2 ${n(c.co2_pc_2023, 2)} t per orang`).join("\n"),
-    asean: (cs, n, nm) => "Negara ASEAN, 2023 (rezim, memasak bersih, kapasitas listrik terbarukan per orang):\n" + cs.map((c) => `${nm(c)} (${c.iso3}): ${c.kode_2023}, ${n(c.cooking_2023, 0)}%, ${n(c.renew_cap_2023)} W`).join("\n"),
+    country: (c, r, n, pw, nm) => `${nm(c)} (${c.iso3}) masuk ${r.kode_rezim}, ${r.nama_id}${c.kode_2019 !== c.kode_2023 ? `; pada 2019 di ${c.kode_2019}` : ""}${c.kode_2027 !== c.kode_2023 ? `; proyeksi 2027 berpotensi pindah ke ${c.kode_2027}` : `; proyeksi 2027 bertahan di ${c.kode_2027}`}${pw ? ` (jalur perubahan ${pw.pathway})` : ""}. ` +
+      `Pada 2023: akses listrik ${n(c.elec_2023)}%, memasak bersih ${n(c.cooking_2023, 0)}% (2019: ${n(c.cooking_2019, 0)}%, proyeksi 2027: ${n(c.cooking_2027)}%), pangsa energi terbarukan ${n(c.renew_share_2023)}%, ` +
+      `kapasitas listrik terbarukan ${n(c.renew_cap_2023)} W per orang (proyeksi 2027: ${n(c.renew_cap_2027)} W), intensitas energi ${n(c.energy_int_2023, 2)} MJ per USD PPP, dan CO2 ${n(c.co2_pc_2023, 2)} ton per orang.`,
+    compare: (cs, n, nm) => "Perbandingan 2023:\n" + cs.map((c) => `${nm(c)} (${c.iso3}): ${c.kode_2023} (2027*: ${c.kode_2027}), listrik ${n(c.elec_2023)}%, memasak bersih ${n(c.cooking_2023, 0)}%, terbarukan ${n(c.renew_share_2023)}%, kapasitas ${n(c.renew_cap_2023)} W per orang, CO2 ${n(c.co2_pc_2023, 2)} t per orang`).join("\n"),
+    asean: (cs, n, nm) => "Negara ASEAN, 2023 (rezim, memasak bersih, kapasitas listrik terbarukan per orang):\n" + cs.map((c) => `${nm(c)} (${c.iso3}): ${c.kode_2023}${c.kode_2027 !== c.kode_2023 ? `->${c.kode_2027}*` : ""}, ${n(c.cooking_2023, 0)}%, ${n(c.renew_cap_2023)} W`).join("\n"),
     regime: (r, n) => `${r.kode_rezim}, ${r.nama_id}: ${r.n_negara} negara dengan ${n(r.populasi_miliar, 2)} miliar penduduk. Rata-rata akses listrik ${n(r.elec_mean)}%, memasak bersih ${n(r.cooking_mean)}%, pangsa terbarukan ${n(r.renew_share_mean)}%; median kapasitas listrik terbarukan ${n(r.renew_cap_median)} W per orang dan median CO2 ${n(r.co2_pc_median, 2)} ton per orang.`,
     regimes: (rs) => "Empat rezim 2023: " + rs.map((r) => `${r.kode_rezim} ${r.nama_id} (${r.n_negara} negara)`).join("; ") + ". Sebut R1 sampai R4 untuk rinciannya.",
     extreme: (lbl, hi, cs, n, d) => `${hi ? "Tertinggi" : "Terendah"} untuk ${lbl} (2023): ` + cs.map((c, i) => `${i + 1}. ${c.name} (${c.iso3}) ${n(c.v, d)}`).join(", ") + ".",
     labels: { cooking_2023: "memasak bersih (%)", elec_2023: "akses listrik (%)", renew_share_2023: "pangsa energi terbarukan (%)", renew_cap_2023: "kapasitas listrik terbarukan (W per orang)", energy_int_2023: "intensitas energi (MJ per USD PPP)", co2_pc_2023: "CO2 per orang (ton)" },
-    moves: (list) => "Perpindahan rezim 2015 ke 2023: " + list.map((m) => `${m.kode_2015} ke ${m.kode_2023}: ${m.n} negara`).join("; ") + ". Negara lain tetap di rezimnya. Ini perbandingan dua titik waktu, bukan dampak kebijakan.",
+    moves: (list19, list27) => "Perpindahan rezim 2019 ke 2023: " + list19.map((m) => `${m.kode_2019} ke ${m.kode_2023}: ${m.n} negara`).join("; ") + " (0 turun). " +
+      (list27 && list27.length ? "Proyeksi 2023 ke 2027* (Elastic Net): " + list27.map((m) => `${m.kode_2023} ke ${m.kode_2027}: ${m.n} negara`).join("; ") + " (0 turun). " : "") +
+      "Perbandingan historis bersifat deskriptif dan proyeksi 2027 mengasumsikan dinamika 2019-2023 berlanjut.",
     paradox: (k, rs, n) => `Pangsa energi terbarukan (SDG 7.2.1) ikut menghitung kayu bakar dan arang di tungku rumah. Akibatnya, pada 2023 ada ${k} negara dengan pangsa terbarukan di atas 50% tetapi memasak bersih di bawah 20%. Di rezim R1 rata-rata pangsa terbarukannya ${n(rs.renew_share_mean)}%, sementara memasak bersih hanya ${n(rs.cooking_mean)}%.`,
     methods: (km4, gmm4, meta, n) => `K-Means k=4 dipilih untuk analisis utama karena stabil di antara model multi-rezim (rerata Jaccard ${n(km4.jaccard_mean, 3)}, minimum ${n(km4.jaccard_min, 3)}, Silhouette ${n(km4.silhouette, 3)}, dan sepakat dengan Ward D2 ARI 0,795). Alternatif biner k=2 lebih tinggi secara kasar (B1 dan B2), tetapi menggabungkan negara bersih R3 dengan fosil tinggi R4. GMM bebas (VEV) turun ke Silhouette ${n(gmm4.silhouette, 3)} dan sensitif terhadap kovarians (dengan model sferis EII, Silhouette naik ke ${n(meta.gmm_eii_sil_k4, 3)} dan ARI ke ${n(meta.gmm_eii_ari_k4, 3)}).`,
-    pathways: (p1, p2, pw, n) => `Pengelompokan perubahan 2015 ke 2023 (FANNY k=2) membentuk dua arah, tetapi strukturnya lemah (Silhouette ${n(pw.k_comparison.find((x) => x.k === pw.k).silhouette, 3)}): P1 (${p1.n_negara} negara) menambah akses (median listrik +${n(p1.med_d_elec_pp)} poin, memasak bersih +${n(p1.med_d_cook_pp, 0)} poin), sedangkan P2 (${p2.n_negara} negara) bergerak ke karbon lebih rendah (kapasitas EBT +${n(p2.med_d_cap_wpc)} W, CO2 ${n(p2.med_d_co2_t, 2)} t).`,
-    forecast: (pers, ols, enet, n) => `Prediksi akses memasak bersih 2023 dari data 2015 (validasi silang 10 lipatan): MAE out-of-fold persistensi ${n(pers.mae_pp, 2)} poin persen, regresi linear memasak 2015 ${n(ols.mae_pp, 2)} poin, dan elastic net keenam indikator ${n(enet.mae_pp, 2)} poin. Ini validasi historis antarnegara 2015 ke 2023, bukan peramalan tahun mendatang.`,
+    pathways: (profiles, pw, n) => `Pengelompokan perubahan 2019 ke 2023 (FANNY k=${pw.k}) membentuk ${pw.k} arah transisi dengan struktur lemah (Silhouette ${n(pw.k_comparison.find((x) => x.k === pw.k).silhouette, 3)}): ` +
+      profiles.map((p) => `${p.pathway} (${p.n_negara} negara: listrik ${p.med_d_elec_pp >= 0 ? "+" : ""}${n(p.med_d_elec_pp)} pp, memasak ${p.med_d_cook_pp >= 0 ? "+" : ""}${n(p.med_d_cook_pp, 0)} pp, kapasitas EBT ${p.med_d_cap_wpc >= 0 ? "+" : ""}${n(p.med_d_cap_wpc)} W, CO2 ${p.med_d_co2_t >= 0 ? "+" : ""}${n(p.med_d_co2_t, 2)} t)`).join("; ") + ".",
+    forecast: (fc, n) => {
+      const m = (tgt, mdl) => fc.cv_metrics.find((x) => x.target === tgt && x.model === mdl);
+      const rc = (mdl) => fc.regime_cv.find((x) => x.model === mdl);
+      const ccE = m("clean_cooking", "elastic_net"), ccP = m("clean_cooking", "persistence");
+      const elE = m("elec_access", "elastic_net"), elP = m("elec_access", "persistence");
+      const rcE = rc("elastic_net_oof"), rcP = rc("persistence_2019");
+      const sh = (fc.migration_2027 || []).filter((x) => x.kode_2023 !== x.kode_2027 && x.n > 0).map((x) => `${x.kode_2023} ke ${x.kode_2027} (${x.n})`).join(", ");
+      return `Proyeksi terawasi 4 tahunan (dilatih dan divalidasi silang 10 lipatan pada 2019 ke 2023, lalu diterapkan ke data 2023 untuk 2027*): Elastic Net menurunkan MAE out-of-fold dibanding persistensi pada memasak bersih (${n(ccE.mae_oof, 2)} vs ${n(ccP.mae_oof, 2)} pp) dan akses listrik (${n(elE.mae_oof, 2)} vs ${n(elP.mae_oof, 2)} pp), dengan akurasi rezim OOF ${n(rcE.akurasi_persen, 1)}% (${rcE.n_benar}/189) vs ${n(rcP.akurasi_persen, 1)}%. Pada 2027*, ${fc.n_shifted} negara diproyeksikan berpotensi berpindah rezim: ${sh} (0 turun).`;
+    },
     outliers: (list, n, nm) => `Enam pencilan multivariat Mahalanobis (D2 > 22,46, tetap dipertahankan karena mewakili kondisi nyata): ` + list.map((o) => `${nm(o)} (${o.iso3}, D2 ${n(o.mahalanobis_d2, 1)})`).join("; ") + "."
   },
   en: {
@@ -51,22 +62,33 @@ const UI = {
     footLocal: "Local mode: No AI involved.",
     footAi: (prov) => `Answered by AI (${prov === "groq" ? "Groq" : "Gemini"}) based on dashboard content.`,
     footFallback: "Local mode: No AI involved.",
-    help: "I did not catch the question. Try a country name or code (for example \"Indo\", \"MY\", \"Spain\", \"ESP\"), two countries to compare, ASEAN, R1 to R4, \"lowest clean cooking\", or ask about methods (K-Means, GMM, pathways P1/P2, forecast).",
+    help: "I did not catch the question. Try a country name or code (for example \"Indo\", \"MY\", \"Spain\", \"ESP\"), two countries to compare, ASEAN, R1 to R4, \"lowest clean cooking\", or ask about methods (K-Means, GMM, pathways P1/P2/P3, 2027 projection).",
     nf: (v, d = 1) => Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }),
-    country: (c, r, n, pw, nm) => `${nm(c)} (${c.iso3}) is in ${r.kode_rezim}, ${r.nama_en}${c.kode_2015 !== c.kode_2023 ? `; in 2015 it was in ${c.kode_2015}` : ""}${pw ? ` (change pathway ${pw.pathway})` : ""}. ` +
-      `In 2023: electricity access ${n(c.elec_2023)}%, clean cooking ${n(c.cooking_2023, 0)}% (2015: ${n(c.cooking_2015, 0)}%), renewable share ${n(c.renew_share_2023)}%, ` +
-      `renewable power capacity ${n(c.renew_cap_2023)} W per person, energy intensity ${n(c.energy_int_2023, 2)} MJ per PPP USD, and CO2 ${n(c.co2_pc_2023, 2)} t per person.`,
-    compare: (cs, n, nm) => "Comparison, 2023:\n" + cs.map((c) => `${nm(c)} (${c.iso3}): ${c.kode_2023}, electricity ${n(c.elec_2023)}%, clean cooking ${n(c.cooking_2023, 0)}%, renewable ${n(c.renew_share_2023)}%, capacity ${n(c.renew_cap_2023)} W per person, CO2 ${n(c.co2_pc_2023, 2)} t per person`).join("\n"),
-    asean: (cs, n, nm) => "ASEAN countries, 2023 (regime, clean cooking, renewable power capacity per person):\n" + cs.map((c) => `${nm(c)} (${c.iso3}): ${c.kode_2023}, ${n(c.cooking_2023, 0)}%, ${n(c.renew_cap_2023)} W`).join("\n"),
+    country: (c, r, n, pw, nm) => `${nm(c)} (${c.iso3}) is in ${r.kode_rezim}, ${r.nama_en}${c.kode_2019 !== c.kode_2023 ? `; in 2019 it was in ${c.kode_2019}` : ""}${c.kode_2027 !== c.kode_2023 ? `; 2027 projection shifts to ${c.kode_2027}` : `; 2027 projection stays in ${c.kode_2027}`}${pw ? ` (change pathway ${pw.pathway})` : ""}. ` +
+      `In 2023: electricity access ${n(c.elec_2023)}%, clean cooking ${n(c.cooking_2023, 0)}% (2019: ${n(c.cooking_2019, 0)}%, 2027*: ${n(c.cooking_2027)}%), renewable share ${n(c.renew_share_2023)}%, ` +
+      `renewable power capacity ${n(c.renew_cap_2023)} W per person (2027*: ${n(c.renew_cap_2027)} W), energy intensity ${n(c.energy_int_2023, 2)} MJ per PPP USD, and CO2 ${n(c.co2_pc_2023, 2)} t per person.`,
+    compare: (cs, n, nm) => "Comparison, 2023:\n" + cs.map((c) => `${nm(c)} (${c.iso3}): ${c.kode_2023} (2027*: ${c.kode_2027}), electricity ${n(c.elec_2023)}%, clean cooking ${n(c.cooking_2023, 0)}%, renewable ${n(c.renew_share_2023)}%, capacity ${n(c.renew_cap_2023)} W per person, CO2 ${n(c.co2_pc_2023, 2)} t per person`).join("\n"),
+    asean: (cs, n, nm) => "ASEAN countries, 2023 (regime, clean cooking, renewable power capacity per person):\n" + cs.map((c) => `${nm(c)} (${c.iso3}): ${c.kode_2023}${c.kode_2027 !== c.kode_2023 ? `->${c.kode_2027}*` : ""}, ${n(c.cooking_2023, 0)}%, ${n(c.renew_cap_2023)} W`).join("\n"),
     regime: (r, n) => `${r.kode_rezim}, ${r.nama_en}: ${r.n_negara} countries with ${n(r.populasi_miliar, 2)} billion people. Mean electricity access ${n(r.elec_mean)}%, clean cooking ${n(r.cooking_mean)}%, renewable share ${n(r.renew_share_mean)}%; median renewable capacity ${n(r.renew_cap_median)} W per person and median CO2 ${n(r.co2_pc_median, 2)} t per person.`,
     regimes: (rs) => "The four 2023 regimes: " + rs.map((r) => `${r.kode_rezim} ${r.nama_en} (${r.n_negara} countries)`).join("; ") + ". Name R1 to R4 for details.",
     extreme: (lbl, hi, cs, n, d) => `${hi ? "Highest" : "Lowest"} ${lbl} (2023): ` + cs.map((c, i) => `${i + 1}. ${c.name} (${c.iso3}) ${n(c.v, d)}`).join(", ") + ".",
     labels: { cooking_2023: "clean cooking (%)", elec_2023: "electricity access (%)", renew_share_2023: "renewable share (%)", renew_cap_2023: "renewable power capacity (W per person)", energy_int_2023: "energy intensity (MJ per PPP USD)", co2_pc_2023: "CO2 per person (t)" },
-    moves: (list) => "Regime changes from 2015 to 2023: " + list.map((m) => `${m.kode_2015} to ${m.kode_2023}: ${m.n} countries`).join("; ") + ". All other countries stayed in their regime. This compares two points in time, not a policy effect.",
+    moves: (list19, list27) => "Regime changes from 2019 to 2023: " + list19.map((m) => `${m.kode_2019} to ${m.kode_2023}: ${m.n} countries`).join("; ") + " (0 regressed). " +
+      (list27 && list27.length ? "Projected 2023 to 2027* (Elastic Net): " + list27.map((m) => `${m.kode_2023} to ${m.kode_2027}: ${m.n} countries`).join("; ") + " (0 regressed). " : "") +
+      "Historical changes are descriptive and 2027 projections assume 2019-2023 dynamics persist.",
     paradox: (k, rs, n) => `The renewable share (SDG 7.2.1) counts firewood and charcoal burned in home stoves. So in 2023, ${k} countries had a renewable share above 50% but clean cooking below 20%. In regime R1 the mean renewable share is ${n(rs.renew_share_mean)}%, while clean cooking is only ${n(rs.cooking_mean)}%.`,
     methods: (km4, gmm4, meta, n) => `K-Means k=4 is the chosen multi-regime model for its stability (mean Jaccard ${n(km4.jaccard_mean, 3)}, min ${n(km4.jaccard_min, 3)}, Silhouette ${n(km4.silhouette, 3)}, Ward D2 ARI 0.795). Coarse binary k=2 scores higher globally (B1/B2) but merges clean R3 and fossil-heavy R4. Unconstrained BIC GMM (VEV) drops to Silhouette ${n(gmm4.silhouette, 3)} due to covariance sensitivity (spherical EII raises Silhouette to ${n(meta.gmm_eii_sil_k4, 3)} and ARI to ${n(meta.gmm_eii_ari_k4, 3)}).`,
-    pathways: (p1, p2, pw, n) => `2015 to 2023 change clustering (FANNY k=2) summarises two directions with weak structure (Silhouette ${n(pw.k_comparison.find((x) => x.k === pw.k).silhouette, 3)}): P1 (${p1.n_negara} countries) gained access (median electricity +${n(p1.med_d_elec_pp)} pp, clean cooking +${n(p1.med_d_cook_pp, 0)} pp), while P2 (${p2.n_negara} countries) shifted toward lower carbon (renewable capacity +${n(p2.med_d_cap_wpc)} W, CO2 ${n(p2.med_d_co2_t, 2)} t).`,
-    forecast: (pers, ols, enet, n) => `Predicting 2023 clean cooking from 2015 data (10-fold cross-validation): out-of-fold MAE is ${n(pers.mae_pp, 2)} pp for persistence, ${n(ols.mae_pp, 2)} pp for 2015 cooking regression, and ${n(enet.mae_pp, 2)} pp for elastic net on all six indicators. This is historical cross-country validation, not a future forecast.`,
+    pathways: (profiles, pw, n) => `2019 to 2023 change clustering (FANNY k=${pw.k}) summarises ${pw.k} transition directions with weak structure (Silhouette ${n(pw.k_comparison.find((x) => x.k === pw.k).silhouette, 3)}): ` +
+      profiles.map((p) => `${p.pathway} (${p.n_negara} countries: elec ${p.med_d_elec_pp >= 0 ? "+" : ""}${n(p.med_d_elec_pp)} pp, cook ${p.med_d_cook_pp >= 0 ? "+" : ""}${n(p.med_d_cook_pp, 0)} pp, cap ${p.med_d_cap_wpc >= 0 ? "+" : ""}${n(p.med_d_cap_wpc)} W, CO2 ${p.med_d_co2_t >= 0 ? "+" : ""}${n(p.med_d_co2_t, 2)} t)`).join("; ") + ".",
+    forecast: (fc, n) => {
+      const m = (tgt, mdl) => fc.cv_metrics.find((x) => x.target === tgt && x.model === mdl);
+      const rc = (mdl) => fc.regime_cv.find((x) => x.model === mdl);
+      const ccE = m("clean_cooking", "elastic_net"), ccP = m("clean_cooking", "persistence");
+      const elE = m("elec_access", "elastic_net"), elP = m("elec_access", "persistence");
+      const rcE = rc("elastic_net_oof"), rcP = rc("persistence_2019");
+      const sh = (fc.migration_2027 || []).filter((x) => x.kode_2023 !== x.kode_2027 && x.n > 0).map((x) => `${x.kode_2023} to ${x.kode_2027} (${x.n})`).join(", ");
+      return `4-year supervised projection (10-fold CV validated on 2019 to 2023, then applied to 2023 data for 2027*): Elastic Net lowers out-of-fold MAE over persistence on clean cooking (${n(ccE.mae_oof, 2)} vs ${n(ccP.mae_oof, 2)} pp) and electricity (${n(elE.mae_oof, 2)} vs ${n(elP.mae_oof, 2)} pp), reaching ${n(rcE.akurasi_persen, 1)}% OOF regime accuracy (${rcE.n_benar}/189) vs ${n(rcP.akurasi_persen, 1)}%. For 2027*, ${fc.n_shifted} economies are projected to shift regimes: ${sh} (0 regressing).`;
+    },
     outliers: (list, n, nm) => `Six Mahalanobis multivariate outliers (D2 > 22.46, retained as real regimes): ` + list.map((o) => `${nm(o)} (${o.iso3}, D2 ${n(o.mahalanobis_d2, 1)})`).join("; ") + "."
   }
 };
@@ -103,14 +125,14 @@ const STOP_WORDS = new Set([
   "siapa", "apakah", "dengan", "sejak", "tahun", "lebih", "paling", "masuk", "adalah", "untuk", "dalam",
   "tertinggi", "terendah", "sedikit", "banyak", "besar", "kecil", "pindah", "perpindahan", "migrasi", "bergerak",
   "berubah", "perubahan", "paradoks", "biomassa", "metode", "algoritma", "klaster", "kelompok", "jalur",
-  "prediksi", "ramalan", "persistensi", "elastic", "pencilan", "outlier", "outliers", "mahalanobis", "median",
+  "prediksi", "ramalan", "proyeksi", "persistensi", "elastic", "pencilan", "outlier", "outliers", "mahalanobis", "median",
   "dunia", "global", "orang", "persen", "terpilih", "bagusan", "unggul", "kalah", "menang", "bukan", "tetapi",
   "jelaskan", "ceritakan", "tolong", "coba", "pilih", "peta", "grafik", "tabel", "dashboard", "atlas",
   "country", "countries", "regime", "regimes", "electric", "electricity", "cooking", "clean", "energy",
   "renewable", "capacity", "intensity", "carbon", "emission", "emissions", "compare", "comparison", "between",
   "about", "which", "where", "since", "moved", "migration", "change", "changes", "paradox", "biomass",
   "method", "methods", "algorithm", "cluster", "clusters", "pathway", "pathways", "predict", "prediction",
-  "forecast", "persistence", "highest", "lowest", "least", "smallest", "largest", "world", "people",
+  "forecast", "projection", "projections", "persistence", "highest", "lowest", "least", "smallest", "largest", "world", "people",
   "selected", "better", "worse", "versus", "explain", "describe", "please", "chart", "table", "model", "models",
   "kmeans", "silhouette", "jaccard", "bootstrap", "chosen", "binary", "modern", "fossil", "traditional", "doing"
 ]);
@@ -216,7 +238,7 @@ document.body.append(launch, panel);
 const $ = (s) => panel.querySelector(s);
 const stateBox = $(".bp-state"), log = $(".bp-log"), chips = $(".bp-chips"), input = $("#bp-q"), sendBtn = $("[data-send]"), foot = $(".bp-foot");
 let data = null, status = "idle", busy = false;
-let summaryContext = "", cachedContext = "", fuzzyVocab = [], pwByIso = new Map(), fcByIso = new Map(), rowByIso = new Map();
+let summaryContext = "", cachedContext = "", fuzzyVocab = [], pwByIso = new Map(), rowByIso = new Map();
 let lastMode = "local", lastProvider = "gemini";
 const history = [], replyCache = new Map();
 const cName = (c) => (lang() === "id" && c && c.country_id) ? c.country_id : (c ? c.country_en : "");
@@ -261,7 +283,6 @@ const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCa
 
 function buildIndexes() {
   pwByIso = new Map((data.pathways?.countries || []).map((x) => [x.iso3, x]));
-  fcByIso = new Map((data.cooking_forecast?.countries || []).map((x) => [x.iso3, x]));
 
   const vocab = [];
   const seen = new Set();
@@ -278,37 +299,40 @@ function buildIndexes() {
   }
   fuzzyVocab = vocab;
 
-  // Compact grounding blocks for the AI Worker (summary ~1.5 KB; full 189 countries ~16 KB).
+  // Compact grounding blocks for the AI Worker (summary ~1.8 KB; full 189 countries ~18 KB).
   const rLines = data.regimes.map((r) =>
     `${r.kode_rezim} (${r.nama_en} / ${r.nama_id}): n=${r.n_negara}, pop=${r.populasi_miliar}B, mean elec=${r.elec_mean}%, cook=${r.cooking_mean}%, rshare=${r.renew_share_mean}%, med cap=${r.renew_cap_median}W, med CO2=${r.co2_pc_median}t, Jaccard=${r.jaccard_km}`
   );
   const k2Lines = (data.regimes_k2 || []).map((b) => `${b.kode_k2} (${b.nama_en}): n=${b.n_negara}, comp=${b.komposisi_rezim_k4}, Jaccard=${b.jaccard_km_k2}`);
-  const migLines = data.migration.filter((m) => m.kode_2015 !== m.kode_2023 && m.n > 0).map((m) => `${m.kode_2015}->${m.kode_2023}:${m.n}`);
+  const migLines = data.migration.filter((m) => m.kode_2019 !== m.kode_2023 && m.n > 0).map((m) => `${m.kode_2019}->${m.kode_2023}:${m.n}`);
   const km4 = data.eval_grid.find((m) => m.metode === "KMeans" && m.k === 4);
   const gmm4 = data.eval_grid.find((m) => m.metode === "GMM" && m.k === 4);
+  const pwSil = data.pathways?.k_comparison?.find((x) => x.k === data.pathways.k)?.silhouette ?? "-";
   const pwLines = (data.pathways?.profiles || []).map((p) => `${p.pathway}: n=${p.n_negara}, dElec=${p.med_d_elec_pp}pp, dCook=${p.med_d_cook_pp}pp, dRSh=${p.med_d_rshare_pp}pp, dCap=${p.med_d_cap_wpc}W, dCO2=${p.med_d_co2_t}t, regimes=${p.rezim_2023}`);
-  const fcLines = (data.cooking_forecast?.metrics || []).map((m) => `${m.model}: MAE=${m.mae_pp}pp, RMSE=${m.rmse_pp}pp`);
+  const fcEn = (data.forecast_2027?.cv_metrics || []).filter((m) => m.model === "elastic_net").map((m) => `${m.target}: MAE=${m.mae_oof}${m.satuan}, R2=${m.r2_oof}`);
+  const fcMig = (data.forecast_2027?.migration_2027 || []).filter((m) => m.kode_2023 !== m.kode_2027 && m.n > 0).map((m) => `${m.kode_2023}->${m.kode_2027}:${m.n}`);
+  const rcEn = (data.forecast_2027?.regime_cv || []).find((m) => m.model === "elastic_net_oof");
   const outLines = (data.outliers || []).map((o) => `${o.iso3}(${o.country_id || o.country_en}, D2=${o.mahalanobis_d2})`);
   const paradoxCount = data.countries.filter((c) => c.renew_share_2023 > 50 && c.cooking_2023 < 20).length;
 
   rowByIso = new Map();
   const rows = data.countries.map((c) => {
     const pw = pwByIso.get(c.iso3)?.pathway || "-";
-    const row = `${c.iso3}|${c.iso2 || ""}|${c.country_en}|${c.country_id || c.country_en}|${c.kode_2023}|${c.kode_2015}|${c.elec_2023}|${c.cooking_2023}(${c.cooking_2015})|${c.renew_share_2023}|${c.renew_cap_2023}|${c.energy_int_2023}|${c.co2_pc_2023}|${pw}`;
+    const row = `${c.iso3}|${c.iso2 || ""}|${c.country_en}|${c.country_id || c.country_en}|${c.kode_2019}->${c.kode_2023}->${c.kode_2027}|${c.elec_2023}(27:${c.elec_2027})|${c.cooking_2023}(19:${c.cooking_2019},27:${c.cooking_2027})|${c.renew_share_2023}|${c.renew_cap_2023}(27:${c.renew_cap_2027})|${c.energy_int_2023}|${c.co2_pc_2023}|${pw}`;
     rowByIso.set(c.iso3, row);
     return row;
   });
 
   summaryContext = [
-    `DASHBOARD: 189 sovereign economies (8.02B people), UN SDG Indicators Database + World Bank, 2015 & 2023. Biomass paradox count (2023 renew_share>50% & clean_cooking<20%): ${paradoxCount}.`,
+    `DASHBOARD: 189 sovereign economies (8.02B people), UN SDG Indicators Database + World Bank, 2019 & 2023 plus 4-year 2027* projections. Biomass paradox count (2023 renew_share>50% & clean_cooking<20%): ${paradoxCount}.`,
     `REGIMES k=4 (K-Means chosen): ${rLines.join(" ; ")}`,
     `BINARY k=2: ${k2Lines.join(" ; ")}`,
     `MODELS: KMeans k=4 Sil=${km4.silhouette}, DB=${km4.davies_bouldin}, CH=${km4.calinski_harabasz}, Jaccard=${km4.jaccard_mean} (min ${km4.jaccard_min}), Ward ARI=0.795, missMDA n=207 ARI=${data.meta.ari_missmda_189}; GMM VEV k=4 Sil=${gmm4.silhouette} ARI=0.3671, spherical EII Sil=${data.meta.gmm_eii_sil_k4} ARI=${data.meta.gmm_eii_ari_k4}; KMO=${data.meta.kmo_overall}, Hopkins=${data.meta.hopkins}, PC1=59.4%, KW GDP H=${data.meta.kw_gdp_chisq}.`,
-    `MIGRATION 2015->2023 (descriptive): ${migLines.join(", ")}, into R1: 0.`,
-    `PATHWAYS 2015->2023 (FANNY k=2, weak Sil=0.2047): ${pwLines.join(" ; ")}`,
-    `CLEAN COOKING PREDICTION (2015->2023 10-fold CV): ${fcLines.join(" ; ")}`,
+    `MIGRATION 2019->2023 (descriptive): ${migLines.join(", ")}, down: 0.`,
+    `PATHWAYS 2019->2023 (FANNY k=${data.pathways?.k}, weak Sil=${pwSil}): ${pwLines.join(" ; ")}`,
+    `2027* PROJECTION (4-yr Elastic Net validated 2019->2023 10-fold CV, OOF regime acc=${rcEn ? rcEn.akurasi_persen + "%" : "-"}, shifts=${data.forecast_2027?.n_shifted}): ${fcEn.join(" ; ")} | shifts: ${fcMig.join(", ")}`,
     `OUTLIERS (Mahalanobis D2>22.46): ${outLines.join(", ")}`,
-    `COUNTRIES (ISO3|ISO2|NameEN|NameID|R23|R15|Elec%|Cook23%(15%)|RSh%|CapW|IntMJ|CO2t|Path):`
+    `COUNTRIES (ISO3|ISO2|NameEN|NameID|R19->R23->R27|Elec%(27)|Cook%(19,27)|RSh%|CapW(27)|IntMJ|CO2t|Path):`
   ].join("\n");
   cachedContext = summaryContext + "\n" + rows.join("\n");
 }
@@ -464,8 +488,10 @@ function answerLocal(q) {
   }
   let cs = findCountries(q);
   if (!cs.length && /negara ini|negara terpilih|this country|selected country/.test(low)) { const s = selectedCountry(); if (s) cs = [s]; }
-  if (!cs.length && /pindah|perpindahan|migrasi|bergerak|berubah|moved|move|migration|change|since 2015|sejak 2015/.test(low)) {
-    return u.moves(data.migration.filter((m) => m.kode_2015 !== m.kode_2023 && m.n > 0));
+  if (!cs.length && /pindah|perpindahan|migrasi|bergerak|berubah|moved|move|migration|change|since 2019|sejak 2019/.test(low)) {
+    const m19 = data.migration.filter((m) => m.kode_2019 !== m.kode_2023 && m.n > 0);
+    const m27 = (data.forecast_2027?.migration_2027 || []).filter((m) => m.kode_2023 !== m.kode_2027 && m.n > 0);
+    return u.moves(m19, m27);
   }
   if (cs.length === 1) return u.country(cs[0], regime(cs[0].kode_2023), n, pwByIso.get(cs[0].iso3), cName);
   if (cs.length > 1) return u.compare(cs.slice(0, 6), n, cName);
@@ -474,17 +500,11 @@ function answerLocal(q) {
     const gmm4 = data.eval_grid.find((m) => m.metode === "GMM" && m.k === 4);
     return u.methods(km4, gmm4, data.meta, n);
   }
-  if (/jalur|pathway|\bp1\b|\bp2\b|fanny/.test(low) && data.pathways?.profiles?.length >= 2) {
-    const p1 = data.pathways.profiles.find((p) => p.pathway === "P1");
-    const p2 = data.pathways.profiles.find((p) => p.pathway === "P2");
-    if (p1 && p2) return u.pathways(p1, p2, data.pathways, n);
+  if (/jalur|pathway|\bp1\b|\bp2\b|\bp3\b|fanny/.test(low) && data.pathways?.profiles?.length >= 2) {
+    return u.pathways(data.pathways.profiles, data.pathways, n);
   }
-  if (/prediksi|ramal|forecast|predict|elastic net|persistensi|persistence|\bmae\b/.test(low) && data.cooking_forecast?.metrics) {
-    const ms = data.cooking_forecast.metrics;
-    const pers = ms.find((m) => m.model === "persistence");
-    const ols = ms.find((m) => m.model === "ols_cook2015");
-    const enet = ms.find((m) => m.model === "elastic_net");
-    if (pers && ols && enet) return u.forecast(pers, ols, enet, n);
+  if (/prediksi|ramal|proyeksi|projection|forecast|predict|2027|elastic net|persistensi|persistence|\bmae\b/.test(low) && data.forecast_2027?.cv_metrics) {
+    return u.forecast(data.forecast_2027, n);
   }
   if (/outlier|pencilan|mahalanobis/.test(low) && data.outliers?.length) {
     return u.outliers(data.outliers, n, cName);

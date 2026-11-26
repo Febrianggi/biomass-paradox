@@ -1,3 +1,11 @@
+Warning messages:
+1: package 'ggplot2' was built under R version 4.5.3 
+2: package 'psych' was built under R version 4.5.3 
+3: package 'mclust' was built under R version 4.5.3 
+4: package 'fpc' was built under R version 4.5.3 
+5: package 'hopkins' was built under R version 4.5.3 
+6: package 'missMDA' was built under R version 4.5.3 
+7: package 'rnaturalearth' was built under R version 4.5.3 
 ======================================================================
 ANALISIS DATA MINING: TRANSISI ENERGI BERSIH & AKSI IKLIM (SDG 7 & 13)
 ======================================================================
@@ -62,38 +70,66 @@ ANALISIS DATA MINING: TRANSISI ENERGI BERSIH & AKSI IKLIM (SDG 7 & 13)
 2 B2              0.985      129            6.15      99.0         92.6
 # ℹ 2 more variables: co2_pc_median <dbl>, komposisi_rezim_k4 <chr>
 
-[Tahap 4] Matriks Migrasi Rezim Pasca-Kesepakatan Paris (2015 -> 2023):
+[Tahap 4] Matriks Migrasi Rezim Energi-Iklim Global (2019 -> 2023):
 # A tibble: 4 × 5
-  kode_2015    R1    R2    R3    R4
+  kode_2019    R1    R2    R3    R4
   <chr>     <int> <int> <int> <int>
-1 R1           27     7     0     0
-2 R2            0    34     8     0
-3 R3            0     0    80     2
-4 R4            0     0     7    24
+1 R1           27     2     0     0
+2 R2            0    39     1     0
+3 R3            0     0    91     0
+4 R4            0     0     3    26
 
-[Tahap 5B] Jalur perubahan FANNY (memb.exp = 1.3): k = 2 dipilih, Jaccard rerata = 0.9334 (STRUKTUR LEMAH)
-  ARI jalur vs PAM = 0.2080, vs FANNY selisih mentah = 0.6195, vs rezim 2023 = 0.1120
-# A tibble: 2 × 9
+[Tahap 5B] Jalur perubahan FANNY (memb.exp = 1.3): k = 3 dipilih, Jaccard rerata = 0.9454 (STRUKTUR LEMAH)
+  ARI jalur vs PAM = 0.6316, vs FANNY selisih mentah = 0.7402, vs rezim 2023 = 0.1402
+# A tibble: 3 × 9
   pathway n_negara keanggotaan_rerata med_d_elec_pp med_d_cook_pp
   <chr>      <int>              <dbl>         <dbl>         <dbl>
-1 P1           100              0.722           6.9             7
-2 P2            89              0.803           0               1
+1 P1            68              0.654          5.95             5
+2 P2            64              0.696          0                0
+3 P3            57              0.778          0                0
 # ℹ 4 more variables: med_d_rshare_pp <dbl>, med_d_cap_wpc <dbl>,
 #   med_d_int_mj <dbl>, med_d_co2_t <dbl>
 
-[Tahap 5B] Prediksi memasak bersih 2023 (validasi silang 10 lipatan antarnegara, satu interval 2015-2023):
-# A tibble: 3 × 5
-  model        mae_pp rmse_pp n_prediksi_di_luar_0_100 mae_pp_tanpa_potong
-  <chr>         <dbl>   <dbl>                    <dbl>               <dbl>
-1 persistence    5.19    8.24                        0                5.19
-2 ols_cook2015   3.79    6.04                       61                4.48
-3 elastic_net    3.33    5.39                       50                3.74
-# A tibble: 3 × 4
-  perbandingan               selisih_mae_pp ci95_bawah ci95_atas
-  <chr>                               <dbl>      <dbl>     <dbl>
-1 elastic_net - persistence           -1.86     -2.51     -1.19 
-2 elastic_net - ols_cook2015          -0.46     -0.826    -0.086
-3 ols_cook2015 - persistence          -1.4      -2.00     -0.809
+[Tahap 5C] Validasi silang 4-tahunan (2019 -> 2023) 6 indikator (Elastic Net):
+# A tibble: 6 × 8
+  target   satuan mae_oof rmse_oof r2_oof selisih_mae_vs_pers ci95_bawah_vs_pers
+  <chr>    <chr>    <dbl>    <dbl>  <dbl>               <dbl>              <dbl>
+1 clean_c… pp       1.86     2.94   0.993              -0.606             -0.931
+2 renew_s… pp       2.51     3.73   0.980              -0.122             -0.307
+3 energy_… MJ/$     0.379    0.616  0.956              -0.034             -0.065
+4 elec_ac… pp       1.56     3.08   0.983              -1.01              -1.39 
+5 renew_c… W/cap   88.7    184.     0.964             -36.4              -56.4  
+6 co2_per… t/cap    0.544    1.65   0.955              -0.004             -0.115
+# ℹ 1 more variable: ci95_atas_vs_pers <dbl>
+
+[Tahap 5C] Akurasi rezim out-of-fold (2019 -> 2023):
+# A tibble: 3 × 6
+  model akurasi_persen n_benar kappa n_berubah_aktual_19_23 n_berubah_pred_19_23
+  <chr>          <dbl>   <int> <dbl>                  <int>                <int>
+1 pers…           96.8     183 0.953                      6                    0
+2 ols_…           97.4     184 0.960                      6                    3
+3 elas…           97.9     185 0.968                      6                    4
+
+[Tahap 5C] Proyeksi perpindahan rezim 2023 -> 2027: 7 negara diproyeksikan berubah rezim:
+# A tibble: 7 × 10
+  iso3  country_en  kode_2023 kode_2027 margin_centroid_2027 d_elec_23_27
+  <chr> <chr>       <chr>     <chr>                    <dbl>        <dbl>
+1 CAN   Canada      R4        R3                       0.003        -0.26
+2 CHN   China       R4        R3                       0.005         0   
+3 COG   Congo, Rep. R1        R2                       0.157         5.03
+4 KOR   Korea, Rep. R4        R3                       0.172        -0.31
+5 PHL   Philippines R2        R3                       0.047         2   
+6 RWA   Rwanda      R1        R2                       0.047         6.14
+7 WSM   Samoa       R2        R3                       0.039         0   
+# ℹ 4 more variables: d_cook_23_27 <dbl>, d_rshare_23_27 <dbl>,
+#   d_int_23_27 <dbl>, d_co2_23_27 <dbl>
+Spherical geometry (s2) switched off
+although coordinates are longitude/latitude, st_union assumes that they are
+planar
+Warning message:
+attribute variables are assumed to be spatially constant throughout all geometries 
+Warning message:
+st_point_on_surface assumes attributes are constant over geometries 
 
 ======================================================================
 SELESAI! Seluruh 17 tabel CSV, 6 grafik PNG (300 DPI), dan data JSON
