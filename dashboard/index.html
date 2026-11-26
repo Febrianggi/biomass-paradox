@@ -339,10 +339,11 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
 }
 
 /* Atlas */
-.atlas-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr); gap: var(--s4); align-items: start; }
+.atlas-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr); gap: var(--s4); align-items: stretch; }
+.atlas-grid > .card, .two-col > .card { display: flex; flex-direction: column; height: 100%; }
 @media (max-width: 1020px) { .atlas-grid { grid-template-columns: 1fr; } }
 #panel-atlas { overflow-anchor: none; }
-.map-stage { background: var(--bg); border-radius: 10px; padding: var(--s2); }
+.map-stage { background: var(--bg); border-radius: 10px; padding: var(--s2); flex: 1; display: flex; align-items: center; }
 .map-stage svg { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: 440px; }
 .country-path {
   fill-rule: evenodd; /* holes (e.g. Lesotho inside South Africa) stay unfilled and unclickable */
@@ -409,7 +410,7 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
 .regime-dl dt { color: var(--muted); }
 .regime-dl dd { margin: 0; text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
-.two-col { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--s4); align-items: start; }
+.two-col { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--s4); align-items: stretch; }
 .two-col > * { min-width: 0; }
 @media (max-width: 960px) { .two-col { grid-template-columns: minmax(0, 1fr); } }
 .svg-chart-wrap { width: 100%; overflow-x: auto; }
@@ -449,13 +450,13 @@ details.acc[open] > summary::before { content: "\2212"; }
 details.acc > .acc-body { padding: 0 var(--s4) var(--s4); font-size: 13.5px; }
 
 /* Analytical guide & quadrant breakdown boxes */
-.guide-box {
-  margin-top: var(--s4); padding-top: var(--s4); border-top: 1px solid var(--line); font-size: 13.5px;
-}
-.guide-box h3 { font-size: 14.5px; margin-bottom: 6px; }
+.guide-box { font-size: 13.5px; }
+.guide-box h3 { font-size: 15px; margin-bottom: 6px; }
 .quad-grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); margin-top: var(--s3);
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); margin-top: var(--s3);
 }
+@media (max-width: 1020px) { .quad-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .quad-grid { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .quad-grid { grid-template-columns: minmax(0, 1fr); } }
 .quad-cell {
   border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2);
@@ -531,11 +532,14 @@ button.quad-btn[aria-pressed="true"] .q-count { background: var(--text); color: 
   gap: 6px; margin-bottom: var(--s2);
 }
 .proj27-plot-head h3 { margin: 0; font-size: 14px; }
+.cv-table-wrap { position: relative; overflow-x: auto; }
 table.compact-table tbody tr.cv-pick-row { cursor: pointer; }
+table.compact-table tbody tr.cv-pick-row td { transition: background-color 180ms ease-out, color 180ms ease-out, box-shadow 180ms ease-out; }
 table.compact-table tbody tr.cv-pick-row:hover td { background: var(--surface-2); }
 table.compact-table tbody tr.cv-pick-row.is-chosen td { background: var(--sel); font-weight: 600; }
 table.compact-table tbody tr.cv-pick-row.is-chosen td:first-child { box-shadow: inset 3px 0 0 var(--text); }
 table.compact-table tbody tr.cv-pick-row:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+@media (prefers-reduced-motion: reduce) { table.compact-table tbody tr.cv-pick-row td { transition: none; } }
 
 /* Roster pop-up modal */
 .modal-backdrop {
@@ -844,7 +848,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
             <div class="svg-chart-wrap" id="eda-svg-wrap"></div>
             <div class="legend-row" id="eda-legend"></div>
             <div class="selected-line" id="eda-selected"></div>
-            <div class="guide-box" id="eda-guide"></div>
           </section>
 
           <section class="card" aria-labelledby="h-eda-diag">
@@ -857,6 +860,10 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
             <div id="eda-diagnostics-box"></div>
           </section>
         </div>
+
+        <section class="card" id="eda-guide-card" style="margin-top:var(--s4)" aria-label="Panduan membaca grafik">
+          <div class="guide-box" id="eda-guide"></div>
+        </section>
       </div>
     </div>
 
@@ -890,7 +897,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           <section class="card" aria-labelledby="h-why-kmeans">
             <div class="card-head">
               <div>
-                <h2 id="h-why-kmeans" data-i18n="whyTitle">Mengapa k = 4, dan alternatif k = 2</h2>
+                <h2 id="h-why-kmeans" data-i18n="whyTitle">Alternatif k = 2 &amp; kesepakatan antarmetode (k = 4)</h2>
               </div>
             </div>
             <div id="model-insight-box"></div>
@@ -1197,7 +1204,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       modelCurveSub: "Garis titik-titik k = 2 menandai optimum biner kasar; garis putus-putus k = 4 menandai model empat rezim yang dipilih.",
       binaryK2: "Biner k = 2",
       chosenK4: "Terpilih k = 4",
-      whyTitle: "Mengapa K-Means k = 4 dipilih meski skor k = 2 lebih tinggi",
+      whyTitle: "Alternatif k = 2 & kesepakatan antarmetode (k = 4)",
       why1: "Secara matematis murni, K-Means k = 2 memang mencatat skor validitas internal tertinggi (Silhouette 0,445; Davies-Bouldin 0,929; Calinski-Harabasz 163,4; Jaccard 0,976) dibandingkan k = 4 (Silhouette 0,349; Davies-Bouldin 1,110; Calinski-Harabasz 120,8; Jaccard 0,953). Namun keputusan memilih k = 4 didasarkan pada tiga alasan substantif dan stabilitas:",
       whyBullets: [
         "<strong>Mengapa k = 2 unggul secara geometri:</strong> celah terbesar di data global adalah pemisahan biner antara negara defisit akses dasar (B1, 60 negara) dan negara yang sudah terelektrifikasi (B2, 129 negara).",
@@ -1451,7 +1458,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       modelCurveSub: "The dotted line at k = 2 marks the coarse binary peak; the dashed line at k = 4 marks the chosen four-regime model.",
       binaryK2: "Binary k = 2",
       chosenK4: "Chosen k = 4",
-      whyTitle: "Why K-Means k = 4 was chosen even though k = 2 scores higher",
+      whyTitle: "Alternative k = 2 & cross-method agreement (k = 4)",
       why1: "Strictly on global internal indices, K-Means k = 2 scores higher (Silhouette 0.445; Davies-Bouldin 0.929; Calinski-Harabasz 163.4; Jaccard 0.976) than k = 4 (Silhouette 0.349; Davies-Bouldin 1.110; Calinski-Harabasz 120.8; Jaccard 0.953). Choosing k = 4 rests on three substantive and stability reasons:",
       whyBullets: [
         "<strong>Why k = 2 wins geometrically:</strong> the single widest gap in global data is a coarse binary split between energy-deficit economies (B1, 60 countries) and electrified economies (B2, 129 countries).",
@@ -2791,8 +2798,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     ).join("");
 
     $("model-insight-box").innerHTML = `
-      <p style="font-size:13.5px;margin-bottom:8px">${t.why1}</p>
-      <ul class="why-list">${t.whyBullets.map((b) => `<li>${b}</li>`).join("")}</ul>
       <div style="overflow-x:auto"><table class="compact-table" style="margin-bottom:14px">
         <thead><tr><th>${t.k2Alt}</th><th class="num">Jaccard</th><th class="num">SDG 7.1.1 / 7.1.2</th><th>${t.k2Split}</th></tr></thead>
         <tbody>${k2Html}</tbody>
@@ -3074,12 +3079,16 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     }).join("");
     $("proj27-cv-box").innerHTML = `<h3 style="margin:0 0 4px">${t.proj27CvTitle}</h3>
       <p class="muted small" style="margin-bottom:8px">${t.proj27CvHint}</p>
-      <div style="overflow-x:auto"><table class="compact-table">
+      <div class="cv-table-wrap"><table class="compact-table">
         <thead><tr>${t.proj27CvCols.map((h, i) => `<th${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead>
         <tbody>${cvRows}</tbody>
       </table></div>`;
+    const cvWrap = $("proj27-cv-box").querySelector(".cv-table-wrap");
     $("proj27-cv-box").querySelectorAll("[data-cv-target]").forEach((tr) => {
       const pick = () => {
+        const prevRow = $("proj27-cv-box").querySelector("[data-cv-target].is-chosen");
+        if (prevRow === tr) return;
+        slideSelection(cvWrap, prevRow, tr);
         state.proj27Target = tr.dataset.cvTarget;
         $("proj27-cv-box").querySelectorAll("[data-cv-target]").forEach((row) => {
           const act = row.dataset.cvTarget === state.proj27Target;
@@ -3094,8 +3103,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       });
     });
 
-    /* Regime OOF accuracy table */
-    const regCvRows = P27.regime_cv.map((r) => `<tr class="${r.model === "elastic_net_oof" ? "is-chosen" : ""}">
+    /* Regime OOF accuracy table (Elastic Net only, the chosen 2027 projection model) */
+    const regCvRows = P27.regime_cv.filter((r) => r.model === "elastic_net_oof").map((r) => `<tr class="is-chosen">
       <td>${t.proj27RegModels[r.model] || r.model}</td>
       <td class="num">${fmt(r.akurasi_persen, 1)}%</td>
       <td class="num">${r.n_benar}/189</td>
