@@ -493,6 +493,16 @@ button.quad-btn[aria-pressed="true"] .q-count { background: var(--text); color: 
 
 /* Migration matrix */
 .mig-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+.mig-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: var(--s4); align-items: start; }
+.mig-split > * { min-width: 0; }
+.proj27-eval-split {
+  display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); gap: var(--s4); align-items: start;
+  margin-top: var(--s4); padding-top: var(--s4); border-top: 1px solid var(--line);
+}
+.proj27-eval-split > * { min-width: 0; }
+@media (max-width: 960px) {
+  .mig-split, .proj27-eval-split { grid-template-columns: minmax(0, 1fr); }
+}
 .mig-grid { display: grid; grid-template-columns: auto repeat(4, minmax(46px, 1fr)); gap: 6px; overflow-x: auto; }
 .mig-hdr { font: 600 12px/1.2 var(--mono); color: var(--muted); display: flex; align-items: center; justify-content: center; padding: 6px; text-align: center; }
 .mig-cell {
@@ -511,7 +521,47 @@ button.quad-btn[aria-pressed="true"] .q-count { background: var(--text); color: 
 .mig-cell[aria-pressed="true"]:focus-visible { outline-offset: 5px; }
 .mig-cell[aria-pressed="true"] span { color: var(--surface); }
 .roster { font-size: 13px; min-height: 64px; }
-.roster .chip-row { margin-top: 6px; }
+.roster .chip-row { margin-top: 8px; }
+.chip.chip-more {
+  background: var(--text); color: var(--surface); border-color: var(--text); font-weight: 700;
+}
+.chip.chip-more:hover { background: var(--text); color: var(--surface); opacity: 0.88; }
+.proj27-plot-head {
+  display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap;
+  gap: 6px; margin-bottom: var(--s2);
+}
+.proj27-plot-head h3 { margin: 0; font-size: 14px; }
+table.compact-table tbody tr.cv-pick-row { cursor: pointer; }
+table.compact-table tbody tr.cv-pick-row:hover td { background: var(--surface-2); }
+table.compact-table tbody tr.cv-pick-row.is-chosen td { background: var(--sel); font-weight: 600; }
+table.compact-table tbody tr.cv-pick-row.is-chosen td:first-child { box-shadow: inset 3px 0 0 var(--text); }
+table.compact-table tbody tr.cv-pick-row:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+
+/* Roster pop-up modal */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 80; display: grid; place-items: center;
+  padding: var(--s4); background: rgba(7, 15, 11, 0.62); backdrop-filter: blur(4px);
+}
+.modal-backdrop[hidden] { display: none; }
+.modal-dialog {
+  width: min(780px, 100%); max-height: min(82vh, 680px); display: flex; flex-direction: column;
+  background: var(--surface); color: var(--text); border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); overflow: hidden;
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
+  padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); background: var(--surface-2);
+}
+.modal-head h3 { margin: 0; font: 600 16px/1.3 var(--display); }
+.modal-close {
+  width: 36px; height: 36px; min-width: 36px; border-radius: 10px;
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--text);
+  font: 600 18px/1 var(--sans); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--ink-soft); border-color: var(--text); }
+.modal-body { padding: var(--s4); overflow-y: auto; }
+.modal-body .chip-row { margin-top: 0; }
+.modal-note { font-size: 12.5px; color: var(--muted); margin-bottom: var(--s3); }
 
 /* Tables */
 .table-wrapper {
@@ -864,22 +914,51 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     <!-- PANEL 4: 2019-2027 & ASEAN -->
     <div role="tabpanel" id="panel-asean" aria-labelledby="tab-asean" hidden="until-found">
       <div class="panel-inner">
-        <div class="two-col">
-          <section class="card" aria-labelledby="h-mig-card">
-            <div class="card-head">
-              <div>
-                <h2 id="h-mig-card" data-i18n="migTitle">Matriks perpindahan rezim, 2019 ke 2023</h2>
-                <p data-i18n="migSub">Arahkan atau fokus ke sel untuk melihat daftarnya; klik untuk menyematkan.</p>
-              </div>
+        <section class="card" aria-labelledby="h-mig-card">
+          <div class="card-head">
+            <div>
+              <h2 id="h-mig-card" data-i18n="migTitle">Matriks perpindahan rezim, 2019 ke 2023</h2>
+              <p data-i18n="migSub">Arahkan atau fokus ke sel untuk melihat daftarnya; klik untuk menyematkan.</p>
             </div>
+          </div>
+          <div class="mig-split">
             <div class="mig-layout">
               <div id="mig-matrix-box"></div>
               <div class="legend-row small" id="mig-legend"></div>
-              <div class="roster" id="mig-list-box" aria-live="polite"></div>
               <p class="muted small" data-i18n="migNote">Posisi 2019 diproyeksikan ke centroid 2023. Perpindahan adalah perbandingan observasional, bukan estimasi dampak kebijakan.</p>
             </div>
-          </section>
+            <div class="roster" id="mig-list-box" aria-live="polite"></div>
+          </div>
+        </section>
 
+        <section class="card" id="proj27-card" style="margin-top:var(--s4)" aria-labelledby="h-proj27">
+          <div class="card-head">
+            <div>
+              <h2 id="h-proj27" data-i18n="proj27Title">Proyeksi 2027 dan potensi perpindahan rezim (horizon 4 tahun)</h2>
+              <p data-i18n="proj27Sub">Dilatih dan divalidasi silang pada interval 2019 ke 2023, lalu diproyeksikan ke 2027 dari kondisi 2023.</p>
+            </div>
+          </div>
+          <div id="proj27-lead" style="font-size:13.5px;margin-bottom:var(--s3)"></div>
+          <div class="mig-split">
+            <div class="mig-layout">
+              <div id="mig27-matrix-box"></div>
+              <div class="legend-row" id="mig27-legend"></div>
+            </div>
+            <div class="roster" id="mig27-list-box" role="status" aria-live="polite"></div>
+          </div>
+          <div class="proj27-eval-split">
+            <div>
+              <div id="proj27-cv-box"></div>
+              <div id="proj27-regime-cv" style="margin-top:var(--s4)"></div>
+            </div>
+            <div>
+              <div class="proj27-plot-head" id="proj27-plot-head"></div>
+              <div class="svg-chart-wrap" id="proj27-scatter-wrap"></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="two-col" style="margin-top:var(--s4)">
           <section class="card" aria-labelledby="h-asean-chart">
             <div class="card-head">
               <div>
@@ -888,6 +967,16 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
               </div>
             </div>
             <div class="svg-chart-wrap" id="asean-bars-wrap"></div>
+          </section>
+
+          <section class="card" aria-labelledby="h-idn-policy">
+            <div class="card-head">
+              <div>
+                <h2 id="h-idn-policy" data-i18n="idnTitle">Indonesia: akses dasar tercapai, kapasitas listrik terbarukan tertinggal</h2>
+                <p data-i18n="idnSub">Sintesis dari perbandingan 2019 ke 2023, proyeksi 2027, dan pembanding ASEAN.</p>
+              </div>
+            </div>
+            <div id="idn-policy-content"></div>
           </section>
         </div>
 
@@ -899,49 +988,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
             </div>
           </div>
           <div id="path-content"></div>
-        </section>
-
-        <section class="card" id="proj27-card" style="margin-top:var(--s4)" aria-labelledby="h-proj27">
-          <div class="card-head">
-            <div>
-              <h2 id="h-proj27" data-i18n="proj27Title">Proyeksi 2027 dan potensi perpindahan rezim (horizon 4 tahun)</h2>
-              <p data-i18n="proj27Sub">Dilatih dan divalidasi silang pada interval 2019 ke 2023, lalu diproyeksikan ke 2027 dari kondisi 2023.</p>
-            </div>
-          </div>
-          <div id="proj27-lead" style="font-size:13.5px;margin-bottom:var(--s3)"></div>
-          <div class="two-col">
-            <div class="mig-layout">
-              <div id="mig27-matrix-box"></div>
-              <div class="legend-row" id="mig27-legend"></div>
-              <div class="roster" id="mig27-list-box" role="status" aria-live="polite"></div>
-              <div id="proj27-cv-box"></div>
-            </div>
-            <div>
-              <div class="field" style="margin-bottom:var(--s3)">
-                <label for="proj27-target-select" data-i18n="proj27TargetLbl">Indikator target proyeksi 2027</label>
-                <select id="proj27-target-select">
-                  <option value="clean_cooking"></option>
-                  <option value="renew_share_tfec"></option>
-                  <option value="energy_intensity"></option>
-                  <option value="elec_access"></option>
-                  <option value="renew_cap_wpc"></option>
-                  <option value="co2_per_capita"></option>
-                </select>
-              </div>
-              <div class="svg-chart-wrap" id="proj27-scatter-wrap"></div>
-              <div id="proj27-regime-cv" style="margin-top:var(--s3)"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="card" style="margin-top:var(--s4)" aria-labelledby="h-idn-policy">
-          <div class="card-head">
-            <div>
-              <h2 id="h-idn-policy" data-i18n="idnTitle">Indonesia: akses dasar tercapai, kapasitas listrik terbarukan tertinggal</h2>
-              <p data-i18n="idnSub">Sintesis dari perbandingan 2019 ke 2023, proyeksi 2027, dan pembanding ASEAN.</p>
-            </div>
-          </div>
-          <div id="idn-policy-content"></div>
         </section>
       </div>
     </div>
@@ -1017,6 +1063,19 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 </main>
 
 <div class="tooltip" id="tooltip" hidden></div>
+
+<div class="modal-backdrop" id="roster-modal" hidden>
+  <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="roster-modal-title">
+    <div class="modal-head">
+      <h3 id="roster-modal-title"></h3>
+      <button type="button" class="modal-close" id="roster-modal-close" aria-label="Tutup">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-note" id="roster-modal-note"></p>
+      <div class="chip-row" id="roster-modal-chips"></div>
+    </div>
+  </div>
+</div>
 
 <footer class="site-foot">
   <div class="wrap">
@@ -1270,7 +1329,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       proj27Empty: (a, b) => `Tidak ada negara diproyeksikan berpindah dari ${a} ke ${b}.`,
       proj27MarginLbl: "margin",
       proj27CvTitle: "Validasi silang 4-tahunan (2019 ke 2023, 10 lipatan)",
+      proj27CvHint: "Klik baris indikator di tabel untuk mengganti plot proyeksi di samping.",
       proj27CvCols: ["Indikator", "MAE EN", "MAE Pers.", "R² EN", "Δ MAE vs Pers. (IK 95%)"],
+      proj27PlotHead: (lbl) => `Plot proyeksi 2027: ${lbl}`,
+      rosterMoreTitle: (n) => `Tampilkan semua ${n} negara`,
+      rosterModalHint: "Klik negara mana saja untuk melihat profil lengkapnya di Peta Rezim.",
+      modalClose: "Tutup daftar negara",
       proj27RegCvTitle: "Validasi akurasi rezim out-of-fold (2019 ke 2023)",
       proj27RegCvCols: ["Model", "Akurasi", "Benar", "Kappa", "Pred. pindah"],
       proj27RegModels: { persistence_2019: "Persistensi (rezim 2019)", ols_own_lag_oof: "Regresi OLS (lag sendiri)", elastic_net_oof: "Elastic Net (6 indikator)" },
@@ -1519,7 +1583,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       proj27Empty: (a, b) => `No countries projected to move from ${a} to ${b}.`,
       proj27MarginLbl: "margin",
       proj27CvTitle: "4-year cross-validation (2019 to 2023, 10 folds)",
+      proj27CvHint: "Click any indicator row in the table to switch the projection plot beside it.",
       proj27CvCols: ["Indicator", "EN MAE", "Pers. MAE", "EN R²", "Δ MAE vs Pers. (95% CI)"],
+      proj27PlotHead: (lbl) => `2027 projection plot: ${lbl}`,
+      rosterMoreTitle: (n) => `Show all ${n} countries`,
+      rosterModalHint: "Click any country to inspect its full profile on the Regime Map.",
+      modalClose: "Close country list",
       proj27RegCvTitle: "Out-of-fold regime accuracy (2019 to 2023)",
       proj27RegCvCols: ["Model", "Accuracy", "Correct", "Kappa", "Pred. shifts"],
       proj27RegModels: { persistence_2019: "Persistence (2019 regime)", ols_own_lag_oof: "OLS (own lag)", elastic_net_oof: "Elastic Net (6 indicators)" },
@@ -2763,21 +2832,82 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       </tbody>`;
   }
 
-  /* Panel 4: migration matrix with per-cell rosters, ASEAN capacity mix, Indonesia synthesis */
-  function renderRoster() {
-    const t = T();
-    const key = state.migPreview || state.migCell;
-    const [f19, t23] = key.split("_");
-    const matched = DATA.countries.filter((c) => c.kode_2019 === f19 && c.kode_2023 === t23)
+  /* Panel 4: migration matrix with per-cell rosters (>20 pop-up modal), ASEAN capacity mix, Indonesia synthesis */
+  const ROSTER_LIMIT = 20;
+  let lastModalTrigger = null;
+
+  function rosterCountries(mode, from, to) {
+    if (mode === "2027") {
+      return DATA.countries.filter((c) => c.kode_2023 === from && c.kode_2027 === to)
+        .sort((a, b) => (b.margin_centroid_2027 || 0) - (a.margin_centroid_2027 || 0));
+    }
+    return DATA.countries.filter((c) => c.kode_2019 === from && c.kode_2023 === to)
       .sort((a, b) => cName(a).localeCompare(cName(b)));
-    $("mig-list-box").innerHTML = matched.length === 0
-      ? `<p class="muted">${t.migEmpty(f19, t23)}</p>`
-      : `<p><strong>${t.migRoster(f19, t23, matched.length)}</strong></p>
-         <div class="chip-row">${matched.map((c) => `<button type="button" class="chip" data-pick="${c.iso3}" title="${cName(c)}">${cName(c)} <span class="muted">${c.iso3}</span></button>`).join("")}</div>`;
-    $("mig-list-box").querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
-      selectCountry(b.dataset.pick);
+  }
+
+  function rosterChipHtml(c, mode, from, to, t) {
+    const extraMeta = mode === "2027" && from !== to ? ` · ${t.proj27MarginLbl} ${fmt(c.margin_centroid_2027, 3)}` : "";
+    return `<button type="button" class="chip" data-pick-iso="${c.iso3}" title="${cName(c)}">${cName(c)} <span class="muted">${c.iso3}${extraMeta}</span></button>`;
+  }
+
+  function closeRosterModal() {
+    const modal = $("roster-modal");
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.body.style.overflow = "";
+    if (lastModalTrigger && lastModalTrigger.isConnected) lastModalTrigger.focus();
+    lastModalTrigger = null;
+  }
+
+  function openRosterModal(mode, from, to, trigger) {
+    const t = T();
+    const matched = rosterCountries(mode, from, to);
+    const title = mode === "2027" ? t.proj27Roster(from, to, matched.length) : t.migRoster(from, to, matched.length);
+    lastModalTrigger = trigger || null;
+    $("roster-modal-title").textContent = title;
+    $("roster-modal-note").textContent = t.rosterModalHint;
+    $("roster-modal-close").setAttribute("aria-label", t.modalClose);
+    $("roster-modal-chips").innerHTML = matched.map((c) => rosterChipHtml(c, mode, from, to, t)).join("");
+    $("roster-modal-chips").querySelectorAll("[data-pick-iso]").forEach((b) => b.addEventListener("click", () => {
+      const iso = b.dataset.pickIso;
+      closeRosterModal();
+      selectCountry(iso);
       goToAtlas();
     }));
+    $("roster-modal").hidden = false;
+    document.body.style.overflow = "hidden";
+    $("roster-modal-close").focus();
+  }
+
+  function renderRosterBox(boxId, mode, from, to) {
+    const t = T();
+    const box = $(boxId);
+    const matched = rosterCountries(mode, from, to);
+    const emptyTxt = mode === "2027" ? t.proj27Empty(from, to) : t.migEmpty(from, to);
+    const titleTxt = mode === "2027" ? t.proj27Roster(from, to, matched.length) : t.migRoster(from, to, matched.length);
+    if (matched.length === 0) {
+      box.innerHTML = `<p class="muted">${emptyTxt}</p>`;
+      return;
+    }
+    const visible = matched.slice(0, ROSTER_LIMIT);
+    const overflow = matched.length - ROSTER_LIMIT;
+    const moreBtn = overflow > 0
+      ? `<button type="button" class="chip chip-more" data-roster-more="1" aria-label="${t.rosterMoreTitle(matched.length)}" title="${t.rosterMoreTitle(matched.length)}">+${overflow}</button>`
+      : "";
+    box.innerHTML = `<p><strong>${titleTxt}</strong></p>
+      <div class="chip-row">${visible.map((c) => rosterChipHtml(c, mode, from, to, t)).join("")}${moreBtn}</div>`;
+    box.querySelectorAll("[data-pick-iso]").forEach((b) => b.addEventListener("click", () => {
+      selectCountry(b.dataset.pickIso);
+      goToAtlas();
+    }));
+    const more = box.querySelector("[data-roster-more]");
+    if (more) more.addEventListener("click", () => openRosterModal(mode, from, to, more));
+  }
+
+  function renderRoster() {
+    const key = state.migPreview || state.migCell;
+    const [f19, t23] = key.split("_");
+    renderRosterBox("mig-list-box", "2019", f19, t23);
   }
 
   /* Panel 4: change pathways and clean cooking prediction */
@@ -2820,19 +2950,62 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   };
 
   function renderRoster2027() {
-    const t = T();
     const key = state.mig27Preview || state.mig27Cell;
     const [f23, t27] = key.split("_");
-    const matched = DATA.countries.filter((c) => c.kode_2023 === f23 && c.kode_2027 === t27)
-      .sort((a, b) => (b.margin_centroid_2027 || 0) - (a.margin_centroid_2027 || 0));
-    $("mig27-list-box").innerHTML = matched.length === 0
-      ? `<p class="muted">${t.proj27Empty(f23, t27)}</p>`
-      : `<p><strong>${t.proj27Roster(f23, t27, matched.length)}</strong></p>
-         <div class="chip-row">${matched.map((c) => `<button type="button" class="chip" data-pick27="${c.iso3}" title="${cName(c)}">${cName(c)} <span class="muted">${c.iso3}${f23 !== t27 ? ` · ${t.proj27MarginLbl} ${fmt(c.margin_centroid_2027, 3)}` : ""}</span></button>`).join("")}</div>`;
-    $("mig27-list-box").querySelectorAll("[data-pick27]").forEach((b) => b.addEventListener("click", () => {
-      selectCountry(b.dataset.pick27);
-      goToAtlas();
-    }));
+    renderRosterBox("mig27-list-box", "2027", f23, t27);
+  }
+
+  function renderProj27Scatter() {
+    const t = T();
+    const lblByTarget = new Map(t.proj27Targets);
+    const sp = PROJ27_SPECS[state.proj27Target] || PROJ27_SPECS.clean_cooking;
+    const tLbl = lblByTarget.get(state.proj27Target) || "";
+    $("proj27-plot-head").innerHTML = `<h3>${t.proj27PlotHead(tLbl)}</h3>`;
+    const trf = (v) => sp.log ? Math.log10(Math.max(0, v) + 1) : v;
+    const inv = (v) => sp.log ? Math.max(0, Math.pow(10, v) - 1) : v;
+    const allVals = DATA.countries.flatMap((c) => [trf(c[sp.k23]), trf(c[sp.k27])]);
+    const vmin = sp.log ? 0 : Math.min(0, ...allVals);
+    const vmax = (!sp.log && sp.unit === "%") ? 100 : Math.max(...allVals) * 1.04;
+    const W = 400, H = 340, padL = 48, padR = 14, padT = 14, padB = 40, pw = W - padL - padR, ph = H - padT - padB;
+    const sx = (v) => padL + ((v - vmin) / (vmax - vmin || 1)) * pw;
+    const sy = (v) => padT + ph - ((v - vmin) / (vmax - vmin || 1)) * ph;
+    const ticks = [0, 0.25, 0.5, 0.75, 1].map((q) => vmin + q * (vmax - vmin));
+    const tickFmt = (tv) => sp.log ? fmt(inv(tv), sp.d === 1 ? 0 : 1) : fmt(tv, sp.unit === "%" ? 0 : 1);
+
+    const ordered = [...DATA.countries].sort((a, b) =>
+      (Boolean(a.berubah_2027) - Boolean(b.berubah_2027)) ||
+      ((a.iso3 === state.selectedIso) - (b.iso3 === state.selectedIso))
+    );
+    const dots = ordered.map((c) => {
+      const sel = c.iso3 === state.selectedIso;
+      const sh = Boolean(c.berubah_2027);
+      const cx = sx(trf(c[sp.k23])), cy = sy(trf(c[sp.k27]));
+      const lx = cx > W - 56 ? (cx - 8).toFixed(1) : (cx + 7).toFixed(1);
+      const anchor = cx > W - 56 ? "end" : "start";
+      const ly = cy < padT + 18 ? (cy + 13).toFixed(1) : (cy - 7).toFixed(1);
+      const r = sel ? 6 : sh ? 4.8 : 3.1;
+      return `<circle class="eda-pt" data-iso="${c.iso3}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r}" fill="${regimeColorVar(c.regime_2027)}" fill-opacity="${sel || sh ? 0.96 : 0.65}" stroke="${sel || sh ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2.2 : sh ? 1.5 : 0.6}"></circle>` +
+        ((sel || sh) ? `<text class="iso" x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="10" font-weight="${sel ? 700 : 600}" fill="var(--text)">${c.iso3}</text>` : "");
+    }).join("");
+
+    const prevRing = ringPosition($("proj27-scatter-wrap"));
+    $("proj27-scatter-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.proj27AxisY(tLbl)}">
+      ${ticks.map((tv) => `<line x1="${padL}" y1="${sy(tv).toFixed(1)}" x2="${W - padR}" y2="${sy(tv).toFixed(1)}" stroke="var(--line)" stroke-width="0.8"/>
+        <text x="${padL - 6}" y="${(sy(tv) + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="var(--muted)">${tickFmt(tv)}</text>
+        <text x="${sx(tv).toFixed(1)}" y="${padT + ph + 16}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${tickFmt(tv)}</text>`).join("")}
+      <line x1="${sx(vmin).toFixed(1)}" y1="${sy(vmin).toFixed(1)}" x2="${sx(vmax).toFixed(1)}" y2="${sy(vmax).toFixed(1)}" stroke="var(--line-strong)" stroke-dasharray="4 4"/>
+      ${dots}
+      <text x="${padL + pw / 2}" y="${H - 6}" text-anchor="middle" font-size="11" fill="var(--text)">${t.proj27AxisX(tLbl)}</text>
+      <text transform="translate(12 ${padT + ph / 2}) rotate(-90)" text-anchor="middle" font-size="11" fill="var(--text)">${t.proj27AxisY(tLbl)}</text>
+    </svg><p class="muted small" style="margin-top:6px">${t.proj27ScatterNote}</p>`;
+    drawRing($("proj27-scatter-wrap"), prevRing);
+    $("proj27-scatter-wrap").querySelectorAll(".eda-pt").forEach((dot) => {
+      const c = BY_ISO.get(dot.dataset.iso);
+      dot.addEventListener("click", () => selectCountry(c.iso3));
+      dot.addEventListener("pointerenter", (ev) => showTip(ev, t.proj27Tip(c, fmt(c[sp.k23], sp.d), fmt(c[sp.k27], sp.d), sp.unit)));
+      dot.addEventListener("pointermove", moveTip);
+      dot.addEventListener("pointerleave", hideTip);
+    });
   }
 
   function renderProjection2027() {
@@ -2885,14 +3058,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     grid27.addEventListener("focusout", (e) => { if (!grid27.contains(e.relatedTarget)) unprev27(); });
     renderRoster2027();
 
-    /* 6-indicator 4-year CV table */
-    const lblByTarget = new Map(t.proj27Targets);
+    /* 6-indicator 4-year CV table (clickable rows control the projection plot beside it) */
     const cvRows = t.proj27Targets.map(([tid, tlbl]) => {
       const enR = P27.cv_metrics.find((r) => r.target === tid && r.model === "elastic_net");
       const pR = P27.cv_metrics.find((r) => r.target === tid && r.model === "persistence");
       const d = tid === "energy_intensity" || tid === "co2_per_capita" ? 3 : tid === "renew_cap_wpc" ? 1 : 2;
       const isAct = tid === state.proj27Target;
-      return `<tr class="${isAct ? "is-chosen" : ""}">
+      return `<tr class="cv-pick-row${isAct ? " is-chosen" : ""}" data-cv-target="${tid}" tabindex="0" role="button" aria-pressed="${isAct}">
         <td>${tlbl}</td>
         <td class="num">${fmt(enR.mae_oof, d)}</td>
         <td class="num">${fmt(pR.mae_oof, d)}</td>
@@ -2900,11 +3072,27 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         <td class="num">${fmt(enR.selisih_mae_vs_pers, d)} [${fmt(enR.ci95_bawah_vs_pers, d)}; ${fmt(enR.ci95_atas_vs_pers, d)}]</td>
       </tr>`;
     }).join("");
-    $("proj27-cv-box").innerHTML = `<h3 style="margin:6px 0">${t.proj27CvTitle}</h3>
+    $("proj27-cv-box").innerHTML = `<h3 style="margin:0 0 4px">${t.proj27CvTitle}</h3>
+      <p class="muted small" style="margin-bottom:8px">${t.proj27CvHint}</p>
       <div style="overflow-x:auto"><table class="compact-table">
         <thead><tr>${t.proj27CvCols.map((h, i) => `<th${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead>
         <tbody>${cvRows}</tbody>
       </table></div>`;
+    $("proj27-cv-box").querySelectorAll("[data-cv-target]").forEach((tr) => {
+      const pick = () => {
+        state.proj27Target = tr.dataset.cvTarget;
+        $("proj27-cv-box").querySelectorAll("[data-cv-target]").forEach((row) => {
+          const act = row.dataset.cvTarget === state.proj27Target;
+          row.classList.toggle("is-chosen", act);
+          row.setAttribute("aria-pressed", String(act));
+        });
+        renderProj27Scatter();
+      };
+      tr.addEventListener("click", pick);
+      tr.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); }
+      });
+    });
 
     /* Regime OOF accuracy table */
     const regCvRows = P27.regime_cv.map((r) => `<tr class="${r.model === "elastic_net_oof" ? "is-chosen" : ""}">
@@ -2920,54 +3108,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         <tbody>${regCvRows}</tbody>
       </table></div>`;
 
-    /* 2023 Actual vs 2027 Projected scatter */
-    const sp = PROJ27_SPECS[state.proj27Target] || PROJ27_SPECS.clean_cooking;
-    const tLbl = lblByTarget.get(state.proj27Target) || "";
-    const trf = (v) => sp.log ? Math.log10(Math.max(0, v) + 1) : v;
-    const inv = (v) => sp.log ? Math.max(0, Math.pow(10, v) - 1) : v;
-    const allVals = DATA.countries.flatMap((c) => [trf(c[sp.k23]), trf(c[sp.k27])]);
-    const vmin = sp.log ? 0 : Math.min(0, ...allVals);
-    const vmax = (!sp.log && sp.unit === "%") ? 100 : Math.max(...allVals) * 1.04;
-    const W = 400, H = 340, padL = 48, padR = 14, padT = 14, padB = 40, pw = W - padL - padR, ph = H - padT - padB;
-    const sx = (v) => padL + ((v - vmin) / (vmax - vmin || 1)) * pw;
-    const sy = (v) => padT + ph - ((v - vmin) / (vmax - vmin || 1)) * ph;
-    const ticks = [0, 0.25, 0.5, 0.75, 1].map((q) => vmin + q * (vmax - vmin));
-    const tickFmt = (tv) => sp.log ? fmt(inv(tv), sp.d === 1 ? 0 : 1) : fmt(tv, sp.unit === "%" ? 0 : 1);
-
-    const ordered = [...DATA.countries].sort((a, b) =>
-      (Boolean(a.berubah_2027) - Boolean(b.berubah_2027)) ||
-      ((a.iso3 === state.selectedIso) - (b.iso3 === state.selectedIso))
-    );
-    const dots = ordered.map((c) => {
-      const sel = c.iso3 === state.selectedIso;
-      const sh = Boolean(c.berubah_2027);
-      const cx = sx(trf(c[sp.k23])), cy = sy(trf(c[sp.k27]));
-      const lx = cx > W - 56 ? (cx - 8).toFixed(1) : (cx + 7).toFixed(1);
-      const anchor = cx > W - 56 ? "end" : "start";
-      const ly = cy < padT + 18 ? (cy + 13).toFixed(1) : (cy - 7).toFixed(1);
-      const r = sel ? 6 : sh ? 4.8 : 3.1;
-      return `<circle class="eda-pt" data-iso="${c.iso3}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r}" fill="${regimeColorVar(c.regime_2027)}" fill-opacity="${sel || sh ? 0.96 : 0.65}" stroke="${sel || sh ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2.2 : sh ? 1.5 : 0.6}"></circle>` +
-        ((sel || sh) ? `<text class="iso" x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="10" font-weight="${sel ? 700 : 600}" fill="var(--text)">${c.iso3}</text>` : "");
-    }).join("");
-
-    const prevRing = ringPosition($("proj27-scatter-wrap"));
-    $("proj27-scatter-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.proj27AxisY(tLbl)}">
-      ${ticks.map((tv) => `<line x1="${padL}" y1="${sy(tv).toFixed(1)}" x2="${W - padR}" y2="${sy(tv).toFixed(1)}" stroke="var(--line)" stroke-width="0.8"/>
-        <text x="${padL - 6}" y="${(sy(tv) + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="var(--muted)">${tickFmt(tv)}</text>
-        <text x="${sx(tv).toFixed(1)}" y="${padT + ph + 16}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${tickFmt(tv)}</text>`).join("")}
-      <line x1="${sx(vmin).toFixed(1)}" y1="${sy(vmin).toFixed(1)}" x2="${sx(vmax).toFixed(1)}" y2="${sy(vmax).toFixed(1)}" stroke="var(--line-strong)" stroke-dasharray="4 4"/>
-      ${dots}
-      <text x="${padL + pw / 2}" y="${H - 6}" text-anchor="middle" font-size="11" fill="var(--text)">${t.proj27AxisX(tLbl)}</text>
-      <text transform="translate(12 ${padT + ph / 2}) rotate(-90)" text-anchor="middle" font-size="11" fill="var(--text)">${t.proj27AxisY(tLbl)}</text>
-    </svg><p class="muted small" style="margin-top:6px">${t.proj27ScatterNote}</p>`;
-    drawRing($("proj27-scatter-wrap"), prevRing);
-    $("proj27-scatter-wrap").querySelectorAll(".eda-pt").forEach((dot) => {
-      const c = BY_ISO.get(dot.dataset.iso);
-      dot.addEventListener("click", () => selectCountry(c.iso3));
-      dot.addEventListener("pointerenter", (ev) => showTip(ev, t.proj27Tip(c, fmt(c[sp.k23], sp.d), fmt(c[sp.k27], sp.d), sp.unit)));
-      dot.addEventListener("pointermove", moveTip);
-      dot.addEventListener("pointerleave", hideTip);
-    });
+    renderProj27Scatter();
   }
 
   function renderAseanAndTransition() {
@@ -3027,7 +3168,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       { key: "cap_bioenergy_wpc", col: "#8B5CF6" }
     ].map((x, i) => ({ ...x, lbl: t.techs[i] }));
     const maxW = Math.max(...asean.map((c) => c.renew_cap_2023), 500);
-    const W = 620, rowH = 30, padL = 148, padR = 68, padT = 14, padB = 30;
+    const W = state.lang === "en" ? 680 : 620, rowH = 30, padL = state.lang === "en" ? 218 : 148, padR = 68, padT = 14, padB = 30;
     const H = padT + asean.length * rowH + padB;
     const barW = W - padL - padR;
     const bars = asean.map((c, i) => {
@@ -3059,7 +3200,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const idn = BY_ISO.get("IDN"), vnm = BY_ISO.get("VNM"), mys = BY_ISO.get("MYS"), phl = BY_ISO.get("PHL");
     const r3 = DATA.regimes.find((r) => r.regime_km === 3);
     $("idn-policy-content").innerHTML = state.lang === "id"
-      ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;font-size:13.5px">
+      ? `<div style="display:grid;grid-template-columns:1fr;gap:14px;font-size:13.5px">
           <div><h3>1. Capaian 2019 ke 2023 &amp; proyeksi 2027</h3>
             <p class="muted" style="margin-top:4px">Indonesia stabil di <strong>R3</strong> pada 2019, 2023, dan proyeksi 2027. Akses memasak bersih naik dari <strong class="num">${fmt(idn.cooking_2019, 0)}%</strong> (2019) ke <strong class="num">${fmt(idn.cooking_2023, 0)}%</strong> (2023) dan diproyeksikan <strong class="num">${fmt(idn.cooking_2027, 1)}%</strong> (2027), dengan listrik <strong class="num">${fmt(idn.elec_2023, 1)}%</strong> dan intensitas <strong class="num">${fmt(idn.energy_int_2023, 2)} MJ/$</strong>.</p></div>
           <div><h3>2. Celah kapasitas listrik terbarukan (SDG 7.b.1)</h3>
@@ -3067,7 +3208,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           <div><h3>3. Implikasi kebijakan</h3>
             <p class="muted" style="margin-top:4px">Pendanaan JETP dan RUPTL dapat difokuskan pada percepatan PLTS atap dan skala utilitas dengan pengadaan yang transparan, interkoneksi antarpulau untuk menyerap potensi panas bumi dan air, serta elektrifikasi wilayah kepulauan agar sisa populasi tanpa listrik terjangkau tanpa generator diesel.</p></div>
         </div>`
-      : `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;font-size:13.5px">
+      : `<div style="display:grid;grid-template-columns:1fr;gap:14px;font-size:13.5px">
           <div><h3>1. Progress 2019 to 2023 &amp; 2027 projection</h3>
             <p class="muted" style="margin-top:4px">Indonesia remains in <strong>R3</strong> across 2019, 2023, and the 2027 projection. Clean cooking rose from <strong class="num">${fmt(idn.cooking_2019, 0)}%</strong> (2019) to <strong class="num">${fmt(idn.cooking_2023, 0)}%</strong> (2023) and is projected at <strong class="num">${fmt(idn.cooking_2027, 1)}%</strong> (2027), with <strong class="num">${fmt(idn.elec_2023, 1)}%</strong> electricity access and <strong class="num">${fmt(idn.energy_int_2023, 2)} MJ/$</strong> energy intensity.</p></div>
           <div><h3>2. The renewable power gap (SDG 7.b.1)</h3>
@@ -3291,9 +3432,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     document.querySelectorAll(".eda-preset").forEach((b, i) => { b.textContent = t.edaBtns[i]; });
     const metSel = $("metric-select");
     t.metricOpts.forEach((txt, i) => { metSel.options[i].textContent = txt; });
-    const p27Sel = $("proj27-target-select");
-    t.proj27Targets.forEach(([, txt], i) => { p27Sel.options[i].textContent = txt; });
-    p27Sel.value = state.proj27Target;
+    closeRosterModal();
     $("table-search").placeholder = t.tSearchPh;
     t.tRegimeOpts.forEach((txt, i) => { $("table-regime").options[i].textContent = txt; });
     t.tRegionOpts.forEach((txt, i) => { $("table-region").options[i].textContent = txt; });
@@ -3388,10 +3527,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     state.evalMetric = e.target.value;
     renderModels();
   });
-  $("proj27-target-select").addEventListener("change", (e) => {
-    state.proj27Target = e.target.value;
-    renderProjection2027();
-  });
+  $("roster-modal-close").addEventListener("click", closeRosterModal);
+  $("roster-modal").addEventListener("click", (e) => { if (e.target === $("roster-modal")) closeRosterModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeRosterModal(); });
   document.querySelectorAll("#table-year-seg [data-tyear]").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.tableYear = btn.dataset.tyear;
