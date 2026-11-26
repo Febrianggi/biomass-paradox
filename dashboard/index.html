@@ -122,7 +122,7 @@ body {
   overflow-x: clip;
 }
 h1, h2, h3, p { margin: 0; }
-h1 { font: 600 clamp(25px, 3.1vw, 38px)/1.1 var(--display); letter-spacing: -0.02em; max-width: 44ch; text-wrap: balance; }
+h1 { font: 600 clamp(25px, 3.1vw, 38px)/1.1 var(--display); letter-spacing: -0.02em; max-width: 26ch; text-wrap: balance; }
 h2 { font: 600 clamp(19px, 1.9vw, 23px)/1.2 var(--display); }
 h3 { font: 600 15px/1.3 var(--sans); }
 a { color: var(--link); text-underline-offset: 3px; }
@@ -214,6 +214,7 @@ header.masthead:not(.is-home) .mist { display: none; }
 .btn:active { background: var(--ink-soft); }
 /* The one filled chromatic control: leaf green with forest ink in both themes (about 11:1). */
 .btn.primary { background: var(--lime); border-color: var(--lime); color: var(--on-lime); font-weight: 700; border-radius: 12px; }
+#download-csv-btn { min-width: 264px; white-space: nowrap; }
 .btn.primary:hover { background: var(--lime-hover); border-color: var(--lime-hover); }
 .btn.primary:active { box-shadow: inset 0 0 0 1px var(--on-lime); }
 .btn-icon { width: 16px; height: 16px; flex: none; }
@@ -340,8 +341,9 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
 /* Atlas */
 .atlas-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr); gap: var(--s4); align-items: start; }
 @media (max-width: 1020px) { .atlas-grid { grid-template-columns: 1fr; } }
+#panel-atlas { overflow-anchor: none; }
 .map-stage { background: var(--bg); border-radius: 10px; padding: var(--s2); }
-.map-stage svg { display: block; width: 100%; height: auto; max-height: 480px; }
+.map-stage svg { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: 440px; }
 .country-path {
   fill-rule: evenodd; /* holes (e.g. Lesotho inside South Africa) stay unfilled and unclickable */
   stroke: var(--map-stroke); stroke-width: 0.55px; vector-effect: non-scaling-stroke;
@@ -396,6 +398,7 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
 .regime-card {
   background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--line);
   border-radius: var(--radius-card); padding: var(--s3) var(--s4); display: flex; flex-direction: column; gap: var(--s2);
+  min-height: 320px;
 }
 .regime-card[data-r="1"] { border-top-color: var(--r1); }
 .regime-card[data-r="2"] { border-top-color: var(--r2); }
@@ -539,8 +542,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   .control-bar .field { gap: 3px; }
   /* Atlas controls in three rows: layer, then scope beside search, then regime pills */
   #panel-atlas .control-bar { display: grid; grid-template-columns: auto minmax(0, 1fr); }
-  #panel-atlas .control-bar > .field:has(select), #panel-atlas .control-bar > .field:has(.pills) { grid-column: 1 / -1; }
+  #panel-atlas .control-bar > .field:has(#map-layer-select), #panel-atlas .control-bar > .field:has(.pills) { grid-column: 1 / -1; }
   #panel-atlas .control-bar > .field:has(.pills) { order: 1; }
+  #download-csv-btn { min-width: 0; }
   .control-bar .field-lbl, .control-bar .field label { font-size: 12px; }
   .control-bar input[type="search"] { min-width: 0; width: 100%; padding: 0 10px; }
   .control-bar .seg { flex-wrap: nowrap; }
@@ -631,11 +635,17 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
             </select>
           </div>
           <div class="field">
-            <span class="field-lbl" id="lbl-map-zoom" data-i18n="lblMapZoom">Cakupan</span>
-            <div class="seg" role="group" aria-labelledby="lbl-map-zoom">
-              <button type="button" id="zoom-world" aria-pressed="true" data-i18n="zoomWorld">Dunia</button>
-              <button type="button" id="zoom-asean" aria-pressed="false" data-i18n="zoomAsean">Fokus ASEAN</button>
-            </div>
+            <label for="map-scope-select" data-i18n="lblMapZoom">Cakupan</label>
+            <select id="map-scope-select">
+              <option value="world"></option>
+              <option value="asean"></option>
+              <option value="asia"></option>
+              <option value="africa"></option>
+              <option value="europe"></option>
+              <option value="north_america"></option>
+              <option value="south_america"></option>
+              <option value="oceania"></option>
+            </select>
           </div>
           <div class="field">
             <span class="field-lbl" id="lbl-regime-filter" data-i18n="lblRegimeFilter">Sorot rezim</span>
@@ -659,7 +669,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
               <span class="muted num small" id="map-count-lbl"></span>
             </div>
             <div class="map-stage">
-              <svg id="world-svg" role="group" aria-label="World map of clean energy transition regimes"></svg>
+              <svg id="world-svg" preserveAspectRatio="xMidYMid meet" role="group" aria-label="World map of clean energy transition regimes"></svg>
             </div>
             <div class="legend-row" id="map-legend"></div>
           </section>
@@ -955,8 +965,16 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       ],
       lblMapLayer: "Lapisan peta",
       lblMapZoom: "Cakupan",
-      zoomWorld: "Dunia",
-      zoomAsean: "Fokus ASEAN",
+      mapScopes: [
+        ["world", "Dunia"],
+        ["asean", "ASEAN"],
+        ["asia", "Asia"],
+        ["africa", "Afrika"],
+        ["europe", "Eropa"],
+        ["north_america", "Amerika Utara"],
+        ["south_america", "Amerika Selatan"],
+        ["oceania", "Oseania"]
+      ],
       lblRegimeFilter: "Sorot rezim",
       all: "Semua",
       lblCountryPicker: "Cari negara",
@@ -964,7 +982,10 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       pickerHint: "Ketik nama negara atau kode ISO3, lalu tekan Enter.",
       mapCardTitle: "Peta rezim transisi energi-iklim",
       mapHint: "Pilih negara pada peta untuk membandingkan enam indikatornya dengan median rezim dan median global.",
-      mapCount: (n) => `${n} negara disorot`,
+      mapCount: (n, scope) => scope ? `${scope} · ${n} negara disorot` : `${n} negara disorot`,
+      noRegimeInScope: (scope) => `Tidak ada negara di ${scope} pada rezim ini.`,
+      mPop: "juta",
+      ofGlobal: (scope, n, total) => `${scope} · ${n}/${total} global`,
       noDataMap: "Tidak dianalisis (data tidak lengkap)",
       thLabels: {
         country: "Negara", regime: "Rezim 2023", r2015: "2015",
@@ -1110,8 +1131,16 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       ],
       lblMapLayer: "Map layer",
       lblMapZoom: "Extent",
-      zoomWorld: "World",
-      zoomAsean: "ASEAN focus",
+      mapScopes: [
+        ["world", "World"],
+        ["asean", "ASEAN"],
+        ["asia", "Asia"],
+        ["africa", "Africa"],
+        ["europe", "Europe"],
+        ["north_america", "North America"],
+        ["south_america", "South America"],
+        ["oceania", "Oceania"]
+      ],
       lblRegimeFilter: "Highlight regime",
       all: "All",
       lblCountryPicker: "Find a country",
@@ -1119,7 +1148,10 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       pickerHint: "Type a country name or ISO3 code, then press Enter.",
       mapCardTitle: "Energy and climate transition regimes",
       mapHint: "Select a country on the map to compare its six indicators with its regime median and the global median.",
-      mapCount: (n) => `${n} countries highlighted`,
+      mapCount: (n, scope) => scope ? `${scope} · ${n} countries highlighted` : `${n} countries highlighted`,
+      noRegimeInScope: (scope) => `No countries in ${scope} fall in this regime.`,
+      mPop: "M",
+      ofGlobal: (scope, n, total) => `${scope} · ${n}/${total} global`,
       noDataMap: "Not modelled (incomplete data)",
       thLabels: {
         country: "Country", regime: "2023 regime", r2015: "2015",
@@ -1263,6 +1295,36 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   ];
   const POSITIVE_CELLS = new Set(["R1_R2", "R1_R3", "R2_R3", "R4_R3"]);
   const NEGATIVE_CELLS = new Set(["R3_R4"]);
+  const CONTINENT_GROUPS = {
+    asia: new Set(["AFG","ARE","ARM","AZE","BGD","BHR","BRN","BTN","CHN","CYP","GEO","IDN","IND","IRN","IRQ","ISR","JOR","JPN","KAZ","KGZ","KHM","KOR","KWT","LAO","LBN","LKA","MDV","MMR","MNG","MYS","NPL","OMN","PAK","PHL","PRK","QAT","SAU","SGP","SYR","THA","TJK","TKM","TLS","TUR","UZB","VNM","YEM"]),
+    africa: new Set(["AGO","BDI","BEN","BFA","BWA","CAF","CIV","CMR","COD","COG","COM","CPV","DJI","DZA","EGY","ERI","ETH","GAB","GHA","GIN","GMB","GNB","GNQ","KEN","LBR","LBY","LSO","MAR","MDG","MLI","MOZ","MRT","MUS","MWI","NAM","NER","NGA","RWA","SDN","SEN","SLE","SOM","SSD","STP","SWZ","SYC","TCD","TGO","TUN","TZA","UGA","ZAF","ZMB","ZWE"]),
+    europe: new Set(["ALB","AUT","BEL","BGR","BIH","BLR","CHE","CZE","DEU","DNK","ESP","EST","FIN","FRA","GBR","GRC","HRV","HUN","IRL","ISL","ITA","LTU","LUX","LVA","MDA","MKD","MLT","MNE","NLD","NOR","POL","PRT","ROU","RUS","SRB","SVK","SVN","SWE","UKR"]),
+    north_america: new Set(["ATG","BHS","BLZ","BRB","CAN","CRI","CUB","DMA","DOM","GRD","GTM","HND","HTI","JAM","KNA","LCA","MEX","NIC","PAN","SLV","TTO","USA","VCT"]),
+    south_america: new Set(["ARG","BOL","BRA","CHL","COL","ECU","GUY","PER","PRY","SUR","URY","VEN"]),
+    oceania: new Set(["AUS","FJI","FSM","KIR","MHL","NRU","NZL","PLW","PNG","SLB","TON","TUV","VUT","WSM"])
+  };
+  const SCOPE_VIEWBOX = {
+    asia: [545, 62, 370, 232],
+    africa: [415, 120, 265, 286],
+    europe: [435, 2, 235, 160],
+    north_america: [50, 0, 365, 235],
+    south_america: [225, 198, 200, 232],
+    oceania: [730, 210, 270, 221]
+  };
+  function inMapScope(c) {
+    if (!c) return false;
+    if (state.mapZoom === "world") return true;
+    if (state.mapZoom === "asean") return Boolean(c.is_asean);
+    const set = CONTINENT_GROUPS[state.mapZoom];
+    return set ? set.has(c.iso3) : true;
+  }
+  function scopeCountries() {
+    return DATA ? DATA.countries.filter(inMapScope) : [];
+  }
+  function scopeLabel() {
+    const hit = T().mapScopes.find(([k]) => k === state.mapZoom);
+    return hit ? hit[1] : "";
+  }
 
   let DATA = null;
   let BY_ISO = new Map();
@@ -1585,39 +1647,50 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   function updateMapColorsAndZoom() {
     const svg = $("world-svg");
-    const vb = state.mapZoom === "asean" ? DATA.meta.asean_viewbox : DATA.meta.svg_viewbox;
+    const vb = state.mapZoom === "world"
+      ? DATA.meta.svg_viewbox
+      : state.mapZoom === "asean"
+        ? DATA.meta.asean_viewbox
+        : (SCOPE_VIEWBOX[state.mapZoom] || DATA.meta.svg_viewbox);
     svg.setAttribute("viewBox", vb.join(" "));
+    const isScoped = state.mapZoom !== "world";
     let activeCount = 0;
     for (const p of svg.querySelectorAll(".country-path")) {
       const c = BY_ISO.get(p.dataset.iso3);
       if (!c) {
         p.style.fill = "var(--map-na)";
-        p.classList.toggle("is-dimmed", state.regimeFilter !== "ALL");
+        p.classList.toggle("is-dimmed", isScoped || state.regimeFilter !== "ALL");
         continue;
       }
       const r = getCountryRegime(c, state.mapLayer);
       const tag = state.mapLayer === "km2_2023" ? `B${r}` : `R${r}`;
       p.setAttribute("aria-label", `${cName(c)} (${tag})`);
       p.style.fill = mapFillVar(r, state.mapLayer);
-      const match = state.regimeFilter === "ALL" || String(r) === state.regimeFilter;
+      const match = inMapScope(c) && (state.regimeFilter === "ALL" || String(r) === state.regimeFilter);
       if (match) activeCount++;
       p.classList.toggle("is-dimmed", !match);
       p.classList.toggle("is-selected", c.iso3 === state.selectedIso);
     }
     const selPath = svg.querySelector(`.country-path[data-iso3="${state.selectedIso}"]`);
     $("map-sel-outline").setAttribute("d", selPath ? selPath.getAttribute("d") : "");
-    $("map-count-lbl").textContent = T().mapCount(activeCount);
+    $("map-count-lbl").textContent = T().mapCount(activeCount, isScoped ? scopeLabel() : "");
 
     const t = T();
+    const scoped = scopeCountries();
     const na = `<span class="legend-item"><span class="swatch" style="background:var(--map-na)"></span>${t.noDataMap}</span>`;
     if (state.mapLayer === "km2_2023") {
       $("map-legend").innerHTML = DATA.regimes_k2.map((b) => {
         const col = b.regime_k2 === 1 ? "var(--r1)" : "var(--r3)";
-        return `<span class="legend-item"><span class="swatch" style="background:${col}"></span><strong>${b.kode_k2}</strong> ${state.lang === "id" ? b.nama_id : b.nama_en} <span class="num muted">(${b.n_negara} · ${b.komposisi_rezim_k4})</span></span>`;
+        const grp = scoped.filter((c) => c.regime_k2 === b.regime_k2);
+        const comp = isScoped
+          ? [1, 2, 3, 4].map((r) => [r, grp.filter((c) => c.regime_2023 === r).length]).filter(([, n]) => n > 0).map(([r, n]) => `R${r}=${n}`).join(", ")
+          : b.komposisi_rezim_k4;
+        const detail = comp ? `${grp.length} · ${comp}` : `${grp.length}`;
+        return `<span class="legend-item"><span class="swatch" style="background:${col}"></span><strong>${b.kode_k2}</strong> ${state.lang === "id" ? b.nama_id : b.nama_en} <span class="num muted">(${detail})</span></span>`;
       }).join("") + na;
     } else {
       const counts = {};
-      for (const c of DATA.countries) {
+      for (const c of scoped) {
         const r = getCountryRegime(c, state.mapLayer);
         counts[r] = (counts[r] || 0) + 1;
       }
@@ -1625,6 +1698,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         `<span class="legend-item"><span class="swatch" style="background:${regimeColorVar(rg.regime_km)}"></span><strong>${rg.kode_rezim}</strong> ${state.lang === "id" ? rg.nama_id : rg.nama_en} <span class="num muted">(${counts[rg.regime_km] || 0})</span></span>`
       ).join("") + na;
     }
+    renderRegimeCards();
   }
 
   /* Country inspector: dot plots against regime and global medians, plus method consensus */
@@ -1676,25 +1750,79 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     }).join("");
   }
 
+  function mean(arr) {
+    const clean = arr.filter((v) => v !== null && v !== undefined && !Number.isNaN(Number(v))).map(Number);
+    return clean.length ? clean.reduce((s, v) => s + v, 0) / clean.length : null;
+  }
+
   function renderRegimeCards() {
     const t = T();
-    $("regime-cards").innerHTML = DATA.regimes.map((rg) => `<article class="regime-card" data-r="${rg.regime_km}">
+    const isScoped = state.mapZoom !== "world";
+    const scoped = scopeCountries();
+    const sLbl = scopeLabel();
+    const layer = state.mapLayer === "km2_2023" ? "km2023" : state.mapLayer;
+    const use2015 = layer === "km2015";
+    $("regime-cards").innerHTML = DATA.regimes.map((rg) => {
+      if (!isScoped && layer === "km2023") {
+        return `<article class="regime-card" data-r="${rg.regime_km}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span class="badge r${rg.regime_km}">${rg.kode_rezim} · ${rg.n_negara} ${t.countries}</span>
+            <span class="muted num" style="font-size:12px">Jaccard ${fmt(rg.jaccard_km, 3)}</span>
+          </div>
+          <h3>${state.lang === "id" ? rg.nama_id : rg.nama_en}</h3>
+          <dl class="regime-dl">
+            <dt>${t.popLbl}</dt><dd>${fmt(rg.populasi_miliar, 2)} ${t.bn}</dd>
+            <dt>SDG 7.1.1 / 7.1.2</dt><dd>${fmt(rg.elec_mean, 1)}% / ${fmt(rg.cooking_mean, 1)}%</dd>
+            <dt>SDG 7.2.1</dt><dd>${fmt(rg.renew_share_mean, 1)}%</dd>
+            <dt>SDG 7.b.1 (median)</dt><dd>${fmt(rg.renew_cap_median, 1)} ${t.perCap}</dd>
+            <dt>SDG 7.3.1 / CO2</dt><dd>${fmt(rg.energy_int_mean, 2)} MJ / ${fmt(rg.co2_pc_median, 2)} t</dd>
+            <dt>${t.gdpExtLbl}</dt><dd>$${fmt(rg.gdp_ppp_median_ext, 0)}</dd>
+            <dt>${t.medoidLbl}</dt><dd>${rg.iso3_contoh_pusat} / ${rg.medoid_pam_iso3}</dd>
+          </dl>
+          <p class="muted" style="font-size:12.5px;margin-top:auto;padding-top:6px;border-top:1px solid var(--line)">${REGIME_POLICY[state.lang][rg.regime_km]}</p>
+        </article>`;
+      }
+      const grp = scoped.filter((c) => getCountryRegime(c, layer) === rg.regime_km);
+      const n = grp.length;
+      const rightMeta = isScoped ? t.ofGlobal(sLbl, n, rg.n_negara) : `Jaccard ${fmt(rg.jaccard_km, 3)}`;
+      if (!n) {
+        return `<article class="regime-card" data-r="${rg.regime_km}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span class="badge r${rg.regime_km}">${rg.kode_rezim} · 0 ${t.countries}</span>
+            <span class="muted num" style="font-size:12px">${rightMeta}</span>
+          </div>
+          <h3>${state.lang === "id" ? rg.nama_id : rg.nama_en}</h3>
+          <p class="muted" style="font-size:13px;padding:14px 0">${t.noRegimeInScope(sLbl)}</p>
+          <p class="muted" style="font-size:12.5px;margin-top:auto;padding-top:6px;border-top:1px solid var(--line)">${REGIME_POLICY[state.lang][rg.regime_km]}</p>
+        </article>`;
+      }
+      const popSumM = grp.reduce((s, c) => s + (Number(c.population_m) || 0), 0);
+      const popTxt = popSumM >= 1000 ? `${fmt(popSumM / 1000, 2)} ${t.bn}` : `${fmt(popSumM, 1)} ${t.mPop}`;
+      const kE = use2015 ? "elec_2015" : "elec_2023";
+      const kC = use2015 ? "cooking_2015" : "cooking_2023";
+      const kS = use2015 ? "renew_share_2015" : "renew_share_2023";
+      const kP = use2015 ? "renew_cap_2015" : "renew_cap_2023";
+      const kI = use2015 ? "energy_int_2015" : "energy_int_2023";
+      const kO = use2015 ? "co2_pc_2015" : "co2_pc_2023";
+      const gdps = grp.map((c) => c.gdp_pc_ppp).filter((v) => v !== null && v !== undefined && !Number.isNaN(Number(v)));
+      const gdpTxt = gdps.length ? `$${fmt(median(gdps), 0)}` : "-";
+      return `<article class="regime-card" data-r="${rg.regime_km}">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-          <span class="badge r${rg.regime_km}">${rg.kode_rezim} · ${rg.n_negara} ${t.countries}</span>
-          <span class="muted num" style="font-size:12px">Jaccard ${fmt(rg.jaccard_km, 3)}</span>
+          <span class="badge r${rg.regime_km}">${rg.kode_rezim} · ${n} ${t.countries}</span>
+          <span class="muted num" style="font-size:12px">${rightMeta}</span>
         </div>
         <h3>${state.lang === "id" ? rg.nama_id : rg.nama_en}</h3>
         <dl class="regime-dl">
-          <dt>${t.popLbl}</dt><dd>${fmt(rg.populasi_miliar, 2)} ${t.bn}</dd>
-          <dt>SDG 7.1.1 / 7.1.2</dt><dd>${fmt(rg.elec_mean, 1)}% / ${fmt(rg.cooking_mean, 1)}%</dd>
-          <dt>SDG 7.2.1</dt><dd>${fmt(rg.renew_share_mean, 1)}%</dd>
-          <dt>SDG 7.b.1 (median)</dt><dd>${fmt(rg.renew_cap_median, 1)} ${t.perCap}</dd>
-          <dt>SDG 7.3.1 / CO2</dt><dd>${fmt(rg.energy_int_mean, 2)} MJ / ${fmt(rg.co2_pc_median, 2)} t</dd>
-          <dt>${t.gdpExtLbl}</dt><dd>$${fmt(rg.gdp_ppp_median_ext, 0)}</dd>
-          <dt>${t.medoidLbl}</dt><dd>${rg.iso3_contoh_pusat} / ${rg.medoid_pam_iso3}</dd>
+          <dt>${t.popLbl}</dt><dd>${popTxt}</dd>
+          <dt>SDG 7.1.1 / 7.1.2</dt><dd>${fmt(mean(grp.map((c) => c[kE])), 1)}% / ${fmt(mean(grp.map((c) => c[kC])), 1)}%</dd>
+          <dt>SDG 7.2.1</dt><dd>${fmt(mean(grp.map((c) => c[kS])), 1)}%</dd>
+          <dt>SDG 7.b.1 (median)</dt><dd>${fmt(median(grp.map((c) => c[kP])), 1)} ${t.perCap}</dd>
+          <dt>SDG 7.3.1 / CO2</dt><dd>${fmt(mean(grp.map((c) => c[kI])), 2)} MJ / ${fmt(median(grp.map((c) => c[kO])), 2)} t</dd>
+          <dt>${t.gdpExtLbl}</dt><dd>${gdpTxt}</dd>
         </dl>
         <p class="muted" style="font-size:12.5px;margin-top:auto;padding-top:6px;border-top:1px solid var(--line)">${REGIME_POLICY[state.lang][rg.regime_km]}</p>
-      </article>`).join("");
+      </article>`;
+    }).join("");
   }
 
   /* Panel 2: scatter with story presets */
@@ -2405,6 +2533,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
     const layerSel = $("map-layer-select");
     t.mapLayers.forEach(([, txt], i) => { layerSel.options[i].textContent = txt; });
+    const scopeSel = $("map-scope-select");
+    t.mapScopes.forEach(([, txt], i) => { scopeSel.options[i].textContent = txt; });
+    scopeSel.value = state.mapZoom;
     $("country-picker").placeholder = t.pickerPh;
     $("country-list").innerHTML = [...DATA.countries]
       .sort((a, b) => cName(a).localeCompare(cName(b)))
@@ -2470,14 +2601,10 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     renderRegimePills();
     updateMapColorsAndZoom();
   });
-  for (const [id, zoom] of [["zoom-world", "world"], ["zoom-asean", "asean"]]) {
-    $(id).addEventListener("click", () => {
-      state.mapZoom = zoom;
-      $("zoom-world").setAttribute("aria-pressed", String(zoom === "world"));
-      $("zoom-asean").setAttribute("aria-pressed", String(zoom === "asean"));
-      updateMapColorsAndZoom();
-    });
-  }
+  $("map-scope-select").addEventListener("change", (e) => {
+    state.mapZoom = e.target.value;
+    updateMapColorsAndZoom();
+  });
   const picker = $("country-picker");
   const commitPicker = () => {
     const iso = resolvePicker(picker.value);
