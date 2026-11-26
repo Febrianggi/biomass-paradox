@@ -1059,7 +1059,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       },
       selected: "Terpilih",
       openMap: "Lihat di peta",
-      edaLegendHint: "Klik R1-R4 untuk menyorot satu rezim",
       edaLegendAria: "Sorot negara berdasarkan rezim",
       edaRegimeLbl: "Rezim disorot",
       edaBackSingle: "Fokus 1 negara",
@@ -1277,7 +1276,6 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       },
       selected: "Selected",
       openMap: "View on map",
-      edaLegendHint: "Click R1-R4 to highlight a regime",
       edaLegendAria: "Highlight countries by regime",
       edaRegimeLbl: "Highlighted regime",
       edaBackSingle: "Focus 1 country",
@@ -2399,7 +2397,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         <span>${rg.kode_rezim}</span>
         <span class="legend-n">(${rg.n_negara})</span>
       </button>`;
-    }).join("") + `<span class="legend-hint">${t.edaLegendHint}</span>`;
+    });
     leg.querySelectorAll("[data-eda-regime]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const r = Number(btn.dataset.edaRegime);
