@@ -16,7 +16,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;600;700&display=swap">
-<title>Atlas Transisi Energi Bersih &amp; Iklim Global (SDG 7 &amp; 13)</title>
+<title>Dashboard Transisi Energi Bersih &amp; Iklim Global (SDG 7 &amp; 13)</title>
 <style>
 /*
   Direction: the Biomass Paradox identity from the landing page (forest base, mist, leaf green),
@@ -927,7 +927,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   const I18N = {
     id: {
-      pageTitle: "Atlas Transisi Energi Bersih & Iklim Global (SDG 7 & 13)",
+      pageTitle: "Dashboard Transisi Energi Bersih & Iklim Global (SDG 7 & 13)",
       langLabel: "Bahasa",
       mapAria: "Peta dunia rezim transisi energi bersih dan iklim",
       brand: "SDG 7 · 13",
@@ -1077,12 +1077,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       fcCmpCols: ["Perbandingan", "Selisih MAE (pp)", "IK 95% (sampel ulang berpasangan galat out-of-fold)"],
       fcVerdict: (dP, loP, hiP, dO, loO, hiO) => `Pada interval ini, MAE elastic net lebih rendah daripada persistensi (selisih ${dP} pp, IK 95% ${loP} sampai ${hiP}) dan daripada regresi memasak 2015 (selisih ${dO} pp, IK 95% ${loO} sampai ${hiO}). Interval berasal dari pengambilan sampel ulang berpasangan atas galat out-of-fold yang sudah ada. Perbandingan dengan regresi mengubah prediktor sekaligus metode estimasi, jadi selisihnya mengukur kinerja model secara keseluruhan dan tidak memisahkan sumbangan lima indikator tambahan.`,
       fcScatterNote: "Warna titik = rezim 2023. Garis putus-putus = prediksi sama dengan nilai aktual. Klik titik untuk memilih negara.",
-      fcTip: (c, f) => `<strong>${c.country_en} (${c.iso3})</strong> · ${c.kode_2023}<br>Aktual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistensi: ${fmt(f.persistence, 0)}%`,
+      fcTip: (c, f) => `<strong>${cName(c)} (${c.iso3})</strong> · ${c.kode_2023}<br>Aktual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistensi: ${fmt(f.persistence, 0)}%`,
       fcAxisX: "Aktual 2023 (%)", fcAxisY: "Prediksi out-of-fold elastic net (%)",
       fcScatterAria: "Memasak bersih 2023 aktual terhadap prediksi out-of-fold elastic net, 189 negara",
     },
     en: {
-      pageTitle: "Clean Energy & Climate Transition Atlas (SDG 7 & 13)",
+      pageTitle: "Clean Energy & Climate Transition Dashboard (SDG 7 & 13)",
       langLabel: "Language",
       mapAria: "World map of clean energy and climate transition regimes",
       brand: "SDG 7 · 13",
@@ -1232,7 +1232,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       fcCmpCols: ["Comparison", "MAE difference (pp)", "95% CI (paired resampling of out-of-fold errors)"],
       fcVerdict: (dP, loP, hiP, dO, loO, hiO) => `Over this interval, the elastic net has lower MAE than persistence (difference ${dP} pp, 95% CI ${loP} to ${hiP}) and than the 2015 cooking-only regression (difference ${dO} pp, 95% CI ${loO} to ${hiO}). The intervals come from paired resampling of the existing out-of-fold errors. The comparison with the regression changes both the predictors and the estimation method, so the difference measures overall model performance and does not isolate the contribution of the five extra indicators.`,
       fcScatterNote: "Point colour = 2023 regime. Dashed line = prediction equals the actual value. Click a point to select a country.",
-      fcTip: (c, f) => `<strong>${c.country_en} (${c.iso3})</strong> · ${c.kode_2023}<br>Actual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistence: ${fmt(f.persistence, 0)}%`,
+      fcTip: (c, f) => `<strong>${cName(c)} (${c.iso3})</strong> · ${c.kode_2023}<br>Actual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistence: ${fmt(f.persistence, 0)}%`,
       fcAxisX: "Actual 2023 (%)", fcAxisY: "Elastic net out-of-fold prediction (%)",
       fcScatterAria: "Actual 2023 clean cooking against elastic net out-of-fold predictions, 189 countries",
     }
@@ -1288,6 +1288,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
   const $ = (id) => document.getElementById(id);
   const T = () => I18N[state.lang];
+  const cName = (c) => (state.lang === "id" && c && c.country_id) ? c.country_id : (c ? c.country_en : "");
   function fmt(v, d = 1) {
     if (v === null || v === undefined || Number.isNaN(Number(v))) return "n/a";
     return Number(v).toLocaleString(state.lang === "id" ? "id-ID" : "en-US", {
@@ -1405,7 +1406,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   }
   function hideTip() { tooltip.hidden = true; }
   function countryTip(c) {
-    return `<strong>${c.country_en} (${c.iso3})</strong> · <strong>${c.kode_2023}</strong><br>` +
+    return `<strong>${cName(c)} (${c.iso3})</strong> · <strong>${c.kode_2023}</strong><br>` +
       `SDG 7.1.1: ${fmt(c.elec_2023, 1)}% · SDG 7.1.2: ${fmt(c.cooking_2023, 1)}%<br>` +
       `SDG 7.2.1: ${fmt(c.renew_share_2023, 1)}% · SDG 7.b.1: ${fmt(c.renew_cap_2023, 1)} ${T().perCap}<br>` +
       `SDG 7.3.1: ${fmt(c.energy_int_2023, 2)} MJ/$ · CO2: ${fmt(c.co2_pc_2023, 2)} t`;
@@ -1533,7 +1534,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       if (c) {
         p.tabIndex = 0;
         p.setAttribute("role", "button");
-        p.setAttribute("aria-label", `${c.country_en} (${c.kode_2023})`);
+        p.setAttribute("aria-label", `${cName(c)} (${c.kode_2023})`);
         p.addEventListener("click", () => selectCountry(c.iso3));
         p.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -1596,7 +1597,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       }
       const r = getCountryRegime(c, state.mapLayer);
       const tag = state.mapLayer === "km2_2023" ? `B${r}` : `R${r}`;
-      p.setAttribute("aria-label", `${c.country_en} (${tag})`);
+      p.setAttribute("aria-label", `${cName(c)} (${tag})`);
       p.style.fill = mapFillVar(r, state.mapLayer);
       const match = state.regimeFilter === "ALL" || String(r) === state.regimeFilter;
       if (match) activeCount++;
@@ -1637,7 +1638,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const t = T();
     const c = BY_ISO.get(state.selectedIso) || DATA.countries[0];
     const rg = DATA.regimes.find((r) => r.regime_km === c.regime_2023);
-    $("insp-name").textContent = c.country_en;
+    $("insp-name").textContent = cName(c);
     $("insp-sub").textContent = `${c.iso3} · ${c.region} · ${c.income_group}`;
     const b = $("insp-badge");
     b.textContent = c.kode_2023;
@@ -1721,8 +1722,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       text = t.storyText.outliers(hl.size);
     }
     const chips = DATA.countries.filter((c) => hl.has(c.iso3))
-      .sort((a, b) => a.country_en.localeCompare(b.country_en))
-      .map((c) => `<button type="button" class="chip" data-pick="${c.iso3}" aria-pressed="${c.iso3 === state.selectedIso}" title="${c.country_en}">${c.iso3}</button>`).join("");
+      .sort((a, b) => cName(a).localeCompare(cName(b)))
+      .map((c) => `<button type="button" class="chip" data-pick="${c.iso3}" aria-pressed="${c.iso3 === state.selectedIso}" title="${cName(c)}">${c.iso3}</button>`).join("");
     box.hidden = false;
     box.innerHTML = `<p>${text}</p><div class="chip-row">${chips}</div>`;
     box.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => selectCountry(b.dataset.pick)));
@@ -1892,7 +1893,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     ).join("");
 
     const c = BY_ISO.get(state.selectedIso);
-    $("eda-selected").innerHTML = `<span>${t.selected}: <strong>${c.country_en}</strong> <span class="badge r${c.regime_2023}">${c.iso3} · ${c.kode_2023}</span></span>
+    $("eda-selected").innerHTML = `<span>${t.selected}: <strong>${cName(c)}</strong> <span class="badge r${c.regime_2023}">${c.iso3} · ${c.kode_2023}</span></span>
       <span class="num muted">7.2.1 ${fmt(c.renew_share_2023, 1)}% · 7.b.1 ${fmt(c.renew_cap_2023, 1)} ${t.perCap}</span>
       <button type="button" class="btn small-btn" id="eda-open-map">${t.openMap}</button>`;
     $("eda-open-map").addEventListener("click", goToAtlas);
@@ -1921,7 +1922,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       </table>
       <p class="muted" style="font-size:12.5px;margin-top:12px">
         <strong>${t.outlierLbl}:</strong>
-        ${DATA.outliers.map((o) => `${o.country_en} (<span class="mono">${o.iso3}</span>, D² = <span class="num">${fmt(o.mahalanobis_d2, 1)}</span>)`).join(", ")}.
+        ${DATA.outliers.map((o) => `${cName(o)} (<span class="mono">${o.iso3}</span>, D² = <span class="num">${fmt(o.mahalanobis_d2, 1)}</span>)`).join(", ")}.
         ${t.outlierNote}
       </p>`;
   }
@@ -2024,11 +2025,11 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const key = state.migPreview || state.migCell;
     const [f15, t23] = key.split("_");
     const matched = DATA.countries.filter((c) => c.kode_2015 === f15 && c.kode_2023 === t23)
-      .sort((a, b) => a.country_en.localeCompare(b.country_en));
+      .sort((a, b) => cName(a).localeCompare(cName(b)));
     $("mig-list-box").innerHTML = matched.length === 0
       ? `<p class="muted">${t.migEmpty(f15, t23)}</p>`
       : `<p><strong>${t.migRoster(f15, t23, matched.length)}</strong></p>
-         <div class="chip-row">${matched.map((c) => `<button type="button" class="chip" data-pick="${c.iso3}" title="${c.country_en}">${c.country_en} <span class="muted">${c.iso3}</span></button>`).join("")}</div>`;
+         <div class="chip-row">${matched.map((c) => `<button type="button" class="chip" data-pick="${c.iso3}" title="${cName(c)}">${cName(c)} <span class="muted">${c.iso3}</span></button>`).join("")}</div>`;
     $("mig-list-box").querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
       selectCountry(b.dataset.pick);
       goToAtlas();
@@ -2092,7 +2093,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       const lx = c.cooking_2023 > 84 ? (cx - 9).toFixed(1) : (cx + 8).toFixed(1);
       const anchor = c.cooking_2023 > 84 ? "end" : "start";
       const ly = f.elastic_net > 92 ? (cy + 14).toFixed(1) : (cy - 8).toFixed(1);
-      return `<circle class="eda-pt" data-iso="${c.iso3}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${sel ? 6 : 3.2}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${sel ? 1 : 0.7}" stroke="${sel ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2 : 0.6}"><title>${c.country_en} (${c.iso3}): ${fmt(c.cooking_2023, 0)}% / ${fmt(f.elastic_net, 1)}%</title></circle>` +
+      return `<circle class="eda-pt" data-iso="${c.iso3}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${sel ? 6 : 3.2}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${sel ? 1 : 0.7}" stroke="${sel ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2 : 0.6}"><title>${cName(c)} (${c.iso3}): ${fmt(c.cooking_2023, 0)}% / ${fmt(f.elastic_net, 1)}%</title></circle>` +
         (sel ? `<text class="iso" x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="11" font-weight="600" fill="var(--text)">${c.iso3}</text>` : "");
     }).join("");
     const previousRing = ringPosition($("fc-scatter-wrap"));
@@ -2181,13 +2182,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       const segs = techs.map((tc) => {
         const v = Math.max(0, c[tc.key] || 0);
         const w = (v / maxW) * barW;
-        const rect = w > 0.4 ? `<rect x="${accX.toFixed(1)}" y="${y + 5}" width="${w.toFixed(1)}" height="19" fill="${tc.col}"><title>${c.country_en} · ${tc.lbl}: ${fmt(v, 1)} ${t.perCap}</title></rect>` : "";
+        const rect = w > 0.4 ? `<rect x="${accX.toFixed(1)}" y="${y + 5}" width="${w.toFixed(1)}" height="19" fill="${tc.col}"><title>${cName(c)} · ${tc.lbl}: ${fmt(v, 1)} ${t.perCap}</title></rect>` : "";
         accX += w;
         return rect;
       }).join("");
       const isIdn = c.iso3 === "IDN";
-      return `<g style="cursor:pointer" data-asean="${c.iso3}" tabindex="0" role="button" aria-label="${c.country_en}: ${fmt(c.renew_cap_2023, 1)} ${t.perCap}">
-        <text x="${padL - 8}" y="${y + 19}" text-anchor="end" font-size="12" font-weight="${isIdn ? 700 : 500}" fill="var(--text)">${c.country_en} (${c.kode_2023})</text>
+      return `<g style="cursor:pointer" data-asean="${c.iso3}" tabindex="0" role="button" aria-label="${cName(c)}: ${fmt(c.renew_cap_2023, 1)} ${t.perCap}">
+        <text x="${padL - 8}" y="${y + 19}" text-anchor="end" font-size="12" font-weight="${isIdn ? 700 : 500}" fill="var(--text)">${cName(c)} (${c.kode_2023})</text>
         ${segs}
         <text class="iso" x="${(accX + 6).toFixed(1)}" y="${y + 19}" font-size="11.5" font-weight="${isIdn ? 700 : 400}" fill="var(--text)">${fmt(c.renew_cap_2023, 1)}</text>
       </g>`;
@@ -2245,9 +2246,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       tr.dataset.regime = c.kode_2023;
       tr.dataset.region = c.region;
       tr.dataset.asean = c.is_asean ? "1" : "0";
-      tr.dataset.search = `${c.country_en} ${c.iso3} ${c.region}`.toLowerCase();
+      tr.dataset.search = `${c.country_id || ""} ${c.country_en} ${c.iso3} ${c.iso2 || ""} ${c.region}`.toLowerCase();
       tr.innerHTML = `
-        <th scope="row" data-value="${c.country_en}"><button type="button" class="row-pick">${c.country_en} <span class="muted mono">${c.iso3}</span></button></th>
+        <th scope="row" data-value="${c.country_en}"><button type="button" class="row-pick"><span class="cname">${c.country_en}</span> <span class="muted mono">${c.iso3}</span></button></th>
         <td data-value="${c.kode_2023}"><span class="badge r${c.regime_2023}">${c.kode_2023}</span></td>
         <td data-value="${c.kode_2015}" class="mono">${c.kode_2015}</td>
         <td class="num" data-value="${c.elec_2023}"></td>
@@ -2308,6 +2309,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   function renderTableNumbers() {
     const digits = [null, null, null, 1, 1, 1, 1, 2, 2, 3];
     for (const tr of $("country-tbody").rows) {
+      const c = BY_ISO.get(tr.dataset.iso);
+      if (c) {
+        const nm = cName(c);
+        tr.cells[0].dataset.value = nm;
+        const cnEl = tr.cells[0].querySelector(".cname");
+        if (cnEl) cnEl.textContent = nm;
+      }
       [...tr.cells].forEach((cell, i) => {
         if (digits[i] !== null) cell.textContent = fmt(cell.dataset.value, digits[i]);
       });
@@ -2351,7 +2359,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   }
 
   /* Country selection shared by map, picker, scatter, chips, table and ASEAN bars */
-  function pickerLabel(c) { return `${c.country_en} (${c.iso3})`; }
+  function pickerLabel(c) { return `${cName(c)} (${c.iso3})`; }
   function selectCountry(iso3) {
     if (!BY_ISO.has(iso3)) return;
     const body = $("country-tbody");
@@ -2369,9 +2377,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   function resolvePicker(raw) {
     const q = raw.trim().toLowerCase();
     if (!q) return null;
-    const hit = DATA.countries.find((c) => pickerLabel(c).toLowerCase() === q || c.iso3.toLowerCase() === q || c.country_en.toLowerCase() === q);
+    const hit = DATA.countries.find((c) => pickerLabel(c).toLowerCase() === q || c.iso3.toLowerCase() === q || (c.iso2 && c.iso2.toLowerCase() === q) || c.country_en.toLowerCase() === q || (c.country_id && c.country_id.toLowerCase() === q));
     if (hit) return hit.iso3;
-    const partial = DATA.countries.filter((c) => c.country_en.toLowerCase().startsWith(q));
+    const partial = DATA.countries.filter((c) => cName(c).toLowerCase().startsWith(q) || c.country_en.toLowerCase().startsWith(q));
     return partial.length === 1 ? partial[0].iso3 : null;
   }
 
@@ -2398,6 +2406,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const layerSel = $("map-layer-select");
     t.mapLayers.forEach(([, txt], i) => { layerSel.options[i].textContent = txt; });
     $("country-picker").placeholder = t.pickerPh;
+    $("country-list").innerHTML = [...DATA.countries]
+      .sort((a, b) => cName(a).localeCompare(cName(b)))
+      .map((c) => `<option value="${pickerLabel(c)}"></option>`).join("");
     document.querySelectorAll("#story-pills [data-story]").forEach((b) => {
       const lbl = t.stories[b.dataset.story];
       const span = b.querySelector("span:not(.dot)");

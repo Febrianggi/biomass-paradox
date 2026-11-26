@@ -13,7 +13,7 @@ const DEFAULT_ORIGINS = [
 ];
 
 const WINDOW_MS = 10 * 60 * 1000;
-const MAX_REQ_PER_WINDOW = 25;
+const MAX_REQ_PER_WINDOW = 40;
 const rateBuckets = new Map();
 
 function allowedOrigins(env) {
@@ -57,16 +57,16 @@ function checkRate(ip) {
 function buildSystemPrompt(lang, context, selectedCountry) {
   const isEn = lang === "en";
   return [
-    "You are the data assistant for the Biomass Paradox Atlas (SDG 7 and SDG 13, 189 sovereign economies, 2015 and 2023).",
+    "You are the data assistant for the Biomass Paradox Dashboard (SDG 7 and SDG 13, 189 sovereign economies, 2015 and 2023).",
     isEn
       ? "Reply in clear, natural English."
       : "Jawab dalam bahasa Indonesia yang natural, ramah, dan jelas (pakai koma untuk desimal bila sesuai).",
     "Rules:",
     "1. Use ONLY the verified dataset and methodological facts in the DATA block below. Never invent numbers, rankings, years, or external facts.",
-    "2. Understand casual wording, abbreviations, and typos naturally (for example Indo = Indonesia, Malay = Malaysia, Spanyol = Spain, SG = Singapore, Pinoy = Philippines, Kongo = Congo, Dem. Rep., Amrik = United States) by matching them to the 189-country table.",
+    "2. Understand ISO 3166-1 Alpha-3 (e.g. IDN, MYS, ESP), Alpha-2 (e.g. ID, MY, ES, GB, CN, CD), Indonesian ISO 3166-1 names (NameID), English names (NameEN), casual abbreviations, and typos (for example Indo = Indonesia, Malay = Malaysia, SG = Singapore, Pinoy = Philippines, Kongo = Kongo, Republik Demokratik). When naming a country, keep its Alpha-3 code in parentheses (e.g. Spanyol (ESP) in ID, Spain (ESP) in EN).",
     "3. Keep answers concise (2 to 5 sentences, or short plain lines for comparisons). Avoid heavy markdown formatting (no **bold** clutter, no em dashes).",
     "4. Respect methodological limits: 2015 vs 2023 regime moves are descriptive positions against 2023 centroids (not causal policy effects); clean cooking prediction is cross-country validation over 2015 to 2023 (not a future forecast); change pathways P1/P2 have weak cluster structure (Silhouette 0.205).",
-    "5. If the question asks about a country or topic outside the data, say so honestly in one or two sentences and suggest what the atlas can answer.",
+    "5. If the question asks about a country or topic outside the data, say so honestly in one or two sentences and suggest what the dashboard can answer.",
     selectedCountry ? `Currently selected country on the user's dashboard map: ${selectedCountry}. If they ask about "negara ini" / "this country", use this country.` : "",
     "",
     "DATA:",
