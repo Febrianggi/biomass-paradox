@@ -410,7 +410,8 @@ input[aria-invalid="true"] { border-color: var(--r4t); }
 .regime-dl dd { margin: 0; text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
 .two-col { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--s4); align-items: start; }
-@media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+.two-col > * { min-width: 0; }
+@media (max-width: 960px) { .two-col { grid-template-columns: minmax(0, 1fr); } }
 .svg-chart-wrap { width: 100%; overflow-x: auto; }
 .svg-chart-wrap svg { display: block; width: 100%; height: auto; }
 .svg-chart-wrap text { font-family: var(--sans); font-variant-numeric: tabular-nums; }
@@ -461,12 +462,30 @@ details.acc > .acc-body { padding: 0 var(--s4) var(--s4); font-size: 13.5px; }
   padding: var(--s3); font-size: 13px; line-height: 1.5;
 }
 .quad-cell strong.q-head { display: block; font-size: 13px; margin-bottom: 4px; color: var(--text); }
+button.quad-btn {
+  text-align: left; font: inherit; color: var(--text); cursor: pointer; width: 100%;
+  transition: border-color 150ms ease-out, background-color 150ms ease-out, box-shadow 150ms ease-out;
+  touch-action: manipulation;
+}
+button.quad-btn:hover { border-color: var(--text); background: var(--surface); }
+button.quad-btn[aria-pressed="true"] {
+  border-color: var(--text); background: var(--surface);
+  box-shadow: 0 0 0 2px var(--text);
+}
+.q-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.q-top strong.q-head { margin-bottom: 0; }
+.q-count {
+  font: 600 11.5px/1 var(--mono); color: var(--muted); white-space: nowrap;
+  padding: 3px 7px; border-radius: var(--pill); border: 1px solid var(--line-strong); background: var(--surface);
+}
+button.quad-btn[aria-pressed="true"] .q-count { background: var(--text); color: var(--surface); border-color: var(--text); }
+@media (prefers-reduced-motion: reduce) { button.quad-btn { transition: none; } }
 .why-list { margin: 8px 0 14px 18px; display: grid; gap: 6px; font-size: 13.5px; line-height: 1.55; }
 .why-list li { padding-left: 2px; }
 
 /* Migration matrix */
 .mig-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
-.mig-grid { display: grid; grid-template-columns: auto repeat(4, minmax(56px, 1fr)); gap: 6px; }
+.mig-grid { display: grid; grid-template-columns: auto repeat(4, minmax(46px, 1fr)); gap: 6px; overflow-x: auto; }
 .mig-hdr { font: 600 12px/1.2 var(--mono); color: var(--muted); display: flex; align-items: center; justify-content: center; padding: 6px; text-align: center; }
 .mig-cell {
   min-height: 56px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2);
@@ -663,6 +682,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
               <option value="km2023"></option>
               <option value="km2_2023"></option>
               <option value="km2015"></option>
+              <option value="proj2027"></option>
               <option value="ward2023"></option>
               <option value="pam2023"></option>
               <option value="gmm2023"></option>
@@ -885,6 +905,39 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           </div>
         </section>
 
+        <section class="card" id="proj27-card" style="margin-top:var(--s4)" aria-labelledby="h-proj27">
+          <div class="card-head">
+            <div>
+              <h2 id="h-proj27" data-i18n="proj27Title">Proyeksi 2027 dan potensi perpindahan rezim (horizon 4 tahun)</h2>
+              <p data-i18n="proj27Sub">Dilatih dan divalidasi silang pada interval 2019 ke 2023, lalu diproyeksikan ke 2027 dari kondisi 2023.</p>
+            </div>
+          </div>
+          <div id="proj27-lead" style="font-size:13.5px;margin-bottom:var(--s3)"></div>
+          <div class="two-col">
+            <div class="mig-layout">
+              <div id="mig27-matrix-box"></div>
+              <div class="legend-row" id="mig27-legend"></div>
+              <div class="roster" id="mig27-list-box" role="status" aria-live="polite"></div>
+              <div id="proj27-cv-box"></div>
+            </div>
+            <div>
+              <div class="field" style="margin-bottom:var(--s3)">
+                <label for="proj27-target-select" data-i18n="proj27TargetLbl">Indikator target proyeksi 2027</label>
+                <select id="proj27-target-select">
+                  <option value="clean_cooking"></option>
+                  <option value="renew_share_tfec"></option>
+                  <option value="energy_intensity"></option>
+                  <option value="elec_access"></option>
+                  <option value="renew_cap_wpc"></option>
+                  <option value="co2_per_capita"></option>
+                </select>
+              </div>
+              <div class="svg-chart-wrap" id="proj27-scatter-wrap"></div>
+              <div id="proj27-regime-cv" style="margin-top:var(--s3)"></div>
+            </div>
+          </div>
+        </section>
+
         <section class="card" style="margin-top:var(--s4)" aria-labelledby="h-idn-policy">
           <div class="card-head">
             <div>
@@ -995,6 +1048,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         ["km2023", "2023 · K-Means k=4 (model terpilih)"],
         ["km2_2023", "2023 · K-Means k=2 (alternatif biner)"],
         ["km2015", "2015 · Baseline (proyeksi k=4)"],
+        ["proj2027", "2027 · Proyeksi Elastic Net (k=4)"],
         ["ward2023", "2023 · Ward's D2 k=4"],
         ["pam2023", "2023 · PAM k=4"],
         ["gmm2023", "2023 · GMM k=4"]
@@ -1037,7 +1091,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       subMed: (r, rv, gv) => `Median ${r} ${rv} · global ${gv}`,
       consensus: (n) => `${n}/4 metode sepakat`,
       consensusNote: "Label Ward's D2, PAM, dan GMM diselaraskan dengan K-Means.",
-      migLine: (c, k2) => `2015 <strong>${c.kode_2015}</strong> ke 2023 <strong>${c.kode_2023}</strong> · k=2: <strong>${k2}</strong> · Populasi <strong class="num">${fmt(c.population_m, 1)} juta</strong> · Silhouette <strong class="num">${fmt(c.sil_width, 3)}</strong>`,
+      migLine: (c, k2) => `2015 <strong>${c.kode_2015}</strong> ke 2023 <strong>${c.kode_2023}</strong>${c.kode_2027 ? ` · proyeksi 2027 <strong>${c.kode_2027}</strong>` : ""} · k=2: <strong>${k2}</strong> · Populasi <strong class="num">${fmt(c.population_m, 1)} juta</strong> · Silhouette <strong class="num">${fmt(c.sil_width, 3)}</strong>`,
       countries: "negara",
       popLbl: "Populasi 2023",
       gdpExtLbl: "Median PDB PPP (eksternal)",
@@ -1112,7 +1166,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           title: "Cara membaca Biplot PCA: makna sumbu PC1, PC2, dan keempat kuadran",
           lead: "PCA meringkas 6 indikator menjadi 2 sumbu utama (77,1% varians). <strong>PC1 (59,4%)</strong> adalah sumbu modernisasi akses energi (ke kanan: listrik r = +0,900, memasak bersih r = +0,945, CO2 r = +0,800, kapasitas EBT r = +0,721; ke kiri: pangsa biomassa tradisional r = -0,772). <strong>PC2 (17,6%)</strong> adalah sumbu intensitas energi & beban karbon (ke atas: intensitas energi r = +0,888, CO2 r = +0,384; ke bawah: efisiensi energi & EBT).",
           cells: [
-            ["Kuadran II · Kiri Atas (PC1 < 0, PC2 > 0)", "Defisit akses energi sekaligus intensitas energi primer tinggi karena tungku biomassa tradisional boros energi per dolar PDB. Dihuni <strong>18/27 negara R1</strong> dan 10 negara R2."],
+            ["Kuadran II · Kiri Atas (PC1 < 0, PC2 > 0)", "Defisit akses energi sekaligus intensitas energi primer tinggi karena tungku biomassa tradisional boros energi per dolar PDB. Dihuni <strong>18/27 negara R1</strong>, 10 negara R2, dan 2 R4 (LBY, SYR)."],
             ["Kuadran I · Kanan Atas (PC1 > 0, PC2 > 0)", "Akses listrik dan memasak penuh, tetapi boros energi dan intensif fosil. Dihuni <strong>24/26 negara R4</strong> (mis. Qatar, Rusia, Iran, Tiongkok) dan 23 negara R3 berintensitas tinggi."],
             ["Kuadran III · Kiri Bawah (PC1 < 0, PC2 < 0)", "Tahap transisi akses energi berkembang dengan intensitas energi lebih moderat. Dihuni <strong>31/41 negara R2</strong> (mis. Pakistan, Kamboja, Filipina) dan 9 negara R1."],
             ["Kuadran IV · Kanan Bawah (PC1 > 0, PC2 < 0)", "Akses penuh, intensitas energi paling rendah (efisien), dan kapasitas listrik EBT modern kuat. Dihuni <strong>72/95 negara R3</strong> (mis. Norwegia, Swedia, Jerman, Vietnam)."]
@@ -1188,6 +1242,35 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       fcTip: (c, f) => `<strong>${cName(c)} (${c.iso3})</strong> · ${c.kode_2023}<br>Aktual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistensi: ${fmt(f.persistence, 0)}%`,
       fcAxisX: "Aktual 2023 (%)", fcAxisY: "Prediksi out-of-fold elastic net (%)",
       fcScatterAria: "Memasak bersih 2023 aktual terhadap prediksi out-of-fold elastic net, 189 negara",
+      edaQuadLbl: "Kuadran PCA disorot",
+      edaQuadClickHint: "Klik kartu kuadran di bawah untuk menyorot negara di kuadran tersebut.",
+      proj27Title: "Proyeksi 2027 dan potensi perpindahan rezim (horizon 4 tahun)",
+      proj27Sub: "Dilatih dan divalidasi silang pada interval 2019 ke 2023, lalu diproyeksikan ke 2027 dari kondisi 2023.",
+      proj27Lead: (nShift, accEn, accPers) => `Data resmi UNSD/Bank Dunia tahun 2025-2026 belum tersedia (0 baris pada seri SDG 7), sedangkan 2019 lengkap pada seluruh 189 negara. Model Elastic Net 4-tahunan dilatih pada <strong>2019 ke 2023</strong> (akurasi rezim out-of-fold <strong class="num">${accEn}%</strong> vs persistensi <strong class="num">${accPers}%</strong>), lalu diisi fitur 2023 untuk memproyeksikan 2027. Sebanyak <strong>${nShift} negara</strong> diproyeksikan berpindah rezim (0 turun). <em>Catatan: proyeksi out-of-sample dengan asumsi pola 2019-2023 berlanjut; perhatikan margin centroid untuk membedakan perpindahan jelas vs tipis di perbatasan.</em>`,
+      proj27TargetLbl: "Indikator target proyeksi 2027",
+      proj27Targets: [
+        ["clean_cooking", "Memasak bersih (SDG 7.1.2, %)"],
+        ["renew_share_tfec", "Pangsa EBT final (SDG 7.2.1, %)"],
+        ["energy_intensity", "Intensitas energi (SDG 7.3.1, MJ/$)"],
+        ["elec_access", "Akses listrik (SDG 7.1.1, %)"],
+        ["renew_cap_wpc", "Kapasitas listrik EBT (SDG 7.b.1, W/kap)"],
+        ["co2_per_capita", "Emisi CO2 per kapita (SDG 13, t/kap)"]
+      ],
+      proj27MigTitle: "Proyeksi perpindahan rezim, 2023 ke 2027",
+      proj27Up: (n) => `Proyeksi naik / dekarbonisasi (${n} negara)`,
+      proj27Stay: "Proyeksi bertahan",
+      proj27Roster: (a, b, n) => `2023 ${a} ke proyeksi 2027 ${b}: ${n} negara`,
+      proj27Empty: (a, b) => `Tidak ada negara diproyeksikan berpindah dari ${a} ke ${b}.`,
+      proj27MarginLbl: "margin",
+      proj27CvTitle: "Validasi silang 4-tahunan (2019 ke 2023, 10 lipatan)",
+      proj27CvCols: ["Indikator", "MAE EN", "MAE Pers.", "R² EN", "Δ MAE vs Pers. (IK 95%)"],
+      proj27RegCvTitle: "Validasi akurasi rezim out-of-fold (2019 ke 2023)",
+      proj27RegCvCols: ["Model", "Akurasi", "Benar", "Kappa", "Pred. pindah"],
+      proj27RegModels: { persistence_2019: "Persistensi (rezim 2019)", ols_own_lag_oof: "Regresi OLS (lag sendiri)", elastic_net_oof: "Elastic Net (6 indikator)" },
+      proj27AxisX: (lbl) => `Aktual 2023 · ${lbl}`,
+      proj27AxisY: (lbl) => `Proyeksi 2027 · ${lbl}`,
+      proj27ScatterNote: "Garis putus-putus = tidak berubah (2027 = 2023). Lingkaran bercincin menandai 7 negara yang diproyeksikan berpindah rezim. Klik titik untuk memilih negara.",
+      proj27Tip: (c, v23, v27, unit) => `<strong>${cName(c)} (${c.iso3})</strong> · ${c.kode_2023} &#8594; <strong>${c.kode_2027}</strong>${c.berubah_2027 ? " (pindah)" : ""}<br>2023: ${v23}${unit} &#8594; Proyeksi 2027: <strong>${v27}${unit}</strong><br>Margin centroid 2027: ${fmt(c.margin_centroid_2027, 3)}`
     },
     en: {
       pageTitle: "Clean Energy & Climate Transition Dashboard (SDG 7 & 13)",
@@ -1212,6 +1295,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         ["km2023", "2023 · K-Means k=4 (chosen model)"],
         ["km2_2023", "2023 · K-Means k=2 (binary alternative)"],
         ["km2015", "2015 · Baseline (projected k=4)"],
+        ["proj2027", "2027 · Elastic Net projection (k=4)"],
         ["ward2023", "2023 · Ward's D2 k=4"],
         ["pam2023", "2023 · PAM k=4"],
         ["gmm2023", "2023 · GMM k=4"]
@@ -1254,7 +1338,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       subMed: (r, rv, gv) => `${r} median ${rv} · global ${gv}`,
       consensus: (n) => `${n}/4 methods agree`,
       consensusNote: "Ward's D2, PAM and GMM labels are aligned to K-Means.",
-      migLine: (c, k2) => `2015 <strong>${c.kode_2015}</strong> to 2023 <strong>${c.kode_2023}</strong> · k=2: <strong>${k2}</strong> · Population <strong class="num">${fmt(c.population_m, 1)}M</strong> · Silhouette <strong class="num">${fmt(c.sil_width, 3)}</strong>`,
+      migLine: (c, k2) => `2015 <strong>${c.kode_2015}</strong> to 2023 <strong>${c.kode_2023}</strong>${c.kode_2027 ? ` · 2027 proj. <strong>${c.kode_2027}</strong>` : ""} · k=2: <strong>${k2}</strong> · Population <strong class="num">${fmt(c.population_m, 1)}M</strong> · Silhouette <strong class="num">${fmt(c.sil_width, 3)}</strong>`,
       countries: "countries",
       popLbl: "2023 population",
       gdpExtLbl: "Median GDP PPP (external)",
@@ -1329,7 +1413,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           title: "How to read the PCA Biplot: PC1, PC2, and the four quadrants",
           lead: "PCA compresses the 6 indicators into 2 axes (77.1% of variance). <strong>PC1 (59.4%)</strong> tracks energy-access modernisation (right: electricity r = +0.900, clean cooking r = +0.945, CO2 r = +0.800, renewable capacity r = +0.721; left: traditional biomass share r = -0.772). <strong>PC2 (17.6%)</strong> tracks energy intensity and carbon load (up: energy intensity r = +0.888, CO2 r = +0.384; down: efficiency and renewables).",
           cells: [
-            ["Quadrant II · Upper Left (PC1 < 0, PC2 > 0)", "Low modern energy access combined with high primary energy intensity from thermally inefficient wood stoves per dollar of GDP. Holds <strong>18/27 R1</strong> and 10 R2 countries."],
+            ["Quadrant II · Upper Left (PC1 < 0, PC2 > 0)", "Low modern energy access combined with high primary energy intensity from thermally inefficient wood stoves per dollar of GDP. Holds <strong>18/27 R1</strong>, 10 R2, and 2 R4 (LBY, SYR) countries."],
             ["Quadrant I · Upper Right (PC1 > 0, PC2 > 0)", "Full electricity and clean cooking access, but energy-intensive and fossil-heavy. Holds <strong>24/26 R4</strong> (e.g. Qatar, Russia, Iran, China) and 23 higher-intensity R3 countries."],
             ["Quadrant III · Lower Left (PC1 < 0, PC2 < 0)", "Expanding access transition with more moderate energy intensity. Holds <strong>31/41 R2</strong> (e.g. Pakistan, Cambodia, Philippines) and 9 R1 countries."],
             ["Quadrant IV · Lower Right (PC1 > 0, PC2 < 0)", "Universal access, lowest energy intensity (most efficient), and stronger modern renewable capacity. Holds <strong>72/95 R3</strong> (e.g. Norway, Sweden, Germany, Viet Nam)."]
@@ -1405,6 +1489,35 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       fcTip: (c, f) => `<strong>${cName(c)} (${c.iso3})</strong> · ${c.kode_2023}<br>Actual 2023: ${fmt(c.cooking_2023, 0)}%<br>Elastic net: ${fmt(f.elastic_net, 1)}% · Persistence: ${fmt(f.persistence, 0)}%`,
       fcAxisX: "Actual 2023 (%)", fcAxisY: "Elastic net out-of-fold prediction (%)",
       fcScatterAria: "Actual 2023 clean cooking against elastic net out-of-fold predictions, 189 countries",
+      edaQuadLbl: "Highlighted PCA quadrant",
+      edaQuadClickHint: "Click any quadrant card below to highlight countries in that quadrant.",
+      proj27Title: "2027 projections and potential regime shifts (4-year horizon)",
+      proj27Sub: "Trained and cross-validated on 2019 to 2023, then projected to 2027 from 2023 features.",
+      proj27Lead: (nShift, accEn, accPers) => `Official 2025-2026 UNSD/World Bank SDG 7 series are not yet published (0 rows), whereas 2019 is complete across all 189 economies. A matched 4-year Elastic Net model is validated on <strong>2019 to 2023</strong> (out-of-fold regime accuracy <strong class="num">${accEn}%</strong> vs persistence <strong class="num">${accPers}%</strong>), then applied to 2023 features to project 2027. Overall, <strong>${nShift} economies</strong> are projected to shift regimes (0 regressing). <em>Note: out-of-sample projections assuming 2019-2023 dynamics persist; check centroid margins to distinguish clear shifts from borderline crossings.</em>`,
+      proj27TargetLbl: "2027 projection target indicator",
+      proj27Targets: [
+        ["clean_cooking", "Clean cooking (SDG 7.1.2, %)"],
+        ["renew_share_tfec", "Renewable share (SDG 7.2.1, %)"],
+        ["energy_intensity", "Energy intensity (SDG 7.3.1, MJ/$)"],
+        ["elec_access", "Electricity access (SDG 7.1.1, %)"],
+        ["renew_cap_wpc", "Renewable power capacity (SDG 7.b.1, W/cap)"],
+        ["co2_per_capita", "CO2 per person (SDG 13, t/cap)"]
+      ],
+      proj27MigTitle: "Projected regime migration, 2023 to 2027",
+      proj27Up: (n) => `Projected upward / lower-carbon (${n} countries)`,
+      proj27Stay: "Projected stay",
+      proj27Roster: (a, b, n) => `2023 ${a} to projected 2027 ${b}: ${n} countries`,
+      proj27Empty: (a, b) => `No countries projected to move from ${a} to ${b}.`,
+      proj27MarginLbl: "margin",
+      proj27CvTitle: "4-year cross-validation (2019 to 2023, 10 folds)",
+      proj27CvCols: ["Indicator", "EN MAE", "Pers. MAE", "EN R²", "Δ MAE vs Pers. (95% CI)"],
+      proj27RegCvTitle: "Out-of-fold regime accuracy (2019 to 2023)",
+      proj27RegCvCols: ["Model", "Accuracy", "Correct", "Kappa", "Pred. shifts"],
+      proj27RegModels: { persistence_2019: "Persistence (2019 regime)", ols_own_lag_oof: "OLS (own lag)", elastic_net_oof: "Elastic Net (6 indicators)" },
+      proj27AxisX: (lbl) => `Actual 2023 · ${lbl}`,
+      proj27AxisY: (lbl) => `Projected 2027 · ${lbl}`,
+      proj27ScatterNote: "Dashed line = no change (2027 = 2023). Ringed markers highlight the 7 economies projected to shift regimes. Click any point to select a country.",
+      proj27Tip: (c, v23, v27, unit) => `<strong>${cName(c)} (${c.iso3})</strong> · ${c.kode_2023} &#8594; <strong>${c.kode_2027}</strong>${c.berubah_2027 ? " (shift)" : ""}<br>2023: ${v23}${unit} &#8594; Projected 2027: <strong>${v27}${unit}</strong><br>2027 centroid margin: ${fmt(c.margin_centroid_2027, 3)}`
     }
   };
 
@@ -1481,10 +1594,14 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     regimeFilter: "ALL",
     edaPreset: "paradox",
     edaRegime: null,
+    edaQuad: null,
     story: "none",
     evalMetric: "jaccard_mean",
     migCell: "R4_R3",
-    migPreview: null
+    migPreview: null,
+    mig27Cell: "R4_R3",
+    mig27Preview: null,
+    proj27Target: "clean_cooking"
   };
 
   const $ = (id) => document.getElementById(id);
@@ -1704,6 +1821,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     if (!c) return null;
     if (layer === "km2_2023") return c.regime_k2;
     if (layer === "km2015") return c.regime_2015;
+    if (layer === "proj2027") return c.regime_2027 || c.regime_2023;
     if (layer === "ward2023") return c.regime_ward;
     if (layer === "pam2023") return c.regime_pam;
     if (layer === "gmm2023") return c.regime_gmm;
@@ -1955,12 +2073,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       }
       const popSumM = grp.reduce((s, c) => s + (Number(c.population_m) || 0), 0);
       const popTxt = popSumM >= 1000 ? `${fmt(popSumM / 1000, 2)} ${t.bn}` : `${fmt(popSumM, 1)} ${t.mPop}`;
-      const kE = use2015 ? "elec_2015" : "elec_2023";
-      const kC = use2015 ? "cooking_2015" : "cooking_2023";
-      const kS = use2015 ? "renew_share_2015" : "renew_share_2023";
-      const kP = use2015 ? "renew_cap_2015" : "renew_cap_2023";
-      const kI = use2015 ? "energy_int_2015" : "energy_int_2023";
-      const kO = use2015 ? "co2_pc_2015" : "co2_pc_2023";
+      const use2027 = layer === "proj2027";
+      const kE = use2015 ? "elec_2015" : use2027 ? "elec_2027" : "elec_2023";
+      const kC = use2015 ? "cooking_2015" : use2027 ? "cooking_2027" : "cooking_2023";
+      const kS = use2015 ? "renew_share_2015" : use2027 ? "renew_share_2027" : "renew_share_2023";
+      const kP = use2015 ? "renew_cap_2015" : use2027 ? "renew_cap_2027" : "renew_cap_2023";
+      const kI = use2015 ? "energy_int_2015" : use2027 ? "energy_int_2027" : "energy_int_2023";
+      const kO = use2015 ? "co2_pc_2015" : use2027 ? "co2_pc_2027" : "co2_pc_2023";
       const gdps = grp.map((c) => c.gdp_pc_ppp).filter((v) => v !== null && v !== undefined && !Number.isNaN(Number(v)));
       const gdpTxt = gdps.length ? `$${fmt(median(gdps), 0)}` : "-";
       return `<article class="regime-card" data-r="${rg.regime_km}">
@@ -2258,8 +2377,15 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     };
     edaAnimRaf = requestAnimationFrame(step);
   }
-  function regimeLabelSet(pts, regimeId) {
-    const grp = pts.filter((c) => c.regime_2023 === regimeId);
+  const PCA_QUAD_ORDER = ["Q2", "Q1", "Q3", "Q4"];
+  function inPcaQuad(c, q) {
+    if (q === "Q2") return c.pc1_2023 < 0 && c.pc2_2023 > 0;
+    if (q === "Q1") return c.pc1_2023 > 0 && c.pc2_2023 > 0;
+    if (q === "Q3") return c.pc1_2023 < 0 && c.pc2_2023 < 0;
+    if (q === "Q4") return c.pc1_2023 > 0 && c.pc2_2023 < 0;
+    return false;
+  }
+  function groupLabelSet(grp) {
     const keep = new Set();
     for (const iso of ["IDN", "VNM", "NOR", "SWE", "ISL", "COD", "ETH", "PAK", "KHM", "PHL", "QAT", "RUS", "CHN", "USA", "DEU"]) {
       if (grp.some((c) => c.iso3 === iso)) keep.add(iso);
@@ -2274,11 +2400,16 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const [title, sub] = t.edaPresets[state.edaPreset];
     $("eda-chart-title").textContent = title;
     $("eda-chart-sub").textContent = sub;
+    if (state.edaPreset !== "pca" && state.edaQuad) state.edaQuad = null;
     const regimeHl = state.edaRegime
       ? new Set(DATA.countries.filter((c) => c.regime_2023 === state.edaRegime).map((c) => c.iso3))
       : null;
-    const storyHl = regimeHl ? null : storySet();
-    const hl = regimeHl || storyHl;
+    const quadHl = (!regimeHl && state.edaQuad && state.edaPreset === "pca")
+      ? new Set(DATA.countries.filter((c) => inPcaQuad(c, state.edaQuad)).map((c) => c.iso3))
+      : null;
+    const groupHl = regimeHl || quadHl;
+    const storyHl = groupHl ? null : storySet();
+    const hl = groupHl || storyHl;
     renderStoryCallout(storyHl);
 
     const W = 680, H = 420, padL = 62, padR = 24, padT = 22, padB = 48;
@@ -2317,8 +2448,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     const xTicks = [0, 0.25, 0.5, 0.75, 1].map((q) => xmin + q * (xmax - xmin));
     const yTicks = [0, 0.25, 0.5, 0.75, 1].map((q) => ymin + q * (ymax - ymin));
 
-    const labelSet = regimeHl
-      ? regimeLabelSet(pts, state.edaRegime)
+    const labelSet = groupHl
+      ? groupLabelSet(pts.filter((c) => groupHl.has(c.iso3)))
       : hl
         ? new Set([...hl, state.selectedIso])
         : new Set(["IDN", "VNM", "NOR", "ISL", "COD", "ETH", "QAT", "CHN", "USA", state.selectedIso]);
@@ -2326,6 +2457,17 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     let extra = "";
     if (state.edaPreset === "pca") {
       const zx = sx(0), zy = sy(0);
+      if (state.edaQuad) {
+        const qRect = {
+          Q2: [padL, padT, zx - padL, zy - padT],
+          Q1: [zx, padT, padL + pw - zx, zy - padT],
+          Q3: [padL, zy, zx - padL, padT + ph - zy],
+          Q4: [zx, zy, padL + pw - zx, padT + ph - zy]
+        }[state.edaQuad];
+        if (qRect) {
+          extra += `<rect x="${qRect[0].toFixed(1)}" y="${qRect[1].toFixed(1)}" width="${Math.max(0, qRect[2]).toFixed(1)}" height="${Math.max(0, qRect[3]).toFixed(1)}" fill="var(--ink-soft)" rx="4"/>`;
+        }
+      }
       extra += `<line x1="${zx}" y1="${padT}" x2="${zx}" y2="${padT + ph}" stroke="var(--line-strong)" stroke-dasharray="3 3"/>`;
       extra += `<line x1="${padL}" y1="${zy}" x2="${padL + pw}" y2="${zy}" stroke="var(--line-strong)" stroke-dasharray="3 3"/>`;
       for (const ld of DATA.meta.pca_loadings) {
@@ -2334,7 +2476,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         extra += `<text class="iso" x="${vx + (ld.PC1 >= 0 ? 5 : -5)}" y="${vy - 4}" fill="var(--text)" font-size="10" text-anchor="${ld.PC1 >= 0 ? "start" : "end"}">${ld.feature}</text>`;
       }
     }
-    if (state.edaPreset === "paradox" && state.story === "r1" && !regimeHl) {
+    if (state.edaPreset === "paradox" && state.story === "r1" && !groupHl) {
       const x70 = sx(70).toFixed(1);
       extra += `<line x1="${x70}" y1="${padT}" x2="${x70}" y2="${padT + ph}" stroke="var(--r1t)" stroke-width="1.2" stroke-dasharray="5 4"/>`;
       extra += `<text x="${(sx(70) - 5).toFixed(1)}" y="${padT + 12}" text-anchor="end" font-size="11" font-weight="600" fill="var(--r1t)">70%</text>`;
@@ -2343,19 +2485,19 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     // Draw dimmed points first so highlighted ones stay on top.
     const ordered = [...pts].sort((a, b) =>
       (hl ? (hl.has(a.iso3) - hl.has(b.iso3)) : 0) ||
-      ((!regimeHl && a.iso3 === state.selectedIso) - (!regimeHl && b.iso3 === state.selectedIso))
+      ((!groupHl && a.iso3 === state.selectedIso) - (!groupHl && b.iso3 === state.selectedIso))
     );
     const circles = ordered.map((c) => {
       const cx = sx(xGet(c)).toFixed(1), cy = sy(yGet(c)).toFixed(1);
-      const singleSel = !regimeHl && c.iso3 === state.selectedIso;
-      const inRegime = Boolean(regimeHl && regimeHl.has(c.iso3));
+      const singleSel = !groupHl && c.iso3 === state.selectedIso;
+      const inGroup = Boolean(groupHl && groupHl.has(c.iso3));
       const on = !hl || hl.has(c.iso3) || singleSel;
       const r = singleSel ? 6.8 : Math.max(3.4, Math.min(8.5, Math.sqrt(c.population_m || 1) * 0.28 + 2.8));
       const lbl = labelSet.has(c.iso3)
         ? `<text class="iso" x="${cx}" y="${(cy - r - 3).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text)">${c.iso3}</text>`
         : "";
       return `<g class="eda-pt" data-iso="${c.iso3}">
-        <circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${singleSel ? 1 : inRegime ? 0.94 : on ? 0.82 : 0.12}" stroke="${singleSel ? "var(--text)" : "var(--surface)"}" stroke-width="${singleSel ? 2.2 : 0.8}" stroke-opacity="${on ? 1 : 0.3}"/>
+        <circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="${regimeColorVar(c.regime_2023)}" fill-opacity="${singleSel ? 1 : inGroup ? 0.94 : on ? 0.82 : 0.12}" stroke="${singleSel ? "var(--text)" : "var(--surface)"}" stroke-width="${singleSel ? 2.2 : 0.8}" stroke-opacity="${on ? 1 : 0.3}"/>
         ${lbl}
       </g>`;
     }).join("");
@@ -2376,8 +2518,8 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       <text x="14" y="${padT + ph / 2}" transform="rotate(-90 14 ${padT + ph / 2})" text-anchor="middle" font-size="12" font-weight="600" fill="var(--text)">${yLbl}</text>
     </svg>`;
 
-    const targetIsos = regimeHl ? [...regimeHl] : [state.selectedIso];
-    drawEdaRings($("eda-svg-wrap"), prevRings, targetIsos, regimeHl ? "regime" : "single", Boolean(opts.skipAnim));
+    const targetIsos = groupHl ? [...groupHl] : [state.selectedIso];
+    drawEdaRings($("eda-svg-wrap"), prevRings, targetIsos, groupHl ? "regime" : "single", Boolean(opts.skipAnim));
 
     $("eda-svg-wrap").querySelectorAll(".eda-pt").forEach((g) => {
       const c = BY_ISO.get(g.dataset.iso);
@@ -2397,11 +2539,12 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         <span>${rg.kode_rezim}</span>
         <span class="legend-n">(${rg.n_negara})</span>
       </button>`;
-    });
+    }).join("");
     leg.querySelectorAll("[data-eda-regime]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const r = Number(btn.dataset.edaRegime);
         state.edaRegime = state.edaRegime === r ? null : r;
+        state.edaQuad = null;
         if (state.edaRegime && state.story !== "none") {
           state.story = "none";
           document.querySelectorAll("#story-pills [data-story]").forEach((b) =>
@@ -2420,6 +2563,21 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
         state.edaRegime = null;
         renderEda();
       });
+    } else if (quadHl) {
+      const qIdx = PCA_QUAD_ORDER.indexOf(state.edaQuad);
+      const qTitle = t.edaGuides.pca.cells[qIdx][0];
+      const qCountries = pts.filter((c) => quadHl.has(c.iso3));
+      const regCounts = [1, 2, 3, 4]
+        .map((r) => [r, qCountries.filter((c) => c.regime_2023 === r).length])
+        .filter(([, n]) => n > 0)
+        .map(([r, n]) => `<span class="badge r${r}">R${r} · ${n}</span>`)
+        .join(" ");
+      $("eda-selected").innerHTML = `<span>${t.edaQuadLbl}: <strong>${qTitle}</strong> (<span class="num">${qCountries.length}</span> ${t.countries}) ${regCounts}</span>
+        <button type="button" class="btn small-btn" id="eda-back-single">${t.edaBackSingle}</button>`;
+      $("eda-back-single").addEventListener("click", () => {
+        state.edaQuad = null;
+        renderEda();
+      });
     } else {
       const c = BY_ISO.get(state.selectedIso);
       $("eda-selected").innerHTML = `<span>${t.selected}: <strong>${cName(c)}</strong> <span class="badge r${c.regime_2023}">${c.iso3} · ${c.kode_2023}</span></span>
@@ -2430,12 +2588,39 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
 
     const g = t.edaGuides[state.edaPreset];
     if (g) {
+      const isPca = state.edaPreset === "pca";
+      const cellsHtml = g.cells.map(([head, body], i) => {
+        if (!isPca) {
+          return `<div class="quad-cell"><strong class="q-head">${head}</strong>${body}</div>`;
+        }
+        const qId = PCA_QUAD_ORDER[i];
+        const cnt = pts.filter((c) => inPcaQuad(c, qId)).length;
+        const pressed = state.edaQuad === qId;
+        return `<button type="button" class="quad-cell quad-btn" data-eda-quad="${qId}" aria-pressed="${pressed}">
+          <span class="q-top"><strong class="q-head">${head}</strong><span class="q-count">${cnt} ${t.countries}</span></span>
+          <span>${body}</span>
+        </button>`;
+      }).join("");
       $("eda-guide").innerHTML = `
         <h3>${g.title}</h3>
-        <p class="muted" style="margin-top:4px">${g.lead}</p>
-        <div class="quad-grid">
-          ${g.cells.map(([head, body]) => `<div class="quad-cell"><strong class="q-head">${head}</strong>${body}</div>`).join("")}
-        </div>`;
+        <p class="muted" style="margin-top:4px">${g.lead}${isPca ? ` <strong>${t.edaQuadClickHint}</strong>` : ""}</p>
+        <div class="quad-grid">${cellsHtml}</div>`;
+      if (isPca) {
+        $("eda-guide").querySelectorAll("[data-eda-quad]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const q = btn.dataset.edaQuad;
+            state.edaQuad = state.edaQuad === q ? null : q;
+            state.edaRegime = null;
+            if (state.edaQuad && state.story !== "none") {
+              state.story = "none";
+              document.querySelectorAll("#story-pills [data-story]").forEach((b) =>
+                b.setAttribute("aria-pressed", String(b.dataset.story === "none"))
+              );
+            }
+            renderEda();
+          });
+        });
+      }
     }
   }
 
@@ -2652,6 +2837,166 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
       const c = BY_ISO.get(dot.dataset.iso), f = FC_BY_ISO.get(dot.dataset.iso);
       dot.addEventListener("click", () => selectCountry(c.iso3));
       dot.addEventListener("pointerenter", (ev) => showTip(ev, t.fcTip(c, f)));
+      dot.addEventListener("pointermove", moveTip);
+      dot.addEventListener("pointerleave", hideTip);
+    });
+  }
+
+  const PROJ27_SPECS = {
+    clean_cooking:    { k23: "cooking_2023",     k27: "cooking_2027",     d: 1, unit: "%",    log: false },
+    renew_share_tfec: { k23: "renew_share_2023", k27: "renew_share_2027", d: 1, unit: "%",    log: false },
+    energy_intensity: { k23: "energy_int_2023",  k27: "energy_int_2027",  d: 2, unit: " MJ/$", log: false },
+    elec_access:      { k23: "elec_2023",        k27: "elec_2027",        d: 1, unit: "%",    log: false },
+    renew_cap_wpc:    { k23: "renew_cap_2023",   k27: "renew_cap_2027",   d: 1, unit: " W",   log: true },
+    co2_per_capita:   { k23: "co2_pc_2023",      k27: "co2_pc_2027",      d: 2, unit: " t",   log: true }
+  };
+
+  function renderRoster2027() {
+    const t = T();
+    const key = state.mig27Preview || state.mig27Cell;
+    const [f23, t27] = key.split("_");
+    const matched = DATA.countries.filter((c) => c.kode_2023 === f23 && c.kode_2027 === t27)
+      .sort((a, b) => (b.margin_centroid_2027 || 0) - (a.margin_centroid_2027 || 0));
+    $("mig27-list-box").innerHTML = matched.length === 0
+      ? `<p class="muted">${t.proj27Empty(f23, t27)}</p>`
+      : `<p><strong>${t.proj27Roster(f23, t27, matched.length)}</strong></p>
+         <div class="chip-row">${matched.map((c) => `<button type="button" class="chip" data-pick27="${c.iso3}" title="${cName(c)}">${cName(c)} <span class="muted">${c.iso3}${f23 !== t27 ? ` · ${t.proj27MarginLbl} ${fmt(c.margin_centroid_2027, 3)}` : ""}</span></button>`).join("")}</div>`;
+    $("mig27-list-box").querySelectorAll("[data-pick27]").forEach((b) => b.addEventListener("click", () => {
+      selectCountry(b.dataset.pick27);
+      goToAtlas();
+    }));
+  }
+
+  function renderProjection2027() {
+    const P27 = DATA.forecast_2027;
+    if (!P27) { $("proj27-card").hidden = true; return; }
+    $("proj27-card").hidden = false;
+    const t = T();
+    const enAcc = P27.regime_cv.find((r) => r.model === "elastic_net_oof");
+    const persAcc = P27.regime_cv.find((r) => r.model === "persistence_2019");
+    $("proj27-lead").innerHTML = `<p>${t.proj27Lead(P27.n_shifted, fmt(enAcc.akurasi_persen, 1), fmt(persAcc.akurasi_persen, 1))}</p>`;
+
+    /* 4x4 projected 2023 -> 2027 migration matrix */
+    const migMap = new Map(P27.migration_2027.map((m) => [`${m.kode_2023}_${m.kode_2027}`, m.n]));
+    const codes = ["R1", "R2", "R3", "R4"];
+    let up = 0;
+    let html = `<div class="mig-grid" role="group" aria-label="${t.proj27MigTitle}"><div class="mig-hdr">2023 \\ 2027*</div>` +
+      codes.map((c) => `<div class="mig-hdr">${c}</div>`).join("");
+    for (const r23 of codes) {
+      html += `<div class="mig-hdr">${r23}</div>`;
+      for (const r27 of codes) {
+        const key = `${r23}_${r27}`;
+        const n = migMap.get(key) || 0;
+        if (POSITIVE_CELLS.has(key)) up += n;
+        const cls = ["mig-cell", n === 0 ? "is-zero" : "", r23 === r27 ? "is-diag" : "",
+          POSITIVE_CELLS.has(key) && n ? "is-up" : "", NEGATIVE_CELLS.has(key) && n ? "is-down" : ""].join(" ");
+        html += `<button type="button" class="${cls}" data-cell27="${key}" aria-pressed="${state.mig27Cell === key}" aria-label="${t.proj27Roster(r23, r27, n)}">
+          <strong>${n}</strong><span>${r23}&#8594;${r27}</span></button>`;
+      }
+    }
+    $("mig27-matrix-box").innerHTML = html + `</div>`;
+    $("mig27-legend").innerHTML =
+      `<span class="legend-item"><span class="swatch" style="border:2px solid var(--r3)"></span>${t.proj27Up(up)}</span>` +
+      `<span class="legend-item"><span class="swatch" style="background:var(--ink-soft);border:1px solid var(--line)"></span>${t.proj27Stay}</span>`;
+    $("mig27-matrix-box").querySelectorAll("[data-cell27]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const grid = btn.closest(".mig-grid");
+        slideSelection(grid, grid.querySelector('[aria-pressed="true"]'), btn);
+        state.mig27Cell = btn.dataset.cell27;
+        state.mig27Preview = null;
+        $("mig27-matrix-box").querySelectorAll("[data-cell27]").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+        renderRoster2027();
+      });
+      const preview = () => { state.mig27Preview = btn.dataset.cell27; renderRoster2027(); };
+      btn.addEventListener("pointerenter", preview);
+      btn.addEventListener("focus", preview);
+    });
+    const grid27 = $("mig27-matrix-box").querySelector(".mig-grid");
+    const unprev27 = () => { if (state.mig27Preview) { state.mig27Preview = null; renderRoster2027(); } };
+    grid27.addEventListener("pointerleave", unprev27);
+    grid27.addEventListener("focusout", (e) => { if (!grid27.contains(e.relatedTarget)) unprev27(); });
+    renderRoster2027();
+
+    /* 6-indicator 4-year CV table */
+    const lblByTarget = new Map(t.proj27Targets);
+    const cvRows = t.proj27Targets.map(([tid, tlbl]) => {
+      const enR = P27.cv_metrics.find((r) => r.target === tid && r.model === "elastic_net");
+      const pR = P27.cv_metrics.find((r) => r.target === tid && r.model === "persistence");
+      const d = tid === "energy_intensity" || tid === "co2_per_capita" ? 3 : tid === "renew_cap_wpc" ? 1 : 2;
+      const isAct = tid === state.proj27Target;
+      return `<tr class="${isAct ? "is-chosen" : ""}">
+        <td>${tlbl}</td>
+        <td class="num">${fmt(enR.mae_oof, d)}</td>
+        <td class="num">${fmt(pR.mae_oof, d)}</td>
+        <td class="num">${fmt(enR.r2_oof, 3)}</td>
+        <td class="num">${fmt(enR.selisih_mae_vs_pers, d)} [${fmt(enR.ci95_bawah_vs_pers, d)}; ${fmt(enR.ci95_atas_vs_pers, d)}]</td>
+      </tr>`;
+    }).join("");
+    $("proj27-cv-box").innerHTML = `<h3 style="margin:6px 0">${t.proj27CvTitle}</h3>
+      <div style="overflow-x:auto"><table class="compact-table">
+        <thead><tr>${t.proj27CvCols.map((h, i) => `<th${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead>
+        <tbody>${cvRows}</tbody>
+      </table></div>`;
+
+    /* Regime OOF accuracy table */
+    const regCvRows = P27.regime_cv.map((r) => `<tr class="${r.model === "elastic_net_oof" ? "is-chosen" : ""}">
+      <td>${t.proj27RegModels[r.model] || r.model}</td>
+      <td class="num">${fmt(r.akurasi_persen, 1)}%</td>
+      <td class="num">${r.n_benar}/189</td>
+      <td class="num">${fmt(r.kappa, 3)}</td>
+      <td class="num">${r.n_berubah_pred_19_23} / ${r.n_berubah_aktual_19_23}</td>
+    </tr>`).join("");
+    $("proj27-regime-cv").innerHTML = `<h3 style="margin-bottom:6px">${t.proj27RegCvTitle}</h3>
+      <div style="overflow-x:auto"><table class="compact-table">
+        <thead><tr>${t.proj27RegCvCols.map((h, i) => `<th${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead>
+        <tbody>${regCvRows}</tbody>
+      </table></div>`;
+
+    /* 2023 Actual vs 2027 Projected scatter */
+    const sp = PROJ27_SPECS[state.proj27Target] || PROJ27_SPECS.clean_cooking;
+    const tLbl = lblByTarget.get(state.proj27Target) || "";
+    const trf = (v) => sp.log ? Math.log10(Math.max(0, v) + 1) : v;
+    const inv = (v) => sp.log ? Math.max(0, Math.pow(10, v) - 1) : v;
+    const allVals = DATA.countries.flatMap((c) => [trf(c[sp.k23]), trf(c[sp.k27])]);
+    const vmin = sp.log ? 0 : Math.min(0, ...allVals);
+    const vmax = (!sp.log && sp.unit === "%") ? 100 : Math.max(...allVals) * 1.04;
+    const W = 400, H = 340, padL = 48, padR = 14, padT = 14, padB = 40, pw = W - padL - padR, ph = H - padT - padB;
+    const sx = (v) => padL + ((v - vmin) / (vmax - vmin || 1)) * pw;
+    const sy = (v) => padT + ph - ((v - vmin) / (vmax - vmin || 1)) * ph;
+    const ticks = [0, 0.25, 0.5, 0.75, 1].map((q) => vmin + q * (vmax - vmin));
+    const tickFmt = (tv) => sp.log ? fmt(inv(tv), sp.d === 1 ? 0 : 1) : fmt(tv, sp.unit === "%" ? 0 : 1);
+
+    const ordered = [...DATA.countries].sort((a, b) =>
+      (Boolean(a.berubah_2027) - Boolean(b.berubah_2027)) ||
+      ((a.iso3 === state.selectedIso) - (b.iso3 === state.selectedIso))
+    );
+    const dots = ordered.map((c) => {
+      const sel = c.iso3 === state.selectedIso;
+      const sh = Boolean(c.berubah_2027);
+      const cx = sx(trf(c[sp.k23])), cy = sy(trf(c[sp.k27]));
+      const lx = cx > W - 56 ? (cx - 8).toFixed(1) : (cx + 7).toFixed(1);
+      const anchor = cx > W - 56 ? "end" : "start";
+      const ly = cy < padT + 18 ? (cy + 13).toFixed(1) : (cy - 7).toFixed(1);
+      const r = sel ? 6 : sh ? 4.8 : 3.1;
+      return `<circle class="eda-pt" data-iso="${c.iso3}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r}" fill="${regimeColorVar(c.regime_2027)}" fill-opacity="${sel || sh ? 0.96 : 0.65}" stroke="${sel || sh ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2.2 : sh ? 1.5 : 0.6}"></circle>` +
+        ((sel || sh) ? `<text class="iso" x="${lx}" y="${ly}" text-anchor="${anchor}" font-size="10" font-weight="${sel ? 700 : 600}" fill="var(--text)">${c.iso3}</text>` : "");
+    }).join("");
+
+    const prevRing = ringPosition($("proj27-scatter-wrap"));
+    $("proj27-scatter-wrap").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.proj27AxisY(tLbl)}">
+      ${ticks.map((tv) => `<line x1="${padL}" y1="${sy(tv).toFixed(1)}" x2="${W - padR}" y2="${sy(tv).toFixed(1)}" stroke="var(--line)" stroke-width="0.8"/>
+        <text x="${padL - 6}" y="${(sy(tv) + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="var(--muted)">${tickFmt(tv)}</text>
+        <text x="${sx(tv).toFixed(1)}" y="${padT + ph + 16}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${tickFmt(tv)}</text>`).join("")}
+      <line x1="${sx(vmin).toFixed(1)}" y1="${sy(vmin).toFixed(1)}" x2="${sx(vmax).toFixed(1)}" y2="${sy(vmax).toFixed(1)}" stroke="var(--line-strong)" stroke-dasharray="4 4"/>
+      ${dots}
+      <text x="${padL + pw / 2}" y="${H - 6}" text-anchor="middle" font-size="11" fill="var(--text)">${t.proj27AxisX(tLbl)}</text>
+      <text transform="translate(12 ${padT + ph / 2}) rotate(-90)" text-anchor="middle" font-size="11" fill="var(--text)">${t.proj27AxisY(tLbl)}</text>
+    </svg><p class="muted small" style="margin-top:6px">${t.proj27ScatterNote}</p>`;
+    drawRing($("proj27-scatter-wrap"), prevRing);
+    $("proj27-scatter-wrap").querySelectorAll(".eda-pt").forEach((dot) => {
+      const c = BY_ISO.get(dot.dataset.iso);
+      dot.addEventListener("click", () => selectCountry(c.iso3));
+      dot.addEventListener("pointerenter", (ev) => showTip(ev, t.proj27Tip(c, fmt(c[sp.k23], sp.d), fmt(c[sp.k27], sp.d), sp.unit)));
       dot.addEventListener("pointermove", moveTip);
       dot.addEventListener("pointerleave", hideTip);
     });
@@ -2903,7 +3248,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   function pickerLabel(c) { return `${cName(c)} (${c.iso3})`; }
   function selectCountry(iso3, opts = {}) {
     if (!BY_ISO.has(iso3)) return;
-    if (!opts.keepEdaRegime) state.edaRegime = null;
+    if (!opts.keepEdaRegime) { state.edaRegime = null; state.edaQuad = null; }
     const body = $("country-tbody");
     slideSelection(body.closest(".table-wrapper"), body.querySelector(".is-active"), body.querySelector('[data-iso="' + iso3 + '"]'));
     state.selectedIso = iso3;
@@ -2914,6 +3259,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     updateMapColorsAndZoom();
     renderEda({ skipAnim: Boolean(opts.skipEdaAnim) });
     renderForecast();
+    renderProjection2027();
     for (const tr of $("country-tbody").rows) tr.classList.toggle("is-active", tr.dataset.iso === iso3);
   }
   function resolvePicker(raw) {
@@ -2962,6 +3308,9 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     document.querySelectorAll(".eda-preset").forEach((b, i) => { b.textContent = t.edaBtns[i]; });
     const metSel = $("metric-select");
     t.metricOpts.forEach((txt, i) => { metSel.options[i].textContent = txt; });
+    const p27Sel = $("proj27-target-select");
+    t.proj27Targets.forEach(([, txt], i) => { p27Sel.options[i].textContent = txt; });
+    p27Sel.value = state.proj27Target;
     $("table-search").placeholder = t.tSearchPh;
     t.tRegimeOpts.forEach((txt, i) => { $("table-regime").options[i].textContent = txt; });
     t.tRegionOpts.forEach((txt, i) => { $("table-region").options[i].textContent = txt; });
@@ -3037,6 +3386,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
     btn.addEventListener("click", () => {
       state.story = btn.dataset.story;
       state.edaRegime = null;
+      state.edaQuad = null;
       document.querySelectorAll("#story-pills [data-story]").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
       renderEda();
     });
@@ -3044,6 +3394,7 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   document.querySelectorAll(".eda-preset").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.edaPreset = btn.dataset.preset;
+      if (state.edaPreset !== "pca") state.edaQuad = null;
       document.querySelectorAll(".eda-preset").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
       renderEda();
     });
@@ -3051,6 +3402,10 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
   $("metric-select").addEventListener("change", (e) => {
     state.evalMetric = e.target.value;
     renderModels();
+  });
+  $("proj27-target-select").addEventListener("change", (e) => {
+    state.proj27Target = e.target.value;
+    renderProjection2027();
   });
 
   /* Boot */

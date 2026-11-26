@@ -1011,6 +1011,205 @@ cat(sprintf("\n[Tahap 5B] Prediksi memasak bersih 2023 (validasi silang %d lipat
 print(fc_metrics); print(fc_compare)
 
 # ==============================================================================
+# TAHAP 5C: PROYEKSI 2027 HORIZON 4 TAHUN (2019 -> 2023 -> 2027) & PERPINDAHAN REZIM
+# ==============================================================================
+# Data resmi UNSD & World Bank tahun 2025-2026 belum tersedia (0 baris pada seri SDG 7),
+# sementara 2024 kehilangan separuh negara pada 7.2.1 & 7.3.1. Tahun 2019 lengkap 189/189,
+# sehingga horizon 4 tahun (2019 -> 2023) dipakai untuk memvalidasi model dan memproyeksikan
+# 2027 (2023 + 4) pada keenam indikator serta posisi rezim proyeksi terhadap centroid 2023.
+panel_2019_path <- file.path(data_dir, "sdg_energy_climate_panel_2019.csv")
+stopifnot("Berkas data/sdg_energy_climate_panel_2019.csv tidak ditemukan!" = file.exists(panel_2019_path))
+d19 <- read_csv(panel_2019_path, show_col_types = FALSE) |>
+  filter(year == 2019, iso3 %in% migration_df$iso3) |>
+  arrange(match(iso3, migration_df$iso3))
+stopifnot(
+  "Kohort 2019 harus cocok persis 189 negara dengan migration_df!" = identical(d19$iso3, migration_df$iso3),
+  "Data 2019 harus lengkap pada keenam indikator inti!" = all(complete.cases(d19[, core_vars]))
+)
+
+X19 <- with(d19, cbind(
+  elec    = elec_access,
+  cook    = clean_cooking,
+  rshare  = renew_share_tfec,
+  log_cap = log1p(renew_cap_wpc),
+  log_int = log1p(energy_intensity),
+  log_co2 = log1p(co2_per_capita)
+))
+X23_fc <- with(migration_df, cbind(
+  elec    = elec_2023,
+  cook    = cooking_2023,
+  rshare  = renew_share_2023,
+  log_cap = log1p(renew_cap_2023),
+  log_int = log1p(energy_int_2023),
+  log_co2 = log1p(co2_pc_2023)
+))
+
+target_specs_2027 <- list(
+  list(id = "clean_cooking",    col_x = "cook",    y23 = migration_df$cooking_2023,     y19 = d19$clean_cooking,     log_scale = FALSE, clip_max = 100, unit = "pp"),
+  list(id = "renew_share_tfec", col_x = "rshare",  y23 = migration_df$renew_share_2023, y19 = d19$renew_share_tfec,  log_scale = FALSE, clip_max = 100, unit = "pp"),
+  list(id = "energy_intensity", col_x = "log_int", y23 = migration_df$energy_int_2023,  y19 = d19$energy_intensity,  log_scale = TRUE,  clip_max = Inf, unit = "MJ/$"),
+  list(id = "elec_access",      col_x = "elec",    y23 = migration_df$elec_2023,        y19 = d19$elec_access,       log_scale = FALSE, clip_max = 100, unit = "pp"),
+  list(id = "renew_cap_wpc",    col_x = "log_cap", y23 = migration_df$renew_cap_2023,   y19 = d19$renew_cap_wpc,     log_scale = TRUE,  clip_max = Inf, unit = "W/cap"),
+  list(id = "co2_per_capita",   col_x = "log_co2", y23 = migration_df$co2_pc_2023,      y19 = d19$co2_per_capita,    log_scale = TRUE,  clip_max = Inf, unit = "t/cap")
+)
+
+back_clip <- function(val, spec) {
+  if (spec$log_scale) pmax(0, expm1(val)) else pmin(pmax(val, 0), spec$clip_max)
+}
+cohen_kappa <- function(a, b, lvls = 1:4) {
+  cm <- table(factor(a, levels = lvls), factor(b, levels = lvls))
+  po <- sum(diag(cm)) / sum(cm)
+  pe <- sum(rowSums(cm) * colSums(cm)) / (sum(cm)^2)
+  if (pe >= 1) 1 else (po - pe) / (1 - pe)
+}
+
+oof_en_23  <- matrix(NA_real_, nrow(X19), length(target_specs_2027), dimnames = list(migration_df$iso3, sapply(target_specs_2027, `[[`, "id")))
+oof_ols_23 <- oof_en_23
+proj_en_27 <- oof_en_23
+fc27_cv_rows <- list()
+
+for (ti in seq_along(target_specs_2027)) {
+  sp <- target_specs_2027[[ti]]
+  y_mod <- if (sp$log_scale) log1p(sp$y23) else sp$y23
+  x_own <- X19[, sp$col_x]
+  p_raw <- matrix(NA_real_, nrow(X19), 3, dimnames = list(NULL, c("persistence", "ols_own_lag", "elastic_net")))
+
+  for (f in seq_len(K_OUTER)) {
+    tr <- fold_out != f; te <- !tr
+    p_raw[te, "persistence"] <- x_own[te]
+    ols_f <- lm(y ~ x, data = data.frame(y = y_mod[tr], x = x_own[tr]))
+    p_raw[te, "ols_own_lag"] <- predict(ols_f, newdata = data.frame(x = x_own[te]))
+    set.seed(2026 + ti * 100 + f)
+    tn_f <- tune_enet(X19[tr, ], y_mod[tr], sample(rep(1:10, length.out = sum(tr))))
+    p_raw[te, "elastic_net"] <- as.numeric(predict(tn_f$cv, X19[te, , drop = FALSE], s = "lambda.min"))
+  }
+
+  p_orig <- apply(p_raw, 2, back_clip, spec = sp)
+  oof_ols_23[, sp$id] <- p_orig[, "ols_own_lag"]
+  oof_en_23[, sp$id]  <- p_orig[, "elastic_net"]
+
+  ae <- abs(p_orig - sp$y23)
+  ci_en_pers <- {
+    d <- ae[, "elastic_net"] - ae[, "persistence"]
+    ci <- quantile(apply(boot_idx, 2, function(i) mean(d[i])), c(0.025, 0.975))
+    c(mean(d), ci)
+  }
+  ci_en_ols <- {
+    d <- ae[, "elastic_net"] - ae[, "ols_own_lag"]
+    ci <- quantile(apply(boot_idx, 2, function(i) mean(d[i])), c(0.025, 0.975))
+    c(mean(d), ci)
+  }
+
+  # Fit penuh 2019 -> 2023 lalu proyeksikan ke 2027 memakai fitur 2023
+  set.seed(2026 + ti * 100)
+  tn_full <- tune_enet(X19, y_mod, sample(rep(1:10, length.out = nrow(X19))))
+  pred27_mod <- as.numeric(predict(tn_full$cv, X23_fc, s = "lambda.min"))
+  proj_en_27[, sp$id] <- back_clip(pred27_mod, sp)
+
+  for (m_name in colnames(p_orig)) {
+    err_m <- p_orig[, m_name] - sp$y23
+    r2_m <- 1 - sum(err_m^2) / sum((sp$y23 - mean(sp$y23))^2)
+    fc27_cv_rows[[length(fc27_cv_rows) + 1L]] <- tibble(
+      target = sp$id,
+      satuan = sp$unit,
+      skala_model = if (sp$log_scale) "log1p" else "asli",
+      model = m_name,
+      mae_oof = round(mean(abs(err_m)), 3),
+      rmse_oof = round(sqrt(mean(err_m^2)), 3),
+      r2_oof = round(r2_m, 4),
+      alpha_penuh = if (m_name == "elastic_net") tn_full$alpha else NA_real_,
+      selisih_mae_vs_pers = if (m_name == "elastic_net") round(ci_en_pers[1], 3) else NA_real_,
+      ci95_bawah_vs_pers  = if (m_name == "elastic_net") round(ci_en_pers[2], 3) else NA_real_,
+      ci95_atas_vs_pers   = if (m_name == "elastic_net") round(ci_en_pers[3], 3) else NA_real_,
+      selisih_mae_vs_ols  = if (m_name == "elastic_net") round(ci_en_ols[1], 3) else NA_real_,
+      ci95_bawah_vs_ols   = if (m_name == "elastic_net") round(ci_en_ols[2], 3) else NA_real_,
+      ci95_atas_vs_ols    = if (m_name == "elastic_net") round(ci_en_ols[3], 3) else NA_real_
+    )
+  }
+}
+
+fc27_cv_tbl <- bind_rows(fc27_cv_rows)
+write_csv(fc27_cv_tbl, file.path(tab_dir, "table_18_forecast_2027_cv_metrics.csv"))
+
+# Validasi out-of-fold perpindahan rezim (2019 -> 2023) & proyeksi rezim 2027 pada centroid 2023
+project_to_2023_regimes <- function(df6) {
+  Z <- scale(transform_features(df6), center = mu_2023, scale = sd_2023)
+  dists <- t(apply(Z, 1, function(r) sqrt(rowSums(sweep(centers_km4, 2, r)^2))))
+  ord <- t(apply(dists, 1, order))
+  reg <- ord[, 1]
+  d1 <- dists[cbind(seq_len(nrow(dists)), ord[, 1])]
+  d2 <- dists[cbind(seq_len(nrow(dists)), ord[, 2])]
+  pc <- Z %*% pca_fit$rotation
+  list(regime = reg, dist1 = d1, margin = d2 - d1, pc1 = pc[, 1], pc2 = pc[, 2])
+}
+
+reg19_proj    <- project_to_2023_regimes(d19[, core_vars])
+reg23_oof_en  <- project_to_2023_regimes(as_tibble(oof_en_23[, core_vars]))
+reg23_oof_ols <- project_to_2023_regimes(as_tibble(oof_ols_23[, core_vars]))
+reg27_proj    <- project_to_2023_regimes(as_tibble(proj_en_27[, core_vars]))
+
+regime_cv_summary <- tibble(
+  model = c("persistence_2019", "ols_own_lag_oof", "elastic_net_oof"),
+  akurasi_persen = round(100 * c(
+    mean(reg19_proj$regime == migration_df$regime_2023),
+    mean(reg23_oof_ols$regime == migration_df$regime_2023),
+    mean(reg23_oof_en$regime == migration_df$regime_2023)
+  ), 2),
+  n_benar = c(
+    sum(reg19_proj$regime == migration_df$regime_2023),
+    sum(reg23_oof_ols$regime == migration_df$regime_2023),
+    sum(reg23_oof_en$regime == migration_df$regime_2023)
+  ),
+  kappa = round(c(
+    cohen_kappa(reg19_proj$regime, migration_df$regime_2023),
+    cohen_kappa(reg23_oof_ols$regime, migration_df$regime_2023),
+    cohen_kappa(reg23_oof_en$regime, migration_df$regime_2023)
+  ), 4),
+  n_berubah_aktual_19_23 = sum(reg19_proj$regime != migration_df$regime_2023),
+  n_berubah_pred_19_23 = c(
+    0L,
+    sum(reg19_proj$regime != reg23_oof_ols$regime),
+    sum(reg19_proj$regime != reg23_oof_en$regime)
+  )
+)
+
+proj27_df <- tibble(
+  iso3 = migration_df$iso3,
+  country_en = migration_df$country_en,
+  kode_2019 = paste0("R", reg19_proj$regime),
+  kode_2023 = migration_df$kode_2023,
+  regime_2027 = reg27_proj$regime,
+  kode_2027 = paste0("R", reg27_proj$regime),
+  berubah_2027 = migration_df$regime_2023 != reg27_proj$regime,
+  margin_centroid_2027 = round(reg27_proj$margin, 3),
+  elec_2027 = round(proj_en_27[, "elec_access"], 2),
+  cooking_2027 = round(proj_en_27[, "clean_cooking"], 2),
+  renew_share_2027 = round(proj_en_27[, "renew_share_tfec"], 2),
+  renew_cap_2027 = round(proj_en_27[, "renew_cap_wpc"], 2),
+  energy_int_2027 = round(proj_en_27[, "energy_intensity"], 2),
+  co2_pc_2027 = round(proj_en_27[, "co2_per_capita"], 2),
+  d_elec_23_27 = round(proj_en_27[, "elec_access"] - migration_df$elec_2023, 2),
+  d_cook_23_27 = round(proj_en_27[, "clean_cooking"] - migration_df$cooking_2023, 2),
+  d_rshare_23_27 = round(proj_en_27[, "renew_share_tfec"] - migration_df$renew_share_2023, 2),
+  d_cap_23_27 = round(proj_en_27[, "renew_cap_wpc"] - migration_df$renew_cap_2023, 2),
+  d_int_23_27 = round(proj_en_27[, "energy_intensity"] - migration_df$energy_int_2023, 2),
+  d_co2_23_27 = round(proj_en_27[, "co2_per_capita"] - migration_df$co2_pc_2023, 2)
+)
+write_csv(proj27_df, file.path(tab_dir, "table_20_forecast_2027_country_projections.csv"))
+
+mig_2027 <- proj27_df |>
+  count(kode_2023, kode_2027) |>
+  complete(kode_2023 = paste0("R", 1:4), kode_2027 = paste0("R", 1:4), fill = list(n = 0L))
+write_csv(bind_rows(mig_2027, regime_cv_summary), file.path(tab_dir, "table_19_forecast_2027_regime_migration.csv"))
+
+cat("\n[Tahap 5C] Validasi silang 4-tahunan (2019 -> 2023) 6 indikator (Elastic Net):\n")
+print(fc27_cv_tbl |> filter(model == "elastic_net") |> select(target, satuan, mae_oof, rmse_oof, r2_oof, selisih_mae_vs_pers, ci95_bawah_vs_pers, ci95_atas_vs_pers))
+cat("\n[Tahap 5C] Akurasi rezim out-of-fold (2019 -> 2023):\n")
+print(regime_cv_summary)
+cat(sprintf("\n[Tahap 5C] Proyeksi perpindahan rezim 2023 -> 2027: %d negara diproyeksikan berubah rezim:\n", sum(proj27_df$berubah_2027)))
+print(proj27_df |> filter(berubah_2027) |> select(iso3, country_en, kode_2023, kode_2027, margin_centroid_2027, d_elec_23_27, d_cook_23_27, d_rshare_23_27, d_int_23_27, d_co2_23_27))
+
+# ==============================================================================
 # TAHAP 6: EKSPOR JSON & PETA SVG ROBINSON UNTUK DASHBOARD INTERAKTIF
 # ==============================================================================
 sf_use_s2(FALSE)
@@ -1116,6 +1315,35 @@ asean_viewbox <- round(c(
   h = (bb_asean["ymax"] - bb_asean["ymin"]) / (bb_world["ymax"] - bb_world["ymin"]) * H_svg + 28
 ), 1)
 
+iso_names_path <- file.path(data_dir, "iso3166_country_names.csv")
+iso_names_df <- if (file.exists(iso_names_path)) {
+  read_csv(iso_names_path, show_col_types = FALSE, na = character())
+} else {
+  tibble(iso3 = character(), iso2 = character(), country_en_iso = character(), country_id = character())
+}
+
+outliers_export <- outliers_maha |>
+  left_join(iso_names_df, by = "iso3") |>
+  mutate(country_en = ifelse(!is.na(country_en_iso) & nzchar(country_en_iso), country_en_iso, country_en)) |>
+  select(-any_of("country_en_iso"))
+
+countries_export <- migration_df |>
+  left_join(proj27_df |> select(iso3, kode_2019, regime_2027, kode_2027, berubah_2027, margin_centroid_2027,
+                                elec_2027, cooking_2027, renew_share_2027, renew_cap_2027, energy_int_2027, co2_pc_2027),
+            by = "iso3") |>
+  left_join(iso_names_df, by = "iso3") |>
+  mutate(
+    country_en   = ifelse(!is.na(country_en_iso) & nzchar(country_en_iso), country_en_iso, country_en),
+    population_m = round(population / 1e6, 2),
+    gdp_pc_ppp   = round(gdp_pc_ppp, 0),
+    urban_pct    = round(urban_pct, 1),
+    across(c(elec_2023, cooking_2023, renew_share_2023, renew_cap_2023, energy_int_2023, co2_pc_2023,
+             elec_2015, cooking_2015, renew_share_2015, renew_cap_2015, energy_int_2015, co2_pc_2015,
+             cap_solar_wpc, cap_wind_wpc, cap_hydro_wpc, cap_geothermal_wpc, cap_bioenergy_wpc),
+           ~ round(.x, 2))
+  ) |>
+  select(-any_of("country_en_iso"))
+
 dashboard_payload <- list(
   meta = list(
     generated_at     = format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
@@ -1156,23 +1384,22 @@ dashboard_payload <- list(
     metrics = fc_metrics, comparisons = fc_compare, tuning = tune_tbl,
     countries = fc_oof |> select(iso3, lipatan, persistence, ols_cook2015, elastic_net)
   ),
+  forecast_2027 = list(
+    train_from = 2019L, train_to = 2023L, horizon_years = 4L, target_year = 2027L,
+    k_outer = K_OUTER,
+    cv_metrics = fc27_cv_tbl,
+    regime_cv = regime_cv_summary,
+    migration_2027 = mig_2027,
+    n_shifted = sum(proj27_df$berubah_2027)
+  ),
   centroids_z   = as_tibble(round(centers_km4, 4), rownames = "kode_rezim"),
   eval_grid     = eval_table,
   ari_matrix    = ari_df,
   migration     = mig_long,
   audit_data    = audit_missing,
   desc_stats    = desc_stats,
-  outliers      = outliers_maha,
-  countries     = migration_df |>
-    mutate(
-      population_m = round(population / 1e6, 2),
-      gdp_pc_ppp   = round(gdp_pc_ppp, 0),
-      urban_pct    = round(urban_pct, 1),
-      across(c(elec_2023, cooking_2023, renew_share_2023, renew_cap_2023, energy_int_2023, co2_pc_2023,
-               elec_2015, cooking_2015, renew_share_2015, renew_cap_2015, energy_int_2015, co2_pc_2015,
-               cap_solar_wpc, cap_wind_wpc, cap_hydro_wpc, cap_geothermal_wpc, cap_bioenergy_wpc),
-             ~ round(.x, 2))
-    ),
+  outliers      = outliers_export,
+  countries     = countries_export,
   world_map     = map_df
 )
 
@@ -1182,6 +1409,6 @@ writeLines(paste0("window.__SDG_DASHBOARD_DATA__ = ", json_txt, ";"),
            file.path(dash_dir, "dashboard_data.js"), useBytes = TRUE)
 
 cat("\n======================================================================\n")
-cat("SELESAI! Seluruh 17 tabel CSV, 6 grafik PNG (300 DPI), dan data JSON\n")
+cat("SELESAI! Seluruh 20 tabel CSV, 6 grafik PNG (300 DPI), dan data JSON\n")
 cat("dashboard berhasil dibangun ulang secara konsisten.\n")
 cat("======================================================================\n")
