@@ -15,7 +15,7 @@ const WORKER_URL = "https://biomass-paradox-bot.febrianggicaesarimmanuel.workers
 const UI = {
   id: {
     launch: "Tanya data", title: "Tanya data Biomass Paradox", close: "Tutup",
-    intro: "Tanyakan apa saja soal 189 negara, perbandingan, rezim, atau metode dashboard ini. Mendukung kode Alpha-3, Alpha-2, singkatan santai, dan salah ketik ringan.",
+    intro: "Tanyakan apa saja soal 189 negara, perbandingan, rezim, atau metode pada dashboard ini.",
     label: "Pertanyaan Anda", placeholder: "Contoh: Indo gimana? atau bandingkan MY dan VN", send: "Kirim",
     you: "Anda", bot: "Data", loading: "Memuat data...", thinking: "Menyusun jawaban...",
     error: "Data gagal dimuat. Muat ulang halaman, lalu coba lagi.",
@@ -43,7 +43,7 @@ const UI = {
   },
   en: {
     launch: "Ask the data", title: "Ask the Biomass Paradox data", close: "Close",
-    intro: "Ask anything about the 189 countries, comparisons, regimes, or dashboard methods. Supports Alpha-3, Alpha-2, casual names, and minor typos.",
+    intro: "Ask anything about the 189 countries, comparisons, regimes, or dashboard methods.",
     label: "Your question", placeholder: "Example: How is Indo doing? or Compare MY and VN", send: "Send",
     you: "You", bot: "Data", loading: "Loading the data...", thinking: "Writing answer...",
     error: "The data failed to load. Reload the page and try again.",
