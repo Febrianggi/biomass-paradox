@@ -494,8 +494,11 @@ button.quad-btn[aria-pressed="true"] .q-count { background: var(--text); color: 
 
 /* Migration matrix */
 .mig-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
-.mig-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: var(--s4); align-items: start; }
+.mig-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: var(--s4); align-items: stretch; }
 .mig-split > * { min-width: 0; }
+.mig-side { display: flex; flex-direction: column; justify-content: space-between; gap: var(--s3); height: 100%; }
+.mig-foot { display: flex; flex-direction: column; gap: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--line); }
+.mig-foot .legend-row { margin-top: 0; }
 .proj27-eval-split {
   display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); gap: var(--s4); align-items: start;
   margin-top: var(--s4); padding-top: var(--s4); border-top: 1px solid var(--line);
@@ -929,12 +932,14 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
             </div>
           </div>
           <div class="mig-split">
-            <div class="mig-layout">
-              <div id="mig-matrix-box"></div>
-              <div class="legend-row small" id="mig-legend"></div>
-              <p class="muted small" data-i18n="migNote">Posisi 2019 diproyeksikan ke centroid 2023. Perpindahan adalah perbandingan observasional, bukan estimasi dampak kebijakan.</p>
+            <div id="mig-matrix-box"></div>
+            <div class="mig-side">
+              <div class="roster" id="mig-list-box" aria-live="polite"></div>
+              <div class="mig-foot">
+                <div class="legend-row small" id="mig-legend"></div>
+                <p class="muted small" data-i18n="migNote">Posisi 2019 diproyeksikan ke centroid 2023. Perpindahan adalah perbandingan observasional, bukan estimasi dampak kebijakan.</p>
+              </div>
             </div>
-            <div class="roster" id="mig-list-box" aria-live="polite"></div>
           </div>
         </section>
 
@@ -947,11 +952,13 @@ footer.site-foot { border-top: 1px solid var(--line); padding: var(--s5) 0; colo
           </div>
           <div id="proj27-lead" style="font-size:13.5px;margin-bottom:var(--s3)"></div>
           <div class="mig-split">
-            <div class="mig-layout">
-              <div id="mig27-matrix-box"></div>
-              <div class="legend-row" id="mig27-legend"></div>
+            <div id="mig27-matrix-box"></div>
+            <div class="mig-side">
+              <div class="roster" id="mig27-list-box" role="status" aria-live="polite"></div>
+              <div class="mig-foot">
+                <div class="legend-row small" id="mig27-legend"></div>
+              </div>
             </div>
-            <div class="roster" id="mig27-list-box" role="status" aria-live="polite"></div>
           </div>
           <div class="proj27-eval-split">
             <div>
