@@ -10,6 +10,12 @@ try {
   if (s === "light" || s === "dark") document.querySelector('meta[name="color-scheme"]').content = s;
 } catch (_) {}
 document.documentElement.classList.add("js");
+if (window.HTMLDialogElement && 'showModal' in HTMLDialogElement.prototype && !location.hash &&
+    !matchMedia('(prefers-reduced-motion: reduce)').matches && !navigator.connection?.saveData) {
+  document.documentElement.dataset.film = 'opening';
+  // Release the cover even if subsequent page scripts cannot initialize.
+  window.filmBootTimer = setTimeout(() => delete document.documentElement.dataset.film, 6500);
+}
 </script>
 <title>Biomass Paradox: energi terbarukan tinggi, dapur masih berasap</title>
 <meta name="description" content="Lihat mengapa negara dengan pangsa energi terbarukan tinggi bisa tetap memasak dengan kayu bakar. Peta interaktif 189 negara pada enam indikator SDG 7 dan SDG 13.">
@@ -213,9 +219,56 @@ footer p { max-width: 900px; }
   .tagline .w { opacity: 1; transition: none; }
   .cta, .cta svg, .seg button, .icon-btn { transition: none; }
 }
+/* The native modal covers both the landing page and the floating assistant. */
+#forest-film {
+  position: fixed; inset: 0; margin: 0; padding: 0; border: 0; width: 100%;
+  height: 100%; height: 100dvh; max-width: none; max-height: none; overflow: hidden;
+  background: #0b1711; color: #fff; opacity: 1; transition: opacity 560ms ease-out;
+}
+#forest-film::backdrop { background: transparent; }
+#forest-film video { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+@media (orientation: portrait) {
+  #forest-film video { object-position: 49% center; }
+}
+html[data-film] { overflow: hidden; }
+html[data-film="opening"]::before {
+  content: ""; position: fixed; inset: 0; z-index: 2147483647;
+  background: #0b1711 url("media/forest-intro.webp") center / cover no-repeat;
+}
+html[data-film] body > :not(#forest-film, .hero),
+html[data-film] .hero-inner, html[data-film] .hero-credit { visibility: hidden; }
+html[data-film="leaving"] #forest-film { opacity: 0; }
+.film-skip, .film-replay { font: inherit; cursor: pointer; color: #faf9f1; }
+.film-skip {
+  position: absolute; right: max(20px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom)); min-height: 44px; padding: 8px 17px;
+  border: 1px solid #ffffff75; border-radius: 99px; background: #0b1711cc;
+}
+.film-replay {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0;
+  margin-top: 12px; border: 0; background: transparent; font-size: .875rem;
+}
+.film-replay[hidden] { display: none; }
+.hero h1[tabindex="-1"]:focus { outline: none; }
+.film-replay:hover span { text-decoration: underline; }
+.film-replay svg { width: 16px; height: 16px; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes film-arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes film-fade { from { opacity: 0; } to { opacity: 1; } }
+  .film-enter .nav, .film-enter .hero-credit, .film-enter .bp-bot-launch, .film-enter .bp-nudge { animation: film-fade 480ms ease-out both; }
+  .film-enter .hero-inner > * { animation: film-arrive 560ms ease-out both; }
+  .film-enter .hero-inner h1 { animation-delay: 70ms; }
+  .film-enter .hero-sub { animation-delay: 140ms; }
+  .film-enter .hero-actions, .film-enter .film-replay { animation-delay: 210ms; }
+}
+@media (prefers-reduced-motion: reduce) { #forest-film { transition: none; } }
 </style>
 </head>
 <body>
+<dialog id="forest-film" aria-label="Animasi pembuka" data-i18n-aria="filmLabel">
+  <video muted playsinline preload="none" aria-hidden="true" disablepictureinpicture></video>
+  <button class="film-skip" type="button" autofocus data-i18n="filmSkip">Lewati animasi</button>
+</dialog>
 <a class="skip" href="#main" data-i18n="skip">Lewati ke konten</a>
 
 <nav class="nav" aria-label="Utama" data-i18n-aria="navLabel">
@@ -246,6 +299,10 @@ footer p { max-width: 900px; }
       <a class="cta" href="dashboard/" data-dash-link><span data-i18n="cta">Buka peta 189 negara</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9.5M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       <p class="proof caption-3" data-i18n="proof">Data resmi UN SDG Indicators Database dan World Bank, tahun 2019 dan 2023, disertai proyeksi 2027.</p>
     </div>
+    <button class="film-replay" type="button" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10a8 8 0 1 1 .6 6M4 4v6h6"/></svg>
+      <span data-i18n="filmReplay">Putar ulang animasi</span>
+    </button>
   </div>
   <p class="hero-credit caption-4" data-i18n="heroCredit">Gambar hutan: ilustrasi buatan AI, bukan lokasi tertentu.</p>
 </header>
@@ -344,6 +401,7 @@ footer p { max-width: 900px; }
 (() => {
   const I18N = {
     id: {
+      filmLabel: "Animasi pembuka",
       pageTitle: "Biomass Paradox: energi terbarukan tinggi, dapur masih berasap",
       desc: "Lihat mengapa negara dengan pangsa energi terbarukan tinggi bisa tetap memasak dengan kayu bakar. Peta interaktif 189 negara pada enam indikator SDG 7 dan SDG 13.",
       navLabel: "Utama", langLabel: "Bahasa", themeLabel: "Ganti tema terang atau gelap", taglineLabel: "Ringkasan"
@@ -353,6 +411,7 @@ footer p { max-width: 900px; }
       desc: "See why countries with a high renewable energy share can still cook with firewood. An interactive map of 189 countries on six SDG 7 and SDG 13 indicators.",
       navLabel: "Main", langLabel: "Language", themeLabel: "Switch light or dark theme", taglineLabel: "Summary",
       skip: "Skip to content",
+      filmSkip: "Skip animation", filmReplay: "Replay animation", filmLabel: "Opening animation",
       heroAlt: "AI generated illustration: a tropical forest seen from the air, with a rocky river and thin mist over the canopy.",
       eyebrow: "SDG 7 and SDG 13",
       h1: '<span class="line">High renewable share.</span> <span class="line">Low access to clean cooking.</span>',
@@ -478,6 +537,7 @@ footer p { max-width: 900px; }
   apply();
 })();
 </script>
+<script src="forest-intro.js"></script>
 <script type="module" src="dashboard/bot.js?v=4"></script>
 </body>
 </html>

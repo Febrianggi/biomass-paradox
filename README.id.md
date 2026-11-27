@@ -77,6 +77,8 @@ Secara matematis murni pada indeks validitas internal global, K-Means `k = 2` me
 
 ## Cara membaca dashboard
 
+Halaman dibuka dengan video hutan tanpa suara. Pilih **Lewati animasi** untuk langsung melihat isinya atau **Putar ulang animasi** untuk menonton kembali. Jika preferensi kurangi gerakan aktif, halaman langsung menampilkan kanopi.
+
 Halaman pembuka memperkenalkan paradoks biomassa dan menautkan langsung ke dashboard (`/dashboard/`). Di dalam dashboard, bilah atas selalu tersedia di semua tab: tombol **ID / EN** mengganti bahasa antarmuka sekaligus nama negara standar ISO 3166-1, tombol tema mengganti mode terang/gelap, dan **Unduh CSV (189 Negara)** mengunduh tabel lengkap multi-tahun (`2019`, `2023`, dan `2027*`). Mengklik negara mana pun di peta, scatter plot, daftar migrasi, atau tabel akan menyinkronkan pilihan di seluruh tab dan panel inspektor.
 
 | Tab | Isi utama | Cara memakai |

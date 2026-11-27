@@ -77,6 +77,8 @@ On purely global internal indices, K-Means at `k = 2` scores higher (Silhouette 
 
 ## How to read the dashboard
 
+The landing page opens with a silent forest film. Use **Skip animation** to reveal the page or **Replay animation** to watch it again. With reduced motion enabled, the page opens directly on the canopy.
+
 The landing page introduces the biomass paradox and links directly to the dashboard (`/dashboard/`). Inside the dashboard, the top bar stays consistent across all views: **ID / EN** switches both interface copy and ISO 3166-1 country names, the theme button toggles light and dark mode, and **Download CSV (189 Countries)** exports the complete multi-year country dataset (`2019`, `2023`, and `2027*`). Clicking any country on the map, scatter plots, migration lists, or table selects it globally and updates the inspector panel.
 
 | Tab | What it shows | How to use it |
