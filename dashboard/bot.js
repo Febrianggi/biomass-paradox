@@ -15,6 +15,8 @@ const WORKER_URL = "https://biomass-paradox-bot.febrianggicaesarimmanuel.workers
 const UI = {
   id: {
     launch: "Tanya data", title: "Tanya data Biomass Paradox", close: "Tutup",
+    nudge: "Bisa tanya apa saja soal isi dashboard ini: data negara, rezim, atau metode.",
+    nudgeClose: "Tutup notifikasi",
     intro: "Tanyakan apa saja soal 189 negara, perbandingan, rezim, atau metode pada dashboard ini.",
     label: "Pertanyaan Anda", placeholder: "Contoh: Indo gimana? atau bandingkan MY dan VN", send: "Kirim",
     you: "Anda", bot: "Data", loading: "Memuat data...", thinking: "Menyusun jawaban...",
@@ -54,6 +56,8 @@ const UI = {
   },
   en: {
     launch: "Ask the data", title: "Ask the Biomass Paradox data", close: "Close",
+    nudge: "You can ask anything about this dashboard: country data, regimes, or methods.",
+    nudgeClose: "Dismiss notification",
     intro: "Ask anything about the 189 countries, comparisons, regimes, or dashboard methods.",
     label: "Your question", placeholder: "Example: How is Indo doing? or Compare MY and VN", send: "Send",
     you: "You", bot: "Data", loading: "Loading the data...", thinking: "Writing answer...",
@@ -153,8 +157,56 @@ const css = `
   transition: background-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .bp-bot-launch:hover { background: #1A2D23; }
-.bp-bot-launch svg { width: 18px; height: 18px; color: #A9D85A; }
+.bp-bot-launch svg { width: 20px; height: 20px; color: #A9D85A; flex: 0 0 auto; }
 .bp-bot-launch[aria-expanded="true"] { display: none; }
+.bp-bot-dot {
+  position: absolute; top: 1px; right: 3px; width: 10px; height: 10px; border-radius: 999px;
+  background: #A9D85A; border: 2px solid #0B1711; pointer-events: none;
+}
+.bp-bot-launch:not(.has-nudge) .bp-bot-dot { display: none; }
+.bp-nudge {
+  position: fixed; z-index: 45; right: 16px; bottom: 76px;
+  width: min(308px, calc(100vw - 32px));
+  display: flex; align-items: flex-start; gap: 6px; padding: 10px 8px 10px 12px;
+  background: light-dark(#FFFFFF, #12211A); color: light-dark(#15231B, #F3F0E4);
+  border: 1px solid light-dark(#D9D5C6, #2A3F33); border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  font: 500 13.5px/1.45 "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 260ms cubic-bezier(0.22, 1, 0.36, 1), transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bp-nudge.is-open { opacity: 1; transform: translateY(0); }
+.bp-nudge[hidden] { display: none !important; }
+.bp-nudge::after {
+  content: ""; position: absolute; right: 24px; bottom: -6px; width: 10px; height: 10px;
+  background: light-dark(#FFFFFF, #12211A);
+  border-right: 1px solid light-dark(#D9D5C6, #2A3F33);
+  border-bottom: 1px solid light-dark(#D9D5C6, #2A3F33);
+  transform: rotate(45deg);
+}
+.bp-nudge-open {
+  flex: 1 1 auto; min-width: 0; border: 0; padding: 2px 0; background: transparent;
+  color: inherit; font: inherit; text-align: left; cursor: pointer;
+  display: flex; align-items: flex-start; gap: 10px; touch-action: manipulation;
+}
+.bp-nudge-open:focus-visible, .bp-nudge-x:focus-visible {
+  outline: 3px solid light-dark(#3F6212, #A9D85A); outline-offset: 2px; border-radius: 8px;
+}
+.bp-nudge-badge, .bp-head-badge {
+  flex: 0 0 auto; width: 28px; height: 28px; border-radius: 9px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: light-dark(#0B1711, #1C3126); color: #A9D85A;
+  border: 1px solid light-dark(rgba(11, 23, 17, 0.12), rgba(169, 216, 90, 0.25));
+}
+.bp-nudge-badge { margin-top: 1px; }
+.bp-nudge-badge svg, .bp-head-badge svg { width: 17px; height: 17px; }
+.bp-nudge-x {
+  flex: 0 0 auto; min-width: 32px; min-height: 32px; margin: -2px -2px 0 0;
+  border: 0; border-radius: 8px; background: transparent;
+  color: light-dark(#4D5A50, #B9C2B5); cursor: pointer; font-size: 18px; line-height: 1;
+  touch-action: manipulation;
+}
+.bp-nudge-x:hover { background: light-dark(rgba(21, 35, 27, 0.07), rgba(243, 240, 228, 0.09)); color: inherit; }
 .bp-bot {
   position: fixed; z-index: 46; right: 16px; bottom: 16px; width: min(420px, calc(100vw - 32px));
   max-height: min(640px, calc(100dvh - 32px)); display: flex; flex-direction: column;
@@ -165,6 +217,7 @@ const css = `
 .bp-bot[hidden], .bp-bot [hidden] { display: none !important; }
 .bp-bot :focus-visible { outline: 3px solid light-dark(#3F6212, #A9D85A); outline-offset: 2px; }
 .bp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 12px 12px 16px; border-bottom: 1px solid light-dark(#D9D5C6, #2A3F33); }
+.bp-head-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .bp-head h2 { margin: 0; font: 700 16px/1.3 "Manrope", system-ui, sans-serif; }
 .bp-x { min-width: 44px; min-height: 44px; border: 0; border-radius: 10px; background: transparent; color: inherit; cursor: pointer; font-size: 20px; line-height: 1; }
 .bp-x:hover { background: light-dark(rgba(21, 35, 27, 0.07), rgba(243, 240, 228, 0.09)); }
@@ -201,8 +254,9 @@ const css = `
 @media (max-width: 640px) {
   .bp-bot { right: 8px; left: 8px; bottom: 8px; width: auto; max-height: calc(100dvh - 96px); }
   .bp-bot-launch { right: 12px; bottom: 12px; }
+  .bp-nudge { right: 12px; bottom: 70px; width: min(280px, calc(100vw - 24px)); }
 }
-@media (prefers-reduced-motion: reduce) { .bp-bot-launch { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .bp-bot-launch, .bp-nudge { transition: none; } }
 `;
 
 const el = (tag, attrs = {}, html = "") => {
@@ -215,12 +269,16 @@ const lang = () => (document.documentElement.lang === "en" ? "en" : "id");
 const t = () => UI[lang()];
 const apiEndpoint = () => (typeof window.__BP_BOT_API__ === "string" ? window.__BP_BOT_API__ : WORKER_URL).trim();
 
+const BOT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="2.5" r="1.2" fill="currentColor"/><rect x="4" y="6.5" width="16" height="12.5" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 11.5v3M22 11.5v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9.2" cy="12.5" r="1.25" fill="currentColor"/><circle cx="14.8" cy="12.5" r="1.25" fill="currentColor"/><path d="M9.5 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+
 document.head.append(el("style", {}, css));
 const launch = el("button", { type: "button", class: "bp-bot-launch", "aria-expanded": "false", "aria-controls": "bp-bot" },
-  '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4.5h12a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5H9l-3.5 3v-3H4A1.5 1.5 0 0 1 2.5 13V6A1.5 1.5 0 0 1 4 4.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span></span>');
+  `${BOT_ICON}<span></span><i class="bp-bot-dot" aria-hidden="true"></i>`);
+const nudge = el("div", { class: "bp-nudge", role: "status", "aria-live": "polite", hidden: "" },
+  `<button type="button" class="bp-nudge-open"><span class="bp-nudge-badge" aria-hidden="true">${BOT_ICON}</span><span class="bp-nudge-text"></span></button><button type="button" class="bp-nudge-x"><span aria-hidden="true">&times;</span><span class="bp-vh"></span></button>`);
 const panel = el("div", { id: "bp-bot", class: "bp-bot", role: "dialog", "aria-modal": "false", "aria-labelledby": "bp-bot-title", hidden: "" });
 panel.innerHTML = `
-  <div class="bp-head"><h2 id="bp-bot-title"></h2><button type="button" class="bp-x" data-close><span aria-hidden="true">&times;</span><span class="bp-vh"></span></button></div>
+  <div class="bp-head"><div class="bp-head-title"><span class="bp-head-badge" aria-hidden="true">${BOT_ICON}</span><h2 id="bp-bot-title"></h2></div><button type="button" class="bp-x" data-close><span aria-hidden="true">&times;</span><span class="bp-vh"></span></button></div>
   <div class="bp-body">
     <p class="bp-intro bp-muted"></p>
     <p class="bp-state" role="status"></p>
@@ -233,7 +291,7 @@ panel.innerHTML = `
     <button type="submit" class="bp-btn" disabled data-send></button>
   </form>
   <p class="bp-foot bp-small bp-muted"></p>`;
-document.body.append(launch, panel);
+document.body.append(nudge, launch, panel);
 
 const $ = (s) => panel.querySelector(s);
 const stateBox = $(".bp-state"), log = $(".bp-log"), chips = $(".bp-chips"), input = $("#bp-q"), sendBtn = $("[data-send]"), foot = $(".bp-foot");
@@ -261,6 +319,8 @@ function renderState() {
 function applyText() {
   const u = t();
   launch.querySelector("span").textContent = u.launch;
+  nudge.querySelector(".bp-nudge-text").textContent = u.nudge;
+  nudge.querySelector(".bp-nudge-x .bp-vh").textContent = u.nudgeClose;
   $("#bp-bot-title").textContent = u.title;
   $(".bp-x .bp-vh").textContent = u.close;
   $(".bp-intro").textContent = u.intro;
@@ -351,7 +411,21 @@ async function loadData() {
   renderState();
 }
 
+const NUDGE_KEY = "bp_bot_nudge_dismissed";
+let nudgeTimer = null;
+function nudgeDismissed() {
+  try { return sessionStorage.getItem(NUDGE_KEY) === "1"; } catch (_) { return false; }
+}
+function dismissNudge(persist = true) {
+  if (nudgeTimer) { clearTimeout(nudgeTimer); nudgeTimer = null; }
+  nudge.classList.remove("is-open");
+  nudge.hidden = true;
+  launch.classList.remove("has-nudge");
+  if (persist) { try { sessionStorage.setItem(NUDGE_KEY, "1"); } catch (_) {} }
+}
+
 async function open() {
+  dismissNudge(true);
   panel.hidden = false;
   launch.setAttribute("aria-expanded", "true");
   renderState();
@@ -365,8 +439,20 @@ function close() {
   launch.focus();
 }
 launch.addEventListener("click", open);
+nudge.querySelector(".bp-nudge-open").addEventListener("click", open);
+nudge.querySelector(".bp-nudge-x").addEventListener("click", () => dismissNudge(true));
 $("[data-close]").addEventListener("click", close);
 panel.addEventListener("keydown", (e) => { if (e.key === "Escape") { e.preventDefault(); close(); } });
+
+if (!nudgeDismissed()) {
+  nudgeTimer = setTimeout(() => {
+    nudgeTimer = null;
+    if (!panel.hidden || nudgeDismissed()) return;
+    nudge.hidden = false;
+    launch.classList.add("has-nudge");
+    requestAnimationFrame(() => nudge.classList.add("is-open"));
+  }, 900);
+}
 
 /* ---- fuzzy & local answering ---- */
 function lev(a, b, maxD) {
