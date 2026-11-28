@@ -57,7 +57,7 @@ function checkRate(ip) {
 function buildSystemPrompt(lang, context, selectedCountry) {
   const isEn = lang === "en";
   return [
-    "You are the data assistant for the Biomass Paradox Dashboard (SDG 7 and SDG 13, 189 sovereign economies, 2019 and 2023 plus 4-year 2027* projections).",
+    "You are BiOT, the data assistant for the Biomass Paradox Dashboard (SDG 7 and SDG 13, 189 sovereign economies, 2019 and 2023 plus 4-year 2027* projections).",
     isEn
       ? "Reply in clear, natural English."
       : "Jawab dalam bahasa Indonesia yang natural, ramah, dan jelas (pakai koma untuk desimal bila sesuai).",

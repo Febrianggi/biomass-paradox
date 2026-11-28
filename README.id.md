@@ -113,9 +113,15 @@ Tips baca tambahan:
 - **Membaca panel inspektor:** Keenam indikator negara terpilih selalu dibandingkan langsung dengan median rezimnya dan median global, lengkap dengan label rezim `2019 -> 2023 -> 2027*` serta jalur perubahan `P1`/`P2`/`P3`.
 - **Membandingkan metode di peta:** Ganti **Lapisan peta** antara `K-Means k=4`, `Ward's D2 k=4`, `PAM k=4`, dan `GMM k=4` untuk melihat langsung negara mana yang konsisten dan mana yang sensitif terhadap pilihan metode.
 
-## Cara menggunakan asisten data
+## Kenalan dengan BiOT, asisten data
 
-Halaman pembuka maupun dashboard dilengkapi tombol mengambang **Tanya data** di pojok kanan bawah (`dashboard/bot.js`). Klik tombol tersebut untuk membuka panel asisten, atau langsung pilih salah satu tombol saran pertanyaan di dalamnya.
+<img src="dashboard/img/biot-96.webp" alt="Maskot BiOT: panci masak hijau di atas api kayu bakar, dengan asap yang melengkung menjadi daun" width="72" align="left">
+
+**BiOT** adalah asisten data yang tertanam di proyek ini. Namanya gabungan dari **Bio**massa dan b**OT**, dan maskotnya merangkum paradoksnya dalam satu gambar: panci masak yang dipanaskan kayu bakar, dengan asap yang berubah menjadi daun. Api kayu dihitung sebagai energi "terbarukan" pada SDG 7.2.1, padahal justru biomassa tradisional inilah yang membuat akses memasak bersih tetap rendah. BiOT hadir untuk membantu pembaca memilah hal itu negara per negara.
+
+BiOT hanya menjawab dari angka dan catatan metode di balik dashboard ini (`dashboard/data/dashboard_data.json`). BiOT tidak mencari di web, dan pada mode AI model diinstruksikan untuk tidak menambahkan fakta dari luar atau mengarang angka, sehingga jawabannya tetap terikat pada isi peta, grafik, dan tabel.
+
+Halaman pembuka maupun dashboard menampilkan tombol mengambang **Tanya BiOT** di pojok kanan bawah (`dashboard/bot.js`). Sekitar satu detik setelah halaman dimuat, BiOT memperkenalkan diri lewat notifikasi kecil di atas tombol (*"Halo, aku BiOT, asisten data Biomass Paradox..."*). Klik notifikasi atau tombol tersebut untuk membuka panel berjudul **BiOT, asisten data Biomass Paradox**, atau tutup notifikasi dengan **×** (notifikasi tidak muncul lagi selama sesi browser itu). Jawaban di panel diberi label **BiOT**. Anda bisa mengetik pertanyaan atau langsung memilih salah satu tombol saran pertanyaan.
 
 Pertanyaan yang didukung:
 - **Profil satu negara:** Mendukung nama ISO 3166-1 bahasa Indonesia maupun Inggris, kode Alpha-3, kode Alpha-2, nama santai, dan salah ketik ringan. Contoh: `Indo gimana?`, `GB`, `ESP`, `Turkiye`, `Cote d'Ivoire`, `VN`.

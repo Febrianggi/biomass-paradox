@@ -113,9 +113,15 @@ Additional reading tips:
 - **Reading the country inspector:** Each country's six indicators are plotted against both its regime median and the global median, with `2019 -> 2023 -> 2027*` regime labels and its `P1`/`P2`/`P3` change pathway tag.
 - **Comparing model layers:** Switching **Map layer** from `K-Means k=4` to `Ward's D2 k=4`, `PAM k=4`, or `GMM k=4` highlights where different clustering assumptions agree or diverge on individual countries.
 
-## Using the data assistant
+## Meet BiOT, the data assistant
 
-Both the landing page and the dashboard include a floating **Ask the data** button in the bottom-right corner (`dashboard/bot.js`). Click it to open the assistant panel, or pick one of the starter suggestion chips right away.
+<img src="dashboard/img/biot-96.webp" alt="BiOT mascot: a green cooking pot over a wood fire, with smoke curling up into a leaf" width="72" align="left">
+
+**BiOT** is the data assistant built into this project. The name joins **Bio**mass and b**OT**, and the mascot tells the paradox in one picture: a cooking pot heated by firewood, with its smoke turning into a leaf. Wood fires count as "renewable" on SDG 7.2.1, yet they are the traditional biomass that keeps clean-cooking access low. BiOT exists to help readers pull that apart country by country.
+
+BiOT answers only from the numbers and method notes behind this dashboard (`dashboard/data/dashboard_data.json`). It does not search the web, and in AI mode the model is instructed not to add outside facts or invent numbers, so answers stay tied to what the map, charts, and tables show.
+
+Both the landing page and the dashboard show a floating **Ask BiOT** button in the bottom-right corner (`dashboard/bot.js`). About a second after the page loads, BiOT introduces itself in a small notification above the button (*"Hi, I'm BiOT, the Biomass Paradox data assistant..."*). Click the notification or the button to open the panel titled **BiOT, the Biomass Paradox data assistant**, or close the notification with **×** (it stays closed for the rest of the browser session). Replies in the panel are labelled **BiOT**. You can type a question or pick one of the starter suggestion chips.
 
 What you can ask:
 - **Single country lookup:** Use English or Indonesian ISO 3166-1 names, Alpha-3 codes, Alpha-2 codes, casual names, or minor typos. Examples: `How is Indonesia doing?`, `GB`, `ESP`, `Turkiye`, `Cote d'Ivoire`, `VN`.

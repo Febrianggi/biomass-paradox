@@ -14,12 +14,12 @@ const WORKER_URL = "https://biomass-paradox-bot.febrianggicaesarimmanuel.workers
 
 const UI = {
   id: {
-    launch: "Tanya data", title: "Tanya data Biomass Paradox", close: "Tutup",
-    nudge: "Bisa tanya apa saja soal isi dashboard ini: data negara, rezim, atau metode.",
+    launch: "Tanya BiOT", title: "BiOT, asisten data Biomass Paradox", close: "Tutup",
+    nudge: "Halo, aku BiOT, asisten data Biomass Paradox. Tanya aku apa saja soal dashboard ini: data negara, rezim, atau metode.",
     nudgeClose: "Tutup notifikasi",
     intro: "Tanyakan apa saja soal 189 negara, perbandingan, rezim, atau metode pada dashboard ini.",
     label: "Pertanyaan Anda", placeholder: "Contoh: Indo gimana? atau bandingkan MY dan VN", send: "Kirim",
-    you: "Anda", bot: "Data", loading: "Memuat data...", thinking: "Menyusun jawaban...",
+    you: "Anda", bot: "BiOT", loading: "Memuat data...", thinking: "Menyusun jawaban...",
     error: "Data gagal dimuat. Muat ulang halaman, lalu coba lagi.",
     suggestions: ["Indo gimana?", "Bandingkan Malay dan Vietnam", "Negara ASEAN", "Memasak bersih terendah", "Kenapa pakai K-Means bukan GMM?"],
     footLocal: "Mode lokal: Tidak ada AI yang terlibat.",
@@ -55,12 +55,12 @@ const UI = {
     outliers: (list, n, nm) => `Enam pencilan multivariat Mahalanobis (D2 > 22,46, tetap dipertahankan karena mewakili kondisi nyata): ` + list.map((o) => `${nm(o)} (${o.iso3}, D2 ${n(o.mahalanobis_d2, 1)})`).join("; ") + "."
   },
   en: {
-    launch: "Ask the data", title: "Ask the Biomass Paradox data", close: "Close",
-    nudge: "You can ask anything about this dashboard: country data, regimes, or methods.",
+    launch: "Ask BiOT", title: "BiOT, the Biomass Paradox data assistant", close: "Close",
+    nudge: "Hi, I'm BiOT, the Biomass Paradox data assistant. Ask me anything about this dashboard: country data, regimes, or methods.",
     nudgeClose: "Dismiss notification",
     intro: "Ask anything about the 189 countries, comparisons, regimes, or dashboard methods.",
     label: "Your question", placeholder: "Example: How is Indo doing? or Compare MY and VN", send: "Send",
-    you: "You", bot: "Data", loading: "Loading the data...", thinking: "Writing answer...",
+    you: "You", bot: "BiOT", loading: "Loading the data...", thinking: "Writing answer...",
     error: "The data failed to load. Reload the page and try again.",
     suggestions: ["How is Indonesia doing?", "Compare Malaysia and Viet Nam", "ASEAN countries", "Lowest clean cooking", "Why K-Means instead of GMM?"],
     footLocal: "Local mode: No AI involved.",
@@ -157,7 +157,7 @@ const css = `
   transition: background-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .bp-bot-launch:hover { background: #1A2D23; }
-.bp-bot-launch svg { width: 20px; height: 20px; color: #A9D85A; flex: 0 0 auto; }
+.bp-bot-launch .bp-biot { width: 30px; height: 30px; margin-left: -8px; border-radius: 999px; background: #F3F0E4; }
 .bp-bot-launch[aria-expanded="true"] { display: none; }
 .bp-bot-dot {
   position: absolute; top: 1px; right: 3px; width: 10px; height: 10px; border-radius: 999px;
@@ -193,13 +193,13 @@ const css = `
   outline: 3px solid light-dark(#3F6212, #A9D85A); outline-offset: 2px; border-radius: 8px;
 }
 .bp-nudge-badge, .bp-head-badge {
-  flex: 0 0 auto; width: 28px; height: 28px; border-radius: 9px;
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 999px;
   display: inline-flex; align-items: center; justify-content: center;
-  background: light-dark(#0B1711, #1C3126); color: #A9D85A;
+  background: #F3F0E4;
   border: 1px solid light-dark(rgba(11, 23, 17, 0.12), rgba(169, 216, 90, 0.25));
 }
 .bp-nudge-badge { margin-top: 1px; }
-.bp-nudge-badge svg, .bp-head-badge svg { width: 17px; height: 17px; }
+.bp-biot { display: block; width: 28px; height: 28px; flex: 0 0 auto; padding: 2px; box-sizing: border-box; }
 .bp-nudge-x {
   flex: 0 0 auto; min-width: 32px; min-height: 32px; margin: -2px -2px 0 0;
   border: 0; border-radius: 8px; background: transparent;
@@ -269,7 +269,7 @@ const lang = () => (document.documentElement.lang === "en" ? "en" : "id");
 const t = () => UI[lang()];
 const apiEndpoint = () => (typeof window.__BP_BOT_API__ === "string" ? window.__BP_BOT_API__ : WORKER_URL).trim();
 
-const BOT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="2.5" r="1.2" fill="currentColor"/><rect x="4" y="6.5" width="16" height="12.5" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 11.5v3M22 11.5v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9.2" cy="12.5" r="1.25" fill="currentColor"/><circle cx="14.8" cy="12.5" r="1.25" fill="currentColor"/><path d="M9.5 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const BOT_ICON = `<img class="bp-biot" src="${new URL("./img/biot-96.webp", import.meta.url)}" alt="" width="28" height="28" decoding="async">`;
 
 document.head.append(el("style", {}, css));
 const launch = el("button", { type: "button", class: "bp-bot-launch", "aria-expanded": "false", "aria-controls": "bp-bot" },
